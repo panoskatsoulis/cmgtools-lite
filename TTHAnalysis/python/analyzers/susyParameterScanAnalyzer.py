@@ -146,6 +146,10 @@ class susyParameterScanAnalyzer( Analyzer ):
             if len(masses) >= 3: event.genSusyMScan3 = masses[2]
             if len(masses) >= 4: event.genSusyMScan4 = masses[3]
 
+        if 'MSSM-higgsino' in lheprod:
+            event.genSusyMScan1 = int(lheprod.split('_')[1])
+            event.genSusyMScan2 = int(lheprod.split('_')[2])
+
     def process(self, event):
         # if not MC, nothing to do
         if not self.cfg_comp.isMC: 
