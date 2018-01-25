@@ -354,8 +354,10 @@ else:
     susyCounter.SMS_varying_masses += ['genSusyMScan1', 'genSusyMScan2', 'genSusyMScan3', 'genSusyMScan4']
     #susyCounter.SMS_mass_1 = 'genSusyMChargino' ##ForTChiWZ
     #susyCounter.SMS_mass_2 = 'genSusyMNeutralino' ##ForTChiWZ
-    susyCounter.SMS_mass_1 = 'genSusyMNeutralino2' ##ForSMS_N2C1/SMS_N2N1 also left for pMSSM
-    susyCounter.SMS_mass_2 = 'genSusyMNeutralino' ##ForSMS_N2C1/SMS_N2N1 also left for pMSSM
+    susyCounter.SMS_mass_1 = 'genSusyMNeutralino2' ##ForSMS_N2C1/SMS_N2N1
+    susyCounter.SMS_mass_2 = 'genSusyMNeutralino' ##ForSMS_N2C1/SMS_N2N1
+    #susyCounter.SMS_mass_1 = 'genSusyMScan1' ##For higgsino pMSSM
+    #susyCounter.SMS_mass_2 = 'genSusyMScan2' ##For higgsino pMSSM
     #susyCounter.SMS_mass_1 = 'genSusyMStop' ##ForT2tt
     #susyCounter.SMS_mass_2 = 'genSusyMNeutralino' ##ForT2tt
     susyCoreSequence.insert(susyCoreSequence.index(susyScanAna)+1,susyCounter)
