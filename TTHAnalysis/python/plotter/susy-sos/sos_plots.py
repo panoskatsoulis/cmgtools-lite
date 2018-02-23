@@ -31,7 +31,7 @@ def base(selection):
     #Freezing
     #CORE="-P /data1/botta/trees_SOS_010217 --Fs {P}/0_both3dlooseClean_v1 --FMCs {P}/0_eventBTagWeight_v1 --mcc susy-sos/lepchoice-recleaner.txt"
     #Pre-approval
-    CORE="-P /data1/botta/trees_SOS_010217 --Fs {P}/0_both3dlooseClean_v2 --FMCs {P}/0_eventBTagWeight_v2 --mcc susy-sos/lepchoice-recleaner.txt"
+    CORE="-P /data1/peruzzi/trees_SOS_110917_noVtx --Fs {P}/0_both3dlooseClean_v2 --FMCs {P}/0_eventBTagWeight_v2 --mcc susy-sos/lepchoice-recleaner.txt"
     CORE+=" -j 8 -f -l 35.9 --s2v --tree treeProducerSusyMultilepton --mcc susy-sos/mcc-sf1.txt --neg" #--mcc susy-sos/2los_triggerdefs.txt #12.9 - 35.9 - 18.1
     if dowhat == "plots": CORE+=" --lspam 'CMS Preliminary' --legendWidth 0.14 --legendFontSize 0.04"
     GO = ""
@@ -42,17 +42,18 @@ def base(selection):
         #GO="%s -L susy-sos/functionsSOS.cc -L susy-sos/lepton_trigger_SF.cc -W 'leptonSF_SOS(LepGood1_pdgId,LepGood1_pt,LepGood1_eta,0)*leptonSF_SOS(LepGood2_pdgId,LepGood2_pt,LepGood2_eta,0)*triggerSF_SOS(met_pt,metmm_pt(LepGood1_pdgId,LepGood1_pt,LepGood1_phi,LepGood2_pdgId,LepGood2_pt,LepGood2_phi,met_pt,met_phi),0)*puw2016_nTrueInt_13fb(nTrueInt)*eventBTagSF'"%GO 
         #Freezing MORIOND17 (trigger SF and recoMu/Ele just 1)
         GO="%s -L susy-sos/functionsSOS.cc -L susy-sos/lepton_trigger_SF.cc -W 'triggerSF_SOS(LepGood1_pt,LepGood1_eta,LepGood2_pt,LepGood2_eta,met_pt,metmm_pt(LepGood1_pdgId,LepGood1_pt,LepGood1_phi,LepGood2_pdgId,LepGood2_pt,LepGood2_phi,met_pt,met_phi),0)*leptonSF_SOS(LepGood1_pdgId,LepGood1_pt,LepGood1_eta,0)*leptonSF_SOS(LepGood2_pdgId,LepGood2_pt,LepGood2_eta,0)*puw2016_nTrueInt_36fb(nTrueInt)*bTagWeight'"%GO #getPUW(nTrueInt)
+        
         #FSR MORIOND17
         #GO="%s -L susy-sos/functionsSOS.cc -L susy-sos/lepton_trigger_SF.cc -W 'triggerSF_SOS(met_pt,metmm_pt(LepGood1_pdgId,LepGood1_pt,LepGood1_phi,LepGood2_pdgId,LepGood2_pt,LepGood2_phi,met_pt,met_phi),0)*puw2016_nTrueInt_36fb(nTrueInt)'"%GO #getPUW(nTrueInt)
         #FSR MORIOND17 - ICHEP DATA
         #GO="%s -L susy-sos/functionsSOS.cc -L susy-sos/lepton_trigger_SF.cc -W 'triggerSF_SOS(met_pt,metmm_pt(LepGood1_pdgId,LepGood1_pt,LepGood1_phi,LepGood2_pdgId,LepGood2_pt,LepGood2_phi,met_pt,met_phi),0)*puw2016_nTrueInt_13fb(nTrueInt)'"%GO 
         if dowhat == "plots": GO+=" susy-sos/2los_plots.txt"     
     elif selection=='3l':    
-        if (dowhat != "limits") : GO="susy-sos/mca-3l-test2-mc.txt susy-sos/3l_tight.txt " 
+        if (dowhat != "limits") : GO="susy-sos/mca-3l-test2-mc.txt susy-sos/3l_tight.txt" 
         GO="%s %s"%(CORE,GO) 
         #GO="%s -L susy-sos/functionsSOS.cc -W 'puw2016_nTrueInt_36fb(nTrueInt)*bTagWeight'"%GO 
         GO="%s -L susy-sos/functionsSOS.cc -L susy-sos/lepton_trigger_SF.cc -W 'leptonSF_SOS(LepGood1_pdgId,LepGood1_pt,LepGood1_eta,0)*leptonSF_SOS(LepGood2_pdgId,LepGood2_pt,LepGood2_eta,0)*leptonSF_SOS(LepGood3_pdgId,LepGood3_pt,LepGood3_eta,0)*triggerSF_3l(LepGood1_pt,LepGood1_eta, LepGood2_pt, LepGood2_eta, LepGood3_pt, LepGood3_eta, met_pt, metmmm_pt(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi,LepGood3_pt,LepGood3_phi, met_pt, met_phi, lepton_Id_selection(LepGood1_pdgId, LepGood2_pdgId, LepGood3_pdgId)), lepton_permut( LepGood1_pdgId, LepGood2_pdgId, LepGood3_pdgId))*puw2016_nTrueInt_36fb(nTrueInt)*bTagWeight'"%GO 
-        if dowhat == "plots": GO+=" susy-sos/3l_plots.txt"     
+        if dowhat == "plots": GO+=" susy-sos/3l_plots.txt"      
     else:
         raise RuntimeError, 'Unknown selection'
 
@@ -61,7 +62,7 @@ def base(selection):
 def procs(GO,mylist):
     return GO+' '+" ".join([ '-p %s'%l for l in mylist ])
 def sigprocs(GO,mylist):
-    return procs(GO,mylist)+' --showIndivSigs --noStackSig'
+    return procs(GO,mylist)+' --showIndivSigs --noStackSig '
 def runIt(GO,name,plots=[],noplots=[]):
     if '_74vs76' in name: GO = prep74vs76(GO)
     if   dowhat == "plots":  print 'python mcPlots.py',"--pdir %s/%s"%(ODIR,name),GO,' '.join(['--sP %s'%p for p in plots]),' '.join(['--xP %s'%p for p in noplots]),' '.join(sys.argv[3:])
@@ -171,40 +172,49 @@ if __name__ == '__main__':
                     runIt(x,'%s/all'%torun,['SR_bins_stop']) 
                 if '_Vars' in torun: 
                     runIt(x,'%s/all'%torun,[],['SR_bins_EWKino','SR_bins_stop'])    
+
+
+
+
     if '3l_SR_' in torun:
         x = base('3l')  
         if(dowhat != "limits"): x = add(x,"--perBin")   
         if '_mc' in torun: 
-            if(dowhat != "limits"):x = add(x,"--noStackSig --showIndivSigs ") 
+            if(dowhat != "limits"):x = add(x," --noStackSig --showIndivSigs") 
         if '_ddbkg' in torun: 
             if(dowhat != "limits"):x = add(x,"--noStackSig --showIndivSigs ") #--showMCError
-            x = x.replace('mca-3l-test2-mc.txt','mca-3l-test2-mc-frmc.txt') #Moriond trees
+            x = x.replace('mca-3l-test2-mc.txt','mca-3l-test2-mc-frdata.txt') #Moriond trees
             PLOTandCUTS="susy-sos/mca-3l-test2-mc-frmc_FastSimTChiWZ.txt susy-sos/3l_tight.txt" #Moriond trees scan  
             #PLOTandCUTS="susy-sos/mca-3l-test2-mc-frmc.txt susy-sos/3l_tight.txt" #Moriond trees   
-        if '_met75' in torun: 
+        if '_appl' in torun:
+            if(dowhat != "limits"):x = add(x,"--noStackSig --showIndivSigs") 
+            x = x.replace('mca-3l-test2-mc.txt','mca-3l-test2-mcdata.txt') #Moriond trees
+            if '_inclFakes' in torun: x = add(x," -I ^TT") 
+            if '_doubleFakes' in torun: x= add(x, "-X ^TT -E ^doubleFakes")
+       if '_met75' in torun: 
             x = x.replace('-l 35.9','-l 16.2') 
             x = add(x," -X ^triggerAll -E ^triggerTripleMu -E ^pt5subleps ")
-            if '_lowPt' in torun:
+           if '_lowPt' in torun:
                 x = add(x," -E ^lowpt3l ")
             if '_highPt' in torun:
                 x = add(x," -E ^highpt3l ")
             if dowhat == "limits":
                 runIt(x,torun,["minMllSFOS"],["'[4,10,20,30,50]'"])
             else: 
-                if'_bins' in torun: 
-                    runIt(x,'%s/all'%torun,['SR_bins_3l'])
+                if'_bins' in torun:     
+                    runIt(x,'%s/all'%torun,[ 'SR_bins_3l'])                 
         if '_met125' in torun: 
             x = x.replace('-l 35.9','-l 33.2') 
-            x = add(x," -X ^mumumu -X ^lowMET -X minAFAS -E ^mml -E ^mediumMET -X ^triggerAll -E ^triggerDoubleMuMET  -E ^pt5subleps")
-            if '_lowPt' in torun:
+            x = add(x,"-X ^mumumu -X ^lowMET -X ^minAFAS -E ^mml -E ^mediumMET -X ^triggerAll -E ^triggerDoubleMuMET -E ^pt5subleps")
+           if '_lowPt' in torun:
                 x = add(x," -E ^lowpt3l ")
             if '_highPt' in torun:
                 x = add(x," -E ^highpt3l ")
             if dowhat == "limits":
                 runIt(x,torun,["minMllSFOS"],["'[4,10,20,30,50]'"])
             else: 
-                if'_bins' in torun: 
-                    runIt(x,'%s/all'%torun,['SR_bins_3l'])
+                if'_bins' in torun:
+                     runIt(x, '%s/all'%torun,['SR_bins_3l'])                    
         if '_met200' in torun:     
             x = add(x," -X ^mumumu -X ^lowMET -X minAFAS -E ^highMET -X ^triggerAll -E ^triggerMET ")
             if dowhat == "limits":
@@ -212,6 +222,9 @@ if __name__ == '__main__':
             else: 
                 if'_bins' in torun: 
                     runIt(x,'%s/all'%torun,['SR_bins_3l'])
+        if '_inclmet' in torun:
+            x = add(x," -X ^lowMET -X ^mumumu -X ^minAFAS -E ^inclMET -X ^triggerAll  -E ^AR_lep_req_inclusive_MET ")
+            runIt(x,'%s/all'%torun,['Ht_MET', 'HtGen_Ht_3lep_sig', 'HtGen_Ht_3lep_bkg', "HtGen", "HtOff"])
 
 
     ### DY Control Region Data-MC, LowMET and HighMET              
@@ -283,8 +296,8 @@ if __name__ == '__main__':
             runIt(x,torun,["nLepGood"],["1,-0.5,0.5"])
         else:
             runIt(x,'%s/all'%torun,[],['SR_bins_EWKino','SR_bins_stop'])
-
                 
+
 
 
     ### SS Stop-like Control Region (high MET)
@@ -334,10 +347,6 @@ if __name__ == '__main__':
             x = x.replace('-l 18.1','-l 15.3') 
         runIt(x,'%s/all'%torun,[],['SR_bins_EWKino','SR_bins_stop'])            
 
-
-
-
-    ### FR WJets closure
     if '2los_FR_Closure_vars' in torun:
         x = base('2los')
         x = add(x,"--plotmode nostack --sp WJets --plotmode norm")
@@ -345,8 +354,26 @@ if __name__ == '__main__':
         x = add(x," --showRatio --maxRatioRange 0 4 --ratioDen QCDFR_WJets --ratioNums WJets") #-X lowMET -X HT -X METovHT
         runIt(x,'%s/all'%torun)
 
+    ### WZ Control Region 3l
+    if '3l_CR_WZ_2016data' in torun:
+        x = base('3l')
+        x = add(x, "plotmode --noStack --showRatio")
+        x = x.replace('mca-3l-test2-mc.txt','mca-3l-test2-mcdata.txt')
+        if '_met75' in torun:
+            x= add(x,"-X ^triggerAll -X ^ledlepPt -X ^sublepPt -X ^trilepPt -X ^ZvetoTrigger -X ^TT -X ^mumumu -X ^minAFAS -X ^minMll -E ^WZ_CR_triggerDoubleMu -E ^WZ_CR_minMll -E ^mu20mu10lepton -E ^CRttTT") 
+            runIt(x,'%s/all'%torun,['SR_bins_3l'])
+        if '_met125' in torun:
+            x = add(x, "-X ^triggerAll -X ^ZvetoTrigger -X ^ledlepPt -X ^sublepPt -X ^trilepPt -X ^mumumu -X ^minAFAS -X ^minMll -X ^TT -X ^lowMET -E ^WZ_CR_triggerDoubleMu -E ^WZ_CR_minMll -E ^mediumMET -E ^mu20mu10lepton -E ^CRttTT")
+            runIt(x,'%s/all'%torun,['SR_bins_3l'])
+        if '_met200' in torun:
+            x = add(x, "-X ^triggerAll -X ^ZvetoTrigger -X ^ledlepPt -X ^sublepPt -X ^trilepPt -X ^mumumu -X ^lowMET -X ^minAFAS -X ^minMll -X ^TT -E ^triggerMET -E ^WZ_CR_minMll -E ^highMET -E ^3leptons -E ^CRttTT")
+            runIt(x,'%s/all'%torun,['SR_bins_3l']) 
+        if '_inclusiveMET' in torun:
+            x = add(x, "-X ^triggerAll -X ^ZvetoTrigger -X ^ledlepPt -X ^sublepPt -X ^trilepPt -X ^mumumu -X ^lowMET -X ^minAFAS -X ^minMll -X ^TT -E ^WZ_CR_minMll -E ^CR_lep_req_inclusive_MET -E ^CRttTT -E ^inclMET ")
+            runIt(x,'%s/all'%torun,['SR_bins_3l']) 
 
-     ##################################
+
+     #################################
      ##################################
      ##################################
 
