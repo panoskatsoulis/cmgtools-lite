@@ -141,7 +141,7 @@ class bTagWeightAnalyzer():
        theHisto = [self.h_eff_b, self.h_eff_c, self.h_eff_l][flavor]
 
        return theHisto.GetBinContent(max(1, min(theHisto.GetNbinsX(), theHisto.GetXaxis().FindBin(pt      ))), \
-                                     max(1, min(theHisto.GetNbinsX(), theHisto.GetXaxis().FindBin(abs(eta)))))
+                                     max(1, min(theHisto.GetNbinsY(), theHisto.GetYaxis().FindBin(abs(eta)))))
        
 
     ## getSF
