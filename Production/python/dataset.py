@@ -22,8 +22,8 @@ def _dasPopen(dbs, verbose=True):
     #--- this below fails also locally, so it's off for the moment; to be improved ---
     #if 'GLOBUS_GRAM_JOB_CONTACT':
     #    raise RuntimeError, "Trying to do a DAS query while in a Grid job (env variable GLOBUS_GRAM_JOB_CONTACT defined)\nquery was: %s" % dbs
-    if 'X509_USER_PROXY' in os.environ:
-        dbs += " --key {0} --cert {0}".format(os.environ['X509_USER_PROXY'])
+    #if 'X509_USER_PROXY' in os.environ:
+    #    dbs += " --key {0} --cert {0}".format(os.environ['X509_USER_PROXY'])
     if verbose: print 'dbs\t: %s' % dbs
     return os.popen(dbs)
 
@@ -152,7 +152,8 @@ class CMSDataset( BaseDataset ):
             else:
                 print "WARNING: queries with run ranges are slow in DAS"
                 query += "   run between [%s,%s]" % ( run_range[0],run_range[1] )
-        dbs='das_client.py --query="file %s=%s"'%(qwhat,query)
+        #dbs='das_client.py --query="file %s=%s"'%(qwhat,query)
+        dbs='dasgoclient --query="file %s=%s"'%(qwhat,query)
         if begin >= 0:
             dbs += ' --index %d' % begin
         if end >= 0:
@@ -239,7 +240,8 @@ class CMSDataset( BaseDataset ):
             else:
                 print "WARNING: queries with run ranges are slow in DAS"
                 query = "%s run between [%d, %d]" % (query,runmin if runmin > 0 else 1, runmax if runmax > 0 else 999999)
-        dbs='das_client.py --query="summary %s=%s"'%(qwhat,query)
+        #dbs='das_client.py --query="summary %s=%s"'%(qwhat,query)
+        dbs='dasgoclient --query="summary %s=%s"'%(qwhat,query)
         dbsOut = _dasPopen(dbs).readlines()
 
         events = []
@@ -247,6 +249,14 @@ class CMSDataset( BaseDataset ):
         lumis = []
         for line in dbsOut:
             line = line.replace('\n','')
+            trythis = eval(line)[0]
+            events.append(int(trythis["nevents"]))
+            files .append(int(trythis["nfiles"]))
+            lumis .append(int(trythis["nlumis"]))
+            continue
+            print line
+            print line.split(":")
+            print trythis
             if "nevents" in line:
                 events.append(int(line.split(":")[1]))
             if "nfiles" in line:
@@ -397,9 +407,11 @@ class PrivateDataset ( BaseDataset ):
     def buildListOfFilesDBS(self, name, dbsInstance):
         entries = self.findPrimaryDatasetNumFiles(name, dbsInstance, -1, -1)
         files = []
-        dbs = 'das_client.py --query="file dataset=%s instance=prod/%s" --limit=%s' % (name, dbsInstance, entries)
+        #dbs = 'das_client.py --query="file dataset=%s instance=prod/%s" --limit=%s' % (name, dbsInstance, entries)
+        dbs = 'dasgoclient --query="file dataset=%s instance=prod/%s" --limit=%s' % (name, dbsInstance, entries)
         dbsOut = _dasPopen(dbs)
         for line in dbsOut:
+            print line
             if line.find('/store')==-1:
                 continue
             line = line.rstrip()
@@ -423,12 +435,16 @@ class PrivateDataset ( BaseDataset ):
             else:
                 print "WARNING: queries with run ranges are slow in DAS"
                 query = "%s run between [%d, %d]" % (query,runmin if runmin > 0 else 1, runmax if runmax > 0 else 999999)
-        dbs='das_client.py --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
+        #dbs='das_client.py --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
+        dbs='dasgoclient --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
         dbsOut = _dasPopen(dbs).readlines()
 
         entries = []
         for line in dbsOut:
             line = line.replace('\n','')
+            trythis = eval(line)[0]
+            entries.append(int(trythis["nevents"]))
+            continue
             if "nevents" in line:
                 entries.append(int(line.split(":")[1]))
         if entries:
@@ -447,12 +463,16 @@ class PrivateDataset ( BaseDataset ):
             else:
                 print "WARNING: queries with run ranges are slow in DAS"
                 query = "%s run between [%d, %d]" % (query,runmin if runmin > 0 else 1, runmax if runmax > 0 else 999999)
-        dbs='das_client.py --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
+        #dbs='das_client.py --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
+        dbs='dasgoclient --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
         dbsOut = _dasPopen(dbs).readlines()
         
         entries = []
         for line in dbsOut:
             line = line.replace('\n','')
+            trythis = eval(line)[0]
+            entries.append(int(trythis["nfiles"]))
+            continue
             if "nfiles" in line:
                 entries.append(int(line.split(":")[1]))
         if entries:
