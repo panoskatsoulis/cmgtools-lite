@@ -48,6 +48,7 @@ class SOSLepCleanerIP3D:
         self.branches += [ ("m3lSel"+self.label, "F") ]
         self.branches += [ ("mZ1Sel"+self.label, "F") ]
         self.branches += [ ("minMllSFOSSel"+self.label, "F") ]
+        self.branches += [ ("maxMllSFOSSel"+self.label, "F") ]
         
         if "/functions_cc.so" not in ROOT.gSystem.GetLibraries(): 
             ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/functions.cc+" % os.environ['CMSSW_BASE']);
@@ -96,6 +97,7 @@ class SOSLepCleanerIP3D:
                                      pt(LepSel[2]),eta(LepSel[2]),phi(LepSel[2]),mass(LepSel[2]))            
         ret['mZ1Sel'] = bestZ1TL(lepsSel, lepsSel)
         ret['minMllSFOSSel'] = minMllTL(lepsSel, lepsSel, paircut = lambda l1,l2 : l1.pdgId == -l2.pdgId)     
+        ret['maxMllSFOSSel'] = maxMllTL(lepsSel, lepsSel, paircut = lambda l1,l2 : l1.pdgId == -l2.pdgId)     
         return ret
 
 
@@ -130,7 +132,7 @@ class SOSLepCleanerIP:
         for iL in xrange(self.nLepGood.Get()[0]):
             if abs(dxy(iL)) < 0.01 and abs(dz(iL)) < 0.01 and sip(iL) < 8 and csv(iL) < 0.46:
                 LepSel.append(iL)
-                if len(LepSel) == 2: break
+                if len(LepSel) == 3: break
         ret = { 'nLepSel'+self.label : len(LepSel),
                 'iLepSel'+self.label : LepSel }
         if len(LepSel) >= 2:
@@ -147,9 +149,10 @@ class SOSJetCleaner:
         for postfix in "", "_jecUp", "_jecDown":
             self.branches +=  [ ("nJetSel"+self.label+postfix, "I") ]
             self.branches += [ ("iJSel"+self.label+postfix, "I", 20, "nJetSel"+self.label+postfix) ]
-            self.branches += [ ("JetSel"+self.label+postfix+"_"+V, "F", 20, "nJetSel"+self.label+postfix) for V in ["pt"]+self.floats]
+            self.branches += [ ("JetSel"+self.label+postfix+"_"+V, "F", 20, "nJetSel"+self.label+postfix) for V in ["pt","eta","phi"]+self.floats]
             self.branches += [ ("JetSel"+self.label+postfix+"_"+V, "I", 20, "nJetSel"+self.label+postfix) for V in ["id"]+self.ints]
             self.branches += [ ("htJet25Sel"+self.label+postfix, "F") ]
+            self.branches += [ ("mhtJet25Sel"+self.label+postfix, "F") ]
             self.branches += [ (("nBJet%s%dSel"%(W,P))+self.label+postfix, "I") for W in ("Loose","Medium") for P in (25,40)]
         self.leptons = leptons
         self.lepPtCut = lepPtCut
@@ -162,7 +165,14 @@ class SOSJetCleaner:
         for postfix in "", "_jecUp", "_jecDown":
             for J in "Jet"+postfix,"DiscJet"+postfix:
                 for B in "n"+J,: setattr(self, B, tree.valueReader(B))
-                for B in "pt", "eta", "phi","btagCSV","id": setattr(self,J+"_"+B, tree.arrayReader(J+"_"+B))
+                for B in "pt", "eta", "phi","btagCSV","id", "mass": setattr(self,J+"_"+B, tree.arrayReader(J+"_"+B))
+    def negSumP4Pt(self, jets):
+        sumvec = ROOT.TLorentzVector()
+        for jet in jets:
+            this = ROOT.TLorentzVector()
+            this.SetPtEtaPhiM(jet[0], jet[1], jet[2], jet[7])
+            sumvec -= this
+        return sumvec.Pt()
     def __call__(self,event):
         ## Init
         if event._tree._ttreereaderversion > self._ttreereaderversion: 
@@ -180,9 +190,10 @@ class SOSJetCleaner:
                 phi = getattr(self, J+"_phi").At
                 jid = getattr(self, J+"_id").At
                 btag = getattr(self, J+"_btagCSV").At
+                mass = getattr(self, J+"_mass").At
                 copys = [ getattr(self, J+"_"+V).At for V in self.ints + self.floats ]
                 for iJ in xrange(nJ):
-                    jets.append( (pt(iJ),eta(iJ),phi(iJ),jid(iJ),btag(iJ),(-iJ-1 if J=="DiscJet" else iJ),[c(iJ) for c in copys]) )
+                    jets.append( (pt(iJ),eta(iJ),phi(iJ),jid(iJ),btag(iJ),(-iJ-1 if "DiscJet" in J else iJ),[c(iJ) for c in copys], mass(iJ)) )
             badjets = []
             for (lpt,leta,lphi) in leps:
                 if lpt <= self.lepPtCut: continue
@@ -195,11 +206,14 @@ class SOSJetCleaner:
 
             ret["nJetSel"+self.label+postfix] = len(jets) 
             ret["htJet25Sel"+self.label+postfix] = sum(l[0] for l in leps) + sum(J[0] for J in jets)
+            ret["mhtJet25Sel"+self.label+postfix] = self.negSumP4Pt(jets)
             ret["nBJetLoose25Sel"+self.label+postfix]  =  sum((J[4]>0.5426) for J in jets)
             ret["nBJetMedium25Sel"+self.label+postfix] =  sum((J[4]>0.8484) for J in jets)
             ret["nBJetLoose40Sel"+self.label+postfix]  =  sum((J[4]>0.5426 and J[0]>40) for J in jets)
             ret["nBJetMedium40Sel"+self.label+postfix] =  sum((J[4]>0.8484 and J[0]>40) for J in jets)
             ret["JetSel"+self.label+postfix+"_pt"] = [ J[0] for J in jets ]
+            ret["JetSel"+self.label+postfix+"_eta"] = [ J[1] for J in jets ]
+            ret["JetSel"+self.label+postfix+"_phi"] = [ J[2] for J in jets ]
             ret["JetSel"+self.label+postfix+"_id"] = [ J[3] for J in jets ]
             ret["iJSel"+self.label+postfix] = [ J[5] for J in jets]
             for i,V in enumerate(self.ints+self.floats):
@@ -231,6 +245,13 @@ MODULES.append( ('bTagEventWeightFullSim'  , bTagEventWeightFullSim ))
 MODULES.append( ('bTagEventWeightFastSim'  , bTagEventWeightFastSim ))
 
 
+from CMGTools.TTHAnalysis.tools.bTagEventWeightsCSVFullShape import BTagEventWeightFriend
+MODULES.append( ('eventBTagWeight'  , lambda : BTagEventWeightFriend(csvfile=os.environ["CMSSW_BASE"]+"/src/CMGTools/TTHAnalysis/data/btag/CSVv2_Moriond17_B_H.csv",
+                                                                   recllabel="")))
+MODULES.append( ('eventBTagWeightFS', lambda : BTagEventWeightFriend(csvfile=os.environ["CMSSW_BASE"]+"/src/CMGTools/TTHAnalysis/data/btag/fastsim_csvv2_ttbar_26_1_2017_fixed.csv",
+                                                                   recllabel="",label='eventBTagSFFS')))
+
+
 def bestZ1TL(lepsl,lepst,cut=lambda lep:True):
       pairs = []
       for l1 in lepst:
@@ -259,3 +280,18 @@ def minMllTL(lepsl, lepst, bothcut=lambda lep:True, onecut=lambda lep:True, pair
         if len(pairs):
             return min(pairs)
         return -1
+
+def maxMllTL(lepsl, lepst, bothcut=lambda lep:True, onecut=lambda lep:True, paircut=lambda lep1,lep2:True):
+        pairs = []
+        for l1 in lepst:
+            if not bothcut(l1): continue
+            for l2 in lepsl:
+                if l2 == l1 or not bothcut(l2): continue
+                if not onecut(l1) and not onecut(l2): continue
+                if not paircut(l1,l2): continue
+                mll = (l1.p4() + l2.p4()).M()
+                pairs.append(mll)
+        if len(pairs):
+            return max(pairs)
+        return -1
+
