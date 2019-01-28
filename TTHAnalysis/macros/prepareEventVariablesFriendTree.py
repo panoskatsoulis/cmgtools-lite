@@ -115,31 +115,47 @@ if len(options.chunks) != 0 and len(options.datasets) != 1:
     exit()
 
 jobs = []
+print glob(args[0]+"/*")
 for D in glob(args[0]+"/*"):
+    print D
+    print os.path.basename(D)
+    if os.path.basename(D) in options.datasets: 
+        print "dataset found!"
     treename = options.tree
     fname    = "%s/%s/%s_tree.root" % (D,options.tree,options.tree)
     if (not os.path.exists(fname)) and (os.path.exists("%s/%s/tree.root" % (D,options.tree)) ):
+        print "tree is there"
         treename = "tree"
         fname    = "%s/%s/tree.root" % (D,options.tree)
 
     if (not os.path.exists(fname)) and (os.path.exists("%s/%s/tree.root.url" % (D,options.tree)) ):
+        print "tree.url is there"
         treename = "tree"
         fname    = "%s/%s/tree.root" % (D,options.tree)
         fname    = open(fname+".url","r").readline().strip()
 
     if os.path.exists(fname) or (os.path.exists("%s/%s/tree.root.url" % (D,options.tree))):
+        print "at short"
         short = os.path.basename(D)
         if options.datasets != []:
-            if short not in options.datasets: continue
+            if short not in options.datasets: 
+                print "short not in datasets"
+                print short
+                continue
+        print options.datasetMatches
         if options.datasetMatches != []:
             found = False
             for dm in  options.datasetMatches:
                 if re.match(dm,short): found = True
             if not found: continue
+        print "at data"
         data =  any(x in short for x in "DoubleMu DoubleEl DoubleEG MuEG MuonEG SingleMu SingleEl MET".split()) # FIXME
-        if not data: continue
+        print data
+##        if not data: continue
         f = ROOT.TFile.Open(fname)
+        print "open file"
         t = f.Get(treename)
+        print "get tree"
         if not t:
             print "Corrupted ",fname
             continue
@@ -288,6 +304,8 @@ def _runIt(myargs):
     print "==== %s starting (%d entries) ====" % (name, nev)
     booker = Booker(fout)
     modulesToRun = MODULES
+    print "modulesToRun ",modulesToRun
+    print "options.modules ",options.modules
     if options.modules != []:
         toRun = {}
         for m,v in MODULES:
@@ -295,6 +313,7 @@ def _runIt(myargs):
                 if re.match(pat,m):
                     toRun[m] = True
         modulesToRun = [ (m,v) for (m,v) in MODULES if m in toRun ]
+    print "modulesToRun ",modulesToRun        
     el = EventLoop([ VariableProducer(options.treeDir,booker,modulesToRun), ])
     el.loop([tb], eventRange=range)
     booker.done()

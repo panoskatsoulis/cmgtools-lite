@@ -9,6 +9,7 @@ class SOSLepCleaner:
         self.branches =  [ ("nLepSel"+self.label, "I") ]
         self.branches += [ ("iLepSel"+self.label, "I", 20, "nLepSel"+self.label) ]
         self.branches += [ ("m2lSel"+self.label, "F") ]
+        print "init branches ",self.branches
         if "/functions_cc.so" not in ROOT.gSystem.GetLibraries(): 
             ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/functions.cc+" % os.environ['CMSSW_BASE']);
         self.m2l = ROOT.mass_2
@@ -49,7 +50,7 @@ class SOSLepCleanerIP3D:
         self.branches += [ ("mZ1Sel"+self.label, "F") ]
         self.branches += [ ("minMllSFOSSel"+self.label, "F") ]
         self.branches += [ ("maxMllSFOSSel"+self.label, "F") ]
-        
+        print "init branches ",self.branches        
         if "/functions_cc.so" not in ROOT.gSystem.GetLibraries(): 
             ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/functions.cc+" % os.environ['CMSSW_BASE']);
         self.m2l = ROOT.mass_2
