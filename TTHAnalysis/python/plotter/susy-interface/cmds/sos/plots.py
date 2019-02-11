@@ -5,17 +5,22 @@ today = datetime.datetime.now().strftime("%Y-%m-%d")
 
 ## == configuration =================================
 
-tag  = "fullstatusFix"
+tag  = "massivePlottingTest"
 
 pfx  = ""
 #####pfx  = "_sc"
 
-add  = ""
+#add = ""
+#add = "--RP=/eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217"
+add  = "--RP=/eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217 -F sf/t /eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_both3dlooseClean_v2/evVarFriend_{cname}.root --FMC sf/t /eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_eventBTagWeight_v2/evVarFriend_{cname}.root"
 #add  = "--SP era2017"
 #add = "--sP jetEta --sP nJet25Eta1p0 --sP nJet25Eta1p4 --sP nJet25Eta2p0"
 #add  = "--sP yields --sP SR_.*"
 #add  = "--sP lep1.*"
 #add  = "--sP SR_2l_col_fine"
+
+extra_Maker_stuff = ""
+#extra_Maker_stuff = " --srfriends=/eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_both3dlooseClean_v2/evVarFriend_{cname}.root --smcfriends=/eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_eventBTagWeight_v2/evVarFriend_{cname}.root"
 
 do = 0 ## only all plots
 #do = 1 ## only SR cards
@@ -29,13 +34,16 @@ model   = "TChiWZ"
 ## --------------------------------------------------
 
 treedirs = {
-            ###2016: "/data1/botta/trees_SOS_010217"  ,
-            2016: "/data1/cheidegg/trees_SOS_010217_skimmed",
-            2017: "/data1/peruzzi/trees_SOS_030518"         ,
+###            2016: "/data1/botta/trees_SOS_010217"  ,
+###            2016: "/afs/cern.ch/user/p/peruzzi/work/sostrees/trees_SOS_010217/;/afs/cern.ch/work/v/vtavolar/SusySOSSW_2/cleanTest/CMSSW_8_0_25/src/CMGTools/TTHAnalysis/python/plotter/",
+            2016: "/afs/cern.ch/user/p/peruzzi/work/sostrees/trees_SOS_010217/",
+##            2016: "/afs/cern.ch/user/v/vtavolar/SusySOS/cleanTest/CMSSW_8_0_25/src/CMGTools/TTHAnalysis/python/plotter/data1/botta/trees_SOS_010217/",
+
+#            2017: "/afs/cern.ch/user/v/vtavolar/SusySOS/cleanTest/CMSSW_8_0_25/src/CMGTools/TTHAnalysis/python/plotter/data1/peruzzi/trees_SOS_030518"         ,
            }
 
-plotdir  = "/afs/cern.ch/user/c/cheidegg/www/heppy"
-carddir  = "/afs/cern.ch/work/c/cheidegg/scratch"
+plotdir  = "/afs/cern.ch/user/k/kpanos/work/CMSSW_releases/analysis/CMSSW_8_0_32/src/sosplots/test"
+carddir  = "/afs/cern.ch/user/v/vtavolar/work/SusySOS/cards"
 
 scales = [
           #("_noSF", "--replInMccs mcc2016/mcc_sf_met125.txt:mcc_sf_met.txt --replInMccs mcc2016/mcc_sf_met200.txt:mcc_sf_met.txt --replInMccs mcc2017/mcc_sf_met125.txt:mcc_sf_met.txt --replInMccs mcc2017/mcc_sf_met200.txt:mcc_sf_met.txt"),
@@ -60,7 +68,7 @@ modes = {
          3: [
              #("SR"       , "data;prompt_.*;rares;fakes_appldata"       , None                          ),
              #("SRmc"     , "data;prompt_.*;rares;fakes_matched_.*"     , None                          ),
-             ("SRsemi"   , "data;prompt_.*;rares;fakes_applmcBoth"     , None                          ),
+	     #("SRsemi"   , "data;prompt_.*;rares;fakes_applmcBoth"     , None                          ),
              #("AR"       , "data;prompt_.*;rares;fakes_matched_.*"     , "-X threeTight -E oneNotTight"),
              #("AR1F"     , "data;prompt_.*;rares;fakes_matched_.*"     , "-X threeTight -E oneLNT"     ),
              #("AR2F"     , "data;prompt_.*;rares;fakes_matched_.*"     , "-X threeTight -E twoLNT"     ),
@@ -82,20 +90,20 @@ redlumi17 = 37.1
 fullumi17 = 41.4
 
 regions = [
-           ("sos2l16", "2lss16"      , fullumi16, "sig_T2tt_.*"), \
-           ("sos2l16", "2losEwkLow16", redlumi16, "sig_TChiWZ_.*"), \
+           #("sos2l16", "2lss16"      , fullumi16, "sig_T2tt_.*"), \
+           #("sos2l16", "2losEwkLow16", redlumi16, "sig_TChiWZ_.*"), \
            ("sos2l16", "2losEwkMed16", fullumi16, "sig_TChiWZ_.*"), \
            ("sos2l16", "2losEwkHig16", fullumi16, "sig_TChiWZ_.*"), \
-           ("sos2l16", "2losColLow16", redlumi16, "sig_T2tt_.*"), \
-           ("sos2l16", "2losColMed16", fullumi16, "sig_T2tt_.*"), \
-           ("sos2l16", "2losColHig16", fullumi16, "sig_T2tt_.*"), \
-           ####("sos3l16", "3lMin16"     , redlumi16, "sig_TChiWZ_.*"), \
-           ("sos3l16", "3lLow16"     , redlumi16, "sig_TChiWZ_.*"), \
-           ("sos3l16", "3lMed16"     , fullumi16, "sig_TChiWZ_.*"), \
-           #("sos2l16", "dyLow16"     , redlumi16, "sig_T2tt_.*"), \
-           #("sos2l16", "dyMed16"     , fullumi16, "sig_T2tt_.*"), \
-           #("sos2l16", "ttLow16"     , redlumi16, "sig_T2tt_.*"), \
-           #("sos2l16", "ttMed16"     , fullumi16, "sig_T2tt_.*"), \
+           #("sos2l16", "2losColLow16", redlumi16, "sig_T2tt_.*"), \
+           #("sos2l16", "2losColMed16", fullumi16, "sig_T2tt_.*"), \
+           #("sos2l16", "2losColHig16", fullumi16, "sig_T2tt_.*"), \
+           #("sos3l16", "3lMin16"     , redlumi16, "sig_TChiWZ_.*"), \
+           #("sos3l16", "3lLow16"     , redlumi16, "sig_TChiWZ_.*"), \
+           #("sos3l16", "3lMed16"     , fullumi16, "sig_TChiWZ_.*"), \
+           ("sos2l16", "dyLow16"     , redlumi16, "sig_T2tt_.*"), \
+           ("sos2l16", "dyMed16"     , fullumi16, "sig_T2tt_.*"), \
+           ("sos2l16", "ttLow16"     , redlumi16, "sig_T2tt_.*"), \
+           ("sos2l16", "ttMed16"     , fullumi16, "sig_T2tt_.*"), \
            #("sos2l16", "vvLow16"     , redlumi16, "sig_TChiWZ_.*"), \
            #("sos2l16", "vvMed16"     , fullumi16, "sig_TChiWZ_.*"), \
            #("sos3l16", "wzMin16"     , fullumi16, "sig_TChiWZ_.*"), \
@@ -143,7 +151,7 @@ if do == 0:
 				out    = plotdir+"/"+today+"_sos"+shyr+"_"+tag
 				procs  = "-p \""+mode[1]+";"+region[3]+"\"" if mode[1] else ""
 				flags  = mode[2]+" "+add if mode[2] else add
-				print plotbase.format(C=region[0], R=region[1], T=treedirs[year], O=out, L=region[2], S=mode[0]+scale[0]+pfx, F=flags, P=procs, A=scale[1], W="wBG")
+				print plotbase.format(C=region[0], R=region[1], T=treedirs[year], O=out, L=region[2], S=mode[0]+scale[0]+pfx, F=flags, P=procs, A=scale[1], W="wBG")+extra_Maker_stuff
 				print 
 
 
