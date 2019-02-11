@@ -6,9 +6,12 @@ BEGIN::sos2l16
   cutfile      := susy-sos-v1/2l/cuts_sos_2016.txt
   plotfile     := susy-sos-v1/2l/plots_sos.txt
   sysfile      := susy-sos-v1/systs_sos_2016.txt
-  sfriends    +:= 0_both3dlooseClean_v2
-  smcfriends  +:= 0_eventBTagWeight_v2
-  sfsfriends  +:= 0_eventBTagWeightFS_v1;0_eventShapeWeight_v2
+#  sfriends    +:= both3dloose
+#  sfriends    +:= 0_both3dlooseClean_v2
+#  srfriends    +:= 0_both3dlooseClean_v2
+#  smcfriends  +:= 0_eventBTagWeight_v2
+#  srmcfriends  +:= 0_eventBTagWeight_v2
+#  sfsfriends  +:= 0_eventBTagWeightFS_v1;0_eventShapeWeight_v2
   macros      +:= susy-sos-v1/functionsSOS.cc ; susy-sos-v1/functionsSF.cc ; susy-sos-v1/functionsPUW.cc
   alias       #:= {wBG : puw_nInt_Moriond(nTrueInt) * getLepSF(LepGood_pt[iLepSel[0] ], LepGood_eta[iLepSel[0] ], LepGood_pdgId[iLepSel[0] ]) * getLepSF(LepGood_pt[iLepSel[1] ], LepGood_eta[iLepSel[1] ], LepGood_pdgId[iLepSel[1] ]) * bTagWeight * triggerSFfullsim(LepGood_pt[iLepSel[0] ], LepGood_eta[iLepSel[0] ], LepGood_pt[iLepSel[1] ], LepGood_eta[iLepSel[1] ], met_pt, metmm_pt(LepGood_pdgId[iLepSel[0] ], LepGood_pt[iLepSel[0] ], LepGood_phi[iLepSel[0] ], LepGood_pdgId[iLepSel[1] ], LepGood_pt[iLepSel[1] ],LepGood_phi[iLepSel[1] ], met_pt, met_phi))}
   alias       #:= {wFS : getLepSFFS(LepGood_pt[iLepSel[0] ], LepGood_eta[iLepSel[0] ], LepGood_pdgId[iLepSel[0] ]) * getLepSFFS(LepGood_pt[iLepSel[1] ], LepGood_eta[iLepSel[1] ], LepGood_pdgId[iLepSel[1] ]) * ISREwkCor * bTagWeightFS * triggerEff(LepGood_pt[iLepSel[0] ], LepGood_eta[iLepSel[0] ], LepGood_pt[iLepSel[1] ],LepGood_eta[iLepSel[1] ], met_pt, metmm_pt(LepGood_pdgId[iLepSel[0] ], LepGood_pt[iLepSel[0] ], LepGood_phi[iLepSel[0] ], LepGood_pdgId[iLepSel[1] ], LepGood_pt[iLepSel[1] ], LepGood_phi[iLepSel[1] ], met_pt, met_phi)) }
