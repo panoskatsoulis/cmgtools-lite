@@ -5,7 +5,7 @@ from CMGTools.TTHAnalysis.plotter.projections import *
 from CMGTools.TTHAnalysis.plotter.figuresOfMerit import FOM_BY_NAME
 import pickle, re, random, time
 
-_T0 = long(ROOT.gSystem.Now())
+#_T0 = long(ROOT.gSystem.Now())
 
 ## These must be defined as standalone functions, to allow runing them in parallel
 def _runYields(args):
@@ -15,9 +15,9 @@ def _runYields(args):
 def _runPlot(args):
     key,tty,plotspec,cut,fsplit,closeTree = args
     timer = ROOT.TStopwatch()
-    print "Starting plot %s for %s, %s" % (plotspec.name,key,tty._cname)
+   # print "Starting plot %s for %s, %s" % (plotspec.name,key,tty._cname)
     ret = (key,tty.getPlot(plotspec,cut,fsplit=fsplit,closeTreeAfter=closeTree))
-    print "Done plot %s for %s, %s, fsplit %s in %s s, at %.2f; entries = %d, time/entry = %.3f ms" % (plotspec.name,key,tty._cname,fsplit,timer.RealTime(), 0.001*(long(ROOT.gSystem.Now()) - _T0), ret[1].GetEntries(), (long(ROOT.gSystem.Now()) - _T0)/float(ret[1].GetEntries()))
+   # print "Done plot %s for %s, %s, fsplit %s in %s s, at %.2f; entries = %d, time/entry = %.3f ms" % (plotspec.name,key,tty._cname,fsplit,timer.RealTime(), 0.001*(long(ROOT.gSystem.Now()) - _T0), ret[1].GetEntries(), (long(ROOT.gSystem.Now()) - _T0)/float(ret[1].GetEntries()))
     return ret
 
 def _runApplyCut(args):
