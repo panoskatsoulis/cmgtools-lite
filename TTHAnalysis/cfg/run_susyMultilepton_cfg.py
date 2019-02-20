@@ -403,6 +403,24 @@ if analysis=='SOS' and not runData:
     treeProducer.globalVariables.append(NTupleVariable("nISR", lambda ev: ev.nIsr, int, help="number of ISR jets according to SUSY recommendations"))
 
 
+# Add L1 Analyser for the emulating the Single Muon Trigger in the SOS context
+if analysis=='SOS':
+    from CMGTools.TTHAnalysis.analyzers.L1Analyzer import L1Analyzer
+    l1Analyzer = cfg.Analyzer(L1Analyzer, name='l1Analyzer')
+    ## add new l1 variables to the treeProducer
+    treeProducer.globalVariables.append(NTupleVariable("l1Muons", lambda ev: ev.L1muons, int, help="number of L1 muons"))
+    treeProducer.globalVariables.append(NTupleVariable("l1Jets", lambda ev: ev.L1jets, int, help="number of L1 jets"))
+    treeProducer.globalVariables.append(NTupleVariable("l1egs", lambda ev: ev.L1egs, int, help="number of L1 egs"))
+    treeProducer.globalVariables.append(NTupleVariable("l1_hiPtMuon_Pt", lambda ev: ev.L1muon[0].pt() if len(ev.L1muon) > 0 else None, float, help="L1 HighPt Muon Pt"))
+    treeProducer.globalVariables.append(NTupleVariable("l1_hiPtMuon_Eta", lambda ev: ev.L1muon[0].eta() if len(ev.L1muon) > 0 else None, float, help="L1 HighPt Muon Eta"))
+    treeProducer.globalVariables.append(NTupleVariable("l1_hiPtMuon_Phi", lambda ev: ev.L1muon[0].phi() if len(ev.L1muon) > 0 else None, float, help="L1 HighPt Muon Phi"))
+    treeProducer.globalVariables.append(NTupleVariable("l1_hiPtJet_Pt", lambda ev: ev.L1jet[0].pt() if len(ev.L1jet) > 0 else None, float, help="L1 HighPt Jet Pt"))
+    treeProducer.globalVariables.append(NTupleVariable("l1_hiPtJet_Eta", lambda ev: ev.L1jet[0].eta() if len(ev.L1jet) > 0 else None, float, help="L1 HighPt Jet Eta"))
+    treeProducer.globalVariables.append(NTupleVariable("l1_hiPtJet_Phi", lambda ev: ev.L1jet[0].phi() if len(ev.L1jet) > 0 else None, float, help="L1 HighPt Jet Phi"))
+    treeProducer.globalVariables.append(NTupleVariable("l1MET", lambda ev: ev.L1met, int, help="L1 MET"))
+    treeProducer.globalVariables.append(NTupleVariable("l1MET_phi", lambda ev: ev.L1met_phi, int, help="L1 MET phi"))
+
+
 #-------- SAMPLES AND TRIGGERS -----------
 
 
@@ -904,6 +922,7 @@ if selectedEvents!="":
 sequence = cfg.Sequence(susyCoreSequence+[
         ttHJetTauAna,
         ttHEventAna,
+        l1Analyzer,
         treeProducer,
     ])
 preprocessor = None
