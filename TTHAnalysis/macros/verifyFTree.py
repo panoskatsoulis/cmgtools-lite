@@ -30,7 +30,10 @@ for dset in dsets:
     n_t = t_t.GetEntries()
     f_t.Close()
     f_f = openRootOrUrl(sys.argv[2]+'/evVarFriend_'+dset+'.root')
-    t_f = f_f.Get("sf/t")
-    n_f = t_f.GetEntries()
+    try:
+        t_f = f_f.Get("sf/t")
+        n_f = t_f.GetEntries()
+    except Exception:
+        print '%s: %s'%(dset, 'ERROR '*15+' !!!')
     f_f.Close()
     print '%s: %d - %d : %s'%(dset,n_t,n_f,'OK' if n_t==n_f else 'ERROR '*15+' !!!')
