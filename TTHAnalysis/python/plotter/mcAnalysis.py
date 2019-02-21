@@ -15,9 +15,9 @@ def _runYields(args):
 def _runPlot(args):
     key,tty,plotspec,cut,fsplit,closeTree = args
     timer = ROOT.TStopwatch()
-    #print "Starting plot %s for %s, %s" % (plotspec.name,key,tty._cname)
+   # print "Starting plot %s for %s, %s" % (plotspec.name,key,tty._cname)
     ret = (key,tty.getPlot(plotspec,cut,fsplit=fsplit,closeTreeAfter=closeTree))
-    #print "Done plot %s for %s, %s, fsplit %s in %s s, at %.2f; entries = %d, time/entry = %.3f ms" % (plotspec.name,key,tty._cname,fsplit,timer.RealTime(), 0.001*(long(ROOT.gSystem.Now()) - _T0), ret[1].GetEntries(), (long(ROOT.gSystem.Now()) - _T0)/float(ret[1].GetEntries()))
+   # print "Done plot %s for %s, %s, fsplit %s in %s s, at %.2f; entries = %d, time/entry = %.3f ms" % (plotspec.name,key,tty._cname,fsplit,timer.RealTime(), 0.001*(long(ROOT.gSystem.Now()) - _T0), ret[1].GetEntries(), (long(ROOT.gSystem.Now()) - _T0)/float(ret[1].GetEntries()))
     return ret
 
 def _runApplyCut(args):
@@ -31,8 +31,6 @@ def _runGetEntries(args):
 
 class MCAnalysis:
     def __init__(self,samples,options):
-        print "mca samples ", samples
-        print "mca options ",options
         self._options = options
         self._allData     = {}
         self._data        = []
@@ -53,7 +51,6 @@ class MCAnalysis:
         self.readMca(samples,options)
 
     def readMca(self,samples,options):
-        print "samples mca ",samples
         for line in open(samples,'r'):
             if re.match("\s*#.*", line): continue
             line = re.sub(r"(?<!\\)#.*","",line)  ## regexp black magic: match a # only if not preceded by a \!
@@ -129,10 +126,7 @@ class MCAnalysis:
                 objname  = extra["ObjName"]  if "ObjName"  in extra else options.obj
 
                 basepath = None
-                print options.path
                 for treepath in options.path:
-                    print treepath
-                    print cname
                     if os.path.exists(treepath+"/"+cname):
                         basepath = treepath
                         break
@@ -141,7 +135,8 @@ class MCAnalysis:
 
                 rootfile = "%s/%s/%s/%s_tree.root" % (basepath, cname, treename, treename)
                 if options.remotePath:
-                    rootfile = "root:%s/%s/%s_tree.root" % (options.remotePath, cname, treename)
+                    rootfile = "root://eoscms.cern.ch/%s/%s_%s_tree.root" % (options.remotePath, cname, treename) ###this line has been modified localy - compatible only with SOS trees
+                    print("-----> "+rootfile)
                 elif os.path.exists(rootfile+".url"): #(not os.path.exists(rootfile)) and :
                     rootfile = open(rootfile+".url","r").readline().strip()
                 elif (not os.path.exists(rootfile)) and os.path.exists("%s/%s/%s/tree.root" % (basepath, cname, treename)):
@@ -153,10 +148,7 @@ class MCAnalysis:
                     rootfile = open(rootfile+".url","r").readline().strip()
                 pckfile = basepath+"/%s/skimAnalyzerCount/SkimReport.pck" % cname
 
-                tty = TreeToYield(rootfile, options, settings=extra, name=pname, cname=cname, objname=objname)
-#                print "tty ",tty
-                ttys.append(tty)
-                print "ttys ",ttys
+                tty = TreeToYield(rootfile, options, settings=extra, name=pname, cname=cname, objname=objname); ttys.append(tty)
                 if signal: 
                     self._signals.append(tty)
                     self._isSignal[pname] = True
@@ -527,9 +519,6 @@ class MCAnalysis:
         else:
             from multiprocessing import Pool
             pool = Pool(self._options.jobs)
-            print pool
-            print func
-            print self._options
             retlist = pool.map(func, tasks, 1)
             pool.close()
             pool.join()
