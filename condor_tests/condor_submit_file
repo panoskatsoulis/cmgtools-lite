@@ -1,0 +1,9 @@
+executable            = sosTrees_test.sh
+getenv		      = True
+arguments             = "2>&1"
+output                = output/hello.$(ClusterId).$(ProcId).out
+##error                 = error/hello.$(ClusterId).$(ProcId).err
+log                   = log/hello.$(ClusterId).$(ProcId).log
+##RequestCpus 	      = 4
+
+queue
