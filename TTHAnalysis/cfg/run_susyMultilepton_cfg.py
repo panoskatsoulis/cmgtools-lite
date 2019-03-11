@@ -442,10 +442,12 @@ if runSMS:
 
 #from CMGTools.RootTools.samples.samples_13TeV_RunIISpring16MiniAODv1 import *
 #from CMGTools.RootTools.samples.samples_13TeV_RunIISpring16MiniAODv2 import *
-from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import *
+from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import *
+#from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import *
 from CMGTools.RootTools.samples.samples_13TeV_signals import *
-from CMGTools.RootTools.samples.samples_13TeV_80X_susySignalsPriv import *
-from CMGTools.RootTools.samples.samples_13TeV_DATA2016 import *
+#from CMGTools.RootTools.samples.samples_13TeV_80X_susySignalsPriv import *
+#from CMGTools.RootTools.samples.samples_13TeV_DATA2016 import *
+from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import *
 from CMGTools.RootTools.samples.configTools import printSummary, configureSplittingFromTime, cropToLumi, prescaleComponents, insertEventSelector
 
 selectedComponents = [TTLep_pow]
