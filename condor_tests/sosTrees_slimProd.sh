@@ -38,10 +38,11 @@ echo "-----> JOB_ID = $JOB_ID"
 echo "-----> OUTPUT_PATH = $OUTPUT_PATH"
 
 echo "-----> configuring env and files"
-cd CMGTools/condor_tests && mkdir slimProd_treeProducersPerProcess
+cd CMGTools/condor_tests
+[ ! -d slimProd_treeProducersPerProcess ] && mkdir slimProd_treeProducersPerProcess
 #rm -rf test && mkdir test
 cp -a run_susySOS_cfg_slimProd.py slimProd_treeProducersPerProcess/run_susySOS_cfg_slimProd_${PROCESS}_${JOB_ID}.py
-sed -r -i "s@(^process = )\[.*\]@\1\[${PROCESS}\]@" slimProd_treeProducersPerProcess/run_susySOS_cfg_slimProd_${PROCESS}_${JOB_ID}.py || { echo "-----> [ERROR] sed command failed"; exit 3; }
+sed -r -i "s@(^process = ).*@\1${PROCESS}@" slimProd_treeProducersPerProcess/run_susySOS_cfg_slimProd_${PROCESS}_${JOB_ID}.py || { echo "-----> [ERROR] sed command failed"; exit 3; }
 
 echo "-----> delete previous trees if exist and run heppy"
 [ -d "$OUTPUT_PATH/$PROCESS" ] && rm -rf $OUTPUT_PATH/$PROCESS
