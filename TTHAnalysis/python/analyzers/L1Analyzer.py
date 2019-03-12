@@ -41,7 +41,6 @@ class L1Analyzer( Analyzer ):
     #---------------------------------------------
     def declareHandles(self):
         super(L1Analyzer, self).declareHandles()
-        print("-----> sample is "+self.cfg_ana.sample)
         self.handles['l1muons'] = AutoHandle( ('gmtStage2Digis','Muon'), 'BXVector<l1t::Muon>' )
         self.handles['l1jets'] = AutoHandle( ('caloStage2Digis','Jet'), 'BXVector<l1t::Jet>')
         self.handles['l1met'] = AutoHandle( ('caloStage2Digis','EtSum'), 'BXVector<l1t::EtSum>' )
@@ -54,7 +53,7 @@ class L1Analyzer( Analyzer ):
 
     def doLeptons(self,event):
         l1muons=self.handles['l1muons'].product()
-        fixBXVector(l1muons)
+        self.fixBXVector(l1muons)
         event.L1muons = l1muons.size(0)
         event.L1muon=[]
 
@@ -66,7 +65,7 @@ class L1Analyzer( Analyzer ):
 
     def doJets(self,event):
          l1jets=self.handles['l1jets'].product()
-         fixBXVector(l1jets)
+         self.fixBXVector(l1jets)
          event.L1jets = l1jets.size(0)
          event.L1jet=[]       
 
@@ -78,7 +77,7 @@ class L1Analyzer( Analyzer ):
 
     def doEG(self,event):
          l1egs=self.handles['l1eg'].product() 
-         fixBXVector(l1egs)
+         self.fixBXVector(l1egs)
          event.L1egs = l1egs.size(0)
          event.L1eg=[]
 
@@ -92,7 +91,7 @@ class L1Analyzer( Analyzer ):
         if not self.cfg_comp.isMC:
             return
         l1met_objs = self.handles['l1met'].product()
-        fixBXVector(l1met_objs)
+        self.fixBXVector(l1met_objs)
         event.L1met = -1
         event.L1met_phi = -999
 
