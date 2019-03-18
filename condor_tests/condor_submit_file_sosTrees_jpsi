@@ -1,0 +1,16 @@
+notification          = Complete
+notify_user	      = panos.katsoulis@cern.ch
+executable            = sosTrees_slimProd.sh
+getenv                = True
+arguments             = "$(process) $(ClusterId) $(ProcId) 2>&1"
+output                = output/hello.$(ClusterId).$(ProcId).out
+error                 = error/hello.$(ClusterId).$(ProcId).err
+log                   = log/hello.$(ClusterId).$(ProcId).log
+RequestCpus           = 8
+max_retries           = 3
+
++JobFlavour = "tomorrow"
+queue process from (
+  ZToJPsiMuMu
+  JPsiToMuMu
+)

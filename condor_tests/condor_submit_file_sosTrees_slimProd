@@ -1,0 +1,30 @@
+notification          = Complete
+notify_user	      = panos.katsoulis@cern.ch
+executable            = sosTrees_slimProd.sh
+getenv                = True
+arguments             = "$(process) $(ClusterId) $(ProcId) 2>&1"
+output                = output/hello.$(ClusterId).$(ProcId).out
+error                 = error/hello.$(ClusterId).$(ProcId).err
+log                   = log/hello.$(ClusterId).$(ProcId).log
+RequestCpus           = 4
+max_retries           = 3
+
++JobFlavour = "tomorrow"
+queue process from (
+#-----------------------scans (sig)
+  SMS_TChiWZ
+#-----------------------mainBkg
+  TTJets_DiLepton
+  TTJets_DiLepton_ext
+  TBar_tWch_ext
+  T_tWch_ext
+  DYJetsM5to50HT
+  DYJetsM50HT
+#-----------------------fakesBkg
+  TTJets_SingleLeptonFromTbar
+  TTJets_SingleLeptonFromT
+  WJetsToLNuHT
+#-----------------------mainBkgVV
+  VVTo2L2Nu
+  VVTo2L2Nu_ext
+)
