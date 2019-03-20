@@ -3,8 +3,8 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "Script to run remotely the tree producer."
     echo "Supports 2 execution environments '--local' and '--condor', otherwise it returns code 101."
     echo "~~~"
-    echo "remote usage: sosTrees_slimProd.sh --condor <process> <condor-job-id> <condor-proc> <output-path> <tree-producer-nosuffix>"
-    echo " local usage: sosTrees_slimProd.sh --local --process <process> --out-path <output-path> --tree-producer <tree-producer-nosuffix>"
+    echo "remote usage: sosTrees_slimProd.sh --condor <process> <condor-job-id> <condor-proc> <output-path> <tree-producer-nosuffix> <event-num>"
+    echo " local usage: sosTrees_slimProd.sh --local --process <process> --out-path <output-path> --tree-producer <tree-producer-nosuffix> --events <event-num>"
     echo "  -h, --help: prints this help message."
     echo "~~~"
     echo "Exit codes:"
@@ -25,6 +25,7 @@ if [ "$1" == "--local" ]; then
 	[ "$1" == "--process" ] && { PROCESS=$2; shift 2; }
 	[ "$1" == "--out-path" ] && { OUTPUT_TREE_PATH=$EOS_USER_PATH/${2}/$PROCESS; shift 2; }
 	[ "$1" == "--tree-producer" ] && { TREE_PRODUCER=$2; shift 2; }
+	[ "$1" == "--events" ] && { EVENTS=$2; shift 2; }
     done
 elif [ "$1" == "--condor" ]; then
     shift 1 #shift the "--condor" arg
@@ -33,6 +34,7 @@ elif [ "$1" == "--condor" ]; then
     JOB_ID="$2.$3"
     OUTPUT_TREE_PATH=$EOS_USER_PATH/${4}/$PROCESS
     TREE_PRODUCER=$5
+    EVENTS=$6
 else
     echo "-----> [ERROR] unknown execution environment $1"
     exit 101
@@ -84,8 +86,9 @@ echo "-----> delete previous trees if exist"
 [ -d "$OUTPUT_TREE_PATH" ] && rm -rf $OUTPUT_TREE_PATH
 
 echo "~~~~~"
+[ -z $EVENTS ] && { echo "-----> specific number of events has not been given as input, will run for 1000"; $EVENTS=1000; }
 echo "-----> will run the heppy tool with the tree producer $TREE_PRODUCER"
-HEPPY_COMMAND=$(heppy $OUTPUT_TREE_PATH ../slimProd_treeProducersPerProcess/${NEW_TREE_PRODUCER} -f -N 10000 -o analysis=SOS -j 8 > ../slimProd_treeProducersPerProcess/heppy.${PROCESS}_${JOB_ID}.out 2>&1)
+HEPPY_COMMAND=$(heppy $OUTPUT_TREE_PATH ../slimProd_treeProducersPerProcess/${NEW_TREE_PRODUCER} -f -N $EVENTS -o analysis=SOS -j 8 > ../slimProd_treeProducersPerProcess/heppy.${PROCESS}_${JOB_ID}.out 2>&1)
 $HEPPY_COMMAND || { echo "-----> [ERROR] heppy failure, would execute command:"; echo "$HEPPY_COMMAND"; exit 4; }
 echo "-----> heppy exited with code $?"
 
