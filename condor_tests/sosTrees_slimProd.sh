@@ -75,8 +75,9 @@ echo "-----> PROCESS = $PROCESS"
 echo "-----> JOB_ID = $JOB_ID"
 echo "-----> configuring env and files"
 cd CMGTools/condor_tests && mkdir slimProd_treeProducersPerProcess
-cp -a ${TREE_PRODUCER}.py slimProd_treeProducersPerProcess/${TREE_PRODUCER}_${PROCESS}_${JOB_ID}.py
-sed -r -i "s@(^selectedComponents.*)\[.*\]@\1\[${PROCESS}\]@" slimProd_treeProducersPerProcess/${TREE_PRODUCER}_${PROCESS}.${JOB_ID}.py || { echo "-----> [ERROR] sed command failed"; exit 3; }
+NEW_TREE_PRODUCER=${TREE_PRODUCER}_${PROCESS}.${JOB_ID}.py
+cp -a ${TREE_PRODUCER}.py slimProd_treeProducersPerProcess/${NEW_TREE_PRODUCER}
+sed -r -i "s@(^selectedComponents.*)\[.*\]@\1\[${PROCESS}\]@" slimProd_treeProducersPerProcess/${NEW_TREE_PRODUCER} || { echo "-----> [ERROR] sed command failed"; exit 3; }
 mkdir jobBase_${PROCESS}_${JOB_ID}
 cd jobBase_${PROCESS}_${JOB_ID}
 echo "-----> delete previous trees if exist"
@@ -84,8 +85,9 @@ echo "-----> delete previous trees if exist"
 
 echo "~~~~~"
 echo "-----> will run the heppy tool with the tree producer $TREE_PRODUCER"
-HEPPY_COMMAND=$(heppy $OUTPUT_TREE_PATH ../slimProd_treeProducersPerProcess/${TREE_PRODUCER}_${PROCESS}_${JOB_ID}.py -f -N 100000 -o test=2 -o analysis=SOS -j 8 > ../slimProd_treeProducersPerProcess/heppy.${PROCESS}_${JOB_ID}.out 2>&1)
+HEPPY_COMMAND=$(heppy $OUTPUT_TREE_PATH ../slimProd_treeProducersPerProcess/${NEW_TREE_PRODUCER} -f -N 10000 -o analysis=SOS -j 8 > ../slimProd_treeProducersPerProcess/heppy.${PROCESS}_${JOB_ID}.out 2>&1)
 $HEPPY_COMMAND || { echo "-----> [ERROR] heppy failure, would execute command:"; echo "$HEPPY_COMMAND"; exit 4; }
 echo "-----> heppy exited with code $?"
 
+cd - && rm -rf jobBase_${PROCESS}_${JOB_ID}
 exit 0
