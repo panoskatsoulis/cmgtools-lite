@@ -787,6 +787,7 @@ class PlotMaker:
                 #
                 stack = ROOT.THStack(pspec.name+"_stack",pspec.name)
                 hists = [v for k,v in pmap.iteritems() if k != 'data']
+                print "-----> hists: ", hists
                 total = hists[0].Clone(pspec.name+"_total"); total.Reset()
                 totalSyst = hists[0].Clone(pspec.name+"_totalSyst"); totalSyst.Reset()
                 if self._options.plotmode == "norm": 
@@ -1070,6 +1071,8 @@ class PlotMaker:
                 if self._options.printPlots:
                     for ext in self._options.printPlots.split(","):
                         fdir = printDir;
+                        print("-----> [DEBUG] printDir: "+fdir)
+                        print("-----> [DEBUG] printOpt: "+ext)
                         if not os.path.exists(fdir): 
                             os.makedirs(fdir); 
                             if os.path.exists("/afs/cern.ch"): os.system("cp /afs/cern.ch/user/g/gpetrucc/php/index.php "+fdir)
@@ -1172,6 +1175,9 @@ class PlotMaker:
                                         pmap["data"].Draw("P SAME")
                                         c1.Print("%s/%s_data_%s.%s" % (fdir, outputName, p, ext))
                             else:
+                                print "-----> total.Integral() = ", total.Integral()
+                                print "-----> self._options.emptyStack: ", self._options.emptyStack
+                                print "-----> self._options.plotmode: ", self._options.plotmode
                                 if total.Integral()>0 or self._options.emptyStack or not self._options.plotmode=="stack":
                                     c1.Print("%s/%s.%s" % (fdir, outputName, ext))
                                     c1.Print("%s/%s.root" % (fdir, outputName))
