@@ -1,0 +1,16 @@
+notification          = Complete
+notify_user	      = panos.katsoulis@cern.ch
+executable            = sosTrees_production.sh
+getenv                = True
+arguments             = "--condor $(process) $(ClusterId) $(ProcId) sostrees/test_80X run_susyMultilepton_cfg_jpsi_noMetCut 10000 2>&1"
+output                = output/hello.$(ClusterId).$(ProcId).out
+error                 = error/hello.$(ClusterId).$(ProcId).err
+log                   = log/hello.$(ClusterId).$(ProcId).log
+RequestCpus           = 8
+max_retries           = 3
+
++JobFlavour = "tomorrow"
+queue process from (
+  ZToJPsiMuMu
+  JPsiToMuMu
+)
