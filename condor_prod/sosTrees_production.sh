@@ -18,7 +18,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
 fi
 
 if [ "$1" == "--local" ]; then
-    shift 1 #shift the "--local" arg
+    EXE_ENV="local" && shift 1 #save and shift the "--local" arg
     CUSTOM_PS1=$PS1
     JOB_ID="local.test"
     while [ ! -z $1 ]; do
@@ -28,7 +28,7 @@ if [ "$1" == "--local" ]; then
 	[ "$1" == "--events" ] && { EVENTS=$2; shift 2; }
     done
 elif [ "$1" == "--condor" ]; then
-    shift 1 #shift the "--condor" arg
+    EXE_ENV="condor" && shift 1 #save and shift the "--condor" arg
     CUSTOM_PS1="[${USER}@$(hostname)]$"
     PROCESS=$1
     JOB_ID="$2.$3"
@@ -54,11 +54,16 @@ echo "~~~~~"
 echo "-----> setting up proxy and running voms-proxy-info..."
 if [ -e "/tmp/x509up_u${UID}" ]; then
     cp -a /tmp/x509up_u${UID} ${AFS_HOME}/.
+    voms-proxy-info
+elif [ "$EXE_ENV" == "condor" ]; then
+    CMS_PROXY_FILE=${AFS_HOME}/x509up_u${UID}
+    { [ -e $CMS_PROXY_FILE ] && voms-proxy-info --file $CMS_PROXY_FILE; } || {
+	echo "-----> [ERROR] Valid CMS proxy file not found. Execution environment is 'condor' and $CMS_PROXY_FILE doesn't exist"; }
 else
-    echo "-----> [ERROR] file /tmp/x509up_u${UID} doesn't exist"; exit 1
+    echo "-----> [ERROR] Valid CMS proxy file not found. Execution environment is 'local' and /tmp/x509up_u${UID} doesn't exist"
+    exit 1
 fi
 export X509_USER_PROXY=$AFS_HOME/x509up_u${UID}
-voms-proxy-info
 
 echo "~~~~~"
 echo "-----> setting up cmssw env..."
@@ -88,7 +93,7 @@ echo "-----> delete previous trees if exist"
 echo "~~~~~"
 [ -z $EVENTS ] && { echo "-----> specific number of events has not been given as input, will run for 1000"; $EVENTS=1000; }
 echo "-----> will run the heppy tool with the tree producer $TREE_PRODUCER"
-HEPPY_COMMAND=$(heppy $OUTPUT_TREE_PATH ../prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} -f -N $EVENTS -o analysis=SOS -j 8 > ../prod_treeProducersPerProcess/heppy.${PROCESS}_${JOB_ID}.out 2>&1)
+HEPPY_COMMAND=$(heppy $OUTPUT_TREE_PATH ../prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} -f -N $EVENTS -o analysis=SOS -j 4 > ../prod_treeProducersPerProcess/heppy.${PROCESS}_${JOB_ID}.out 2>&1)
 $HEPPY_COMMAND || { echo "-----> [ERROR] heppy failure, would execute command:"; echo "$HEPPY_COMMAND"; exit 4; }
 echo "-----> heppy exited with code $?"
 
