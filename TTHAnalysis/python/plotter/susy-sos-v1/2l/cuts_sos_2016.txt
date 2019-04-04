@@ -64,3 +64,9 @@ met250_trig : $FASTSIM{1} $DATA{HLT_HighMET16} $MC{HLT_HighMET16}               
 met300_met1 : met_pt > 300 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, met_pt, met_phi) > 300 ; Disable=True
 met300_trig : $FASTSIM{1} $DATA{HLT_HighMET16} $MC{HLT_HighMET16}                                                          ; Disable=True
 
+## MET binning (0,50) - (50,125) - (125,200) - (200,inf)
+MET_0_50       : met_pt < 50				; Disable=True
+MET_50_125     : met_pt > 50 && met_pt < 125		; Disable=True
+MET_125_200    : met_pt > 125 && met_pt < 200		; Disable=True
+MET_200_inf    : met_pt > 200 	 	  		; Disable=True
+
