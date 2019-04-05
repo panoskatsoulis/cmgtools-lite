@@ -472,7 +472,7 @@ from CMGTools.RootTools.samples.samples_13TeV_DATA2016 import *
 from CMGTools.RootTools.samples.samples_jpsi_80X import *
 from CMGTools.HToZZ4L.tools.configTools import printSummary, configureSplittingFromTime, cropToLumi, prescaleComponents, insertEventSelector
 
-selectedComponents = [TTLep_pow]
+selectedComponents = [JPsiToMuMu_OniaMuonFilter]
 print("-----> selectedComponents before if is type: "+type(selectedComponents).__name__)
 if type(selectedComponents[0]) is list:
     selectedComponents = selectedComponents[0]
@@ -546,7 +546,7 @@ if scaleProdToLumi>0: # select only a subset of a sample, corresponding to a giv
 if runData and not isTest: # For running on data
 
     is50ns = False
-    dataChunks = []
+    dataChunks = [NEW]
 
 
     #json = os.environ['CMSSW_BASE']+'/src/CMGTools/TTHAnalysis/data/json/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt' # 36.15/fb
@@ -1028,6 +1028,10 @@ elif test == 'ttH-sync':
         os.system("xrdcp root://eoscms//eos/cms%s %s" % (comp.files[0],tmpfil))
     comp.files = [ tmpfil ]
     if not getHeppyOption("single"): comp.fineSplitFactor = 8
+elif test == 'sosTrees_production': # file and job slpiting to be used with sosTrees_production.sh
+    for comp in selectedComponents:
+        comp.files = comp.files[1:10] #sosTrees_production
+        comp.splitFactor = 4 #sosTrees_production
 elif test != None:
     raise RuntimeError, "Unknown test %r" % test
 
@@ -1068,8 +1072,16 @@ output_service = cfg.Service(
     )    
 outputService.append(output_service)
 
+# (kpanos) custom spliting to be used with 'sosTrees_production.sh'
+# for comp in selectedComponents:
+#     comp.files = comp.files[1:10]
+#     comp.splitFactor = 4
+#     #comp.fineSplitFactor = 1
+#     print(comp.name,len(comp.files))
 # print summary of components to process
 printSummary(selectedComponents)
+# for comp in selectedComponents:
+#     print(comp.files)
 
 # the following is declared in case this cfg is used in input to the heppy.py script
 from PhysicsTools.HeppyCore.framework.eventsfwlite import Events

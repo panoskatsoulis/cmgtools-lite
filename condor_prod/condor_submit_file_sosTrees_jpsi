@@ -2,16 +2,39 @@ notification          = Complete
 notify_user	      = panos.katsoulis@cern.ch
 executable            = sosTrees_production.sh
 getenv                = True
-arguments             = "--condor $(process) $(ClusterId) $(ProcId) /eos/user/k/kpanos/sostrees/2016_80X run_susyMultilepton_cfg_jpsi_noMetCut 300000 2>&1"
+arguments             = "--condor $(process) $(ClusterId) $(ProcId) /eos/user/k/kpanos/sostrees/2016_80X run_susyMultilepton_cfg_jpsi_noMetCut 31000000 4 $(file1) $(file2) 2>&1"
 output                = output/hello.$(ClusterId).$(ProcId).out
 error                 = error/hello.$(ClusterId).$(ProcId).err
 log                   = log/hello.$(ClusterId).$(ProcId).log
-RequestCpus           = 4
+RequestCpus           = 8
 max_retries           = 3
 
 +JobFlavour = "testmatch"
-queue process from (
-  ZToJPsiMuMu
-  JPsiToMuMu
+queue process,file1,file2 from (
+  JPsiToMuMu_OniaMuonFilter,1,10
+  JPsiToMuMu_OniaMuonFilter,11,20
+  JPsiToMuMu_OniaMuonFilter,21,30
+  JPsiToMuMu_OniaMuonFilter,31,40
+  JPsiToMuMu_OniaMuonFilter,41,50
+  JPsiToMuMu_OniaMuonFilter,51,60
+  JPsiToMuMu_OniaMuonFilter,61,70
+  JPsiToMuMu_OniaMuonFilter,71,80
+  JPsiToMuMu_OniaMuonFilter,81,90
+  JPsiToMuMu_OniaMuonFilter,91,100
+  JPsiToMuMu_OniaMuonFilter,101,110
+  JPsiToMuMu_OniaMuonFilter,111,120
+  JPsiToMuMu_OniaMuonFilter,121,130
+  JPsiToMuMu_OniaMuonFilter,131,140
+  JPsiToMuMu_OniaMuonFilter,141,150
+  JPsiToMuMu_OniaMuonFilter,151,160
+  JPsiToMuMu_OniaMuonFilter,161,170
+  JPsiToMuMu_OniaMuonFilter,171,180
+  JPsiToMuMu_OniaMuonFilter,181,190
+  JPsiToMuMu_OniaMuonFilter,191,200
+  JPsiToMuMu_OniaMuonFilter,201,210
+  JPsiToMuMu_OniaMuonFilter,211,220
+  JPsiToMuMu_OniaMuonFilter,221,230
+#  ZToJPsiMuMu
+#  JPsiToMuMu
 )
 
