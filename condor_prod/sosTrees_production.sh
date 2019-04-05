@@ -23,7 +23,7 @@ if [ "$1" == "--local" ]; then
     JOB_ID="local.test"
     while [ ! -z $1 ]; do
 	[ "$1" == "--process" ] && { PROCESS=$2; shift 2; }
-	[ "$1" == "--out-path" ] && { OUTPUT_TREE_PATH=${2}/$PROCESS; shift 2; }
+	[ "$1" == "--out-path" ] && { OUTPUT_TREE_PATH=${2}; shift 2; }
 	[ "$1" == "--tree-producer" ] && { TREE_PRODUCER=$2; shift 2; }
 	[ "$1" == "--events" ] && { EVENTS=$2; shift 2; }
     done
@@ -32,7 +32,7 @@ elif [ "$1" == "--condor" ]; then
     CUSTOM_PS1="[${USER}@$(hostname)]$"
     PROCESS=$1
     JOB_ID="$2.$3"
-    OUTPUT_TREE_PATH=${4}/$PROCESS
+    OUTPUT_TREE_PATH=${4}
     TREE_PRODUCER=$5
     EVENTS=$6
 else
