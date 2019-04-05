@@ -1,0 +1,4 @@
+## JPsi
+## -----------------------------------------------------------
+jpsi : JPsiToMuMu                 : xsec ; Label="JPsiToMuMu", FakeRate="susy-sos-v1/2l/fakerate/fakerate_standard.txt", FillColor=ROOT.kGreen
+Zjpsi : ZToJPsiMuMu                : xsec ; Label="ZToJPsiMuMu", FakeRate="susy-sos-v1/2l/fakerate/fakerate_standard.txt", FillColor=ROOT.kMagenta

@@ -5,14 +5,15 @@ today = datetime.datetime.now().strftime("%Y-%m-%d")
 
 ## == configuration =================================
 
-tag  = "massivePlottingTest"
+tag  = "test"
 
 pfx  = ""
 #####pfx  = "_sc"
 
 #add = ""
 #add = "--RP=/eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217"
-add  = "--RP=/eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217 -F sf/t /eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_both3dlooseClean_v2/evVarFriend_{cname}.root --FMC sf/t /eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_eventBTagWeight_v2/evVarFriend_{cname}.root"
+#add  = "--RP=/eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217 -F sf/t /eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_both3dlooseClean_v2/evVarFriend_{cname}.root --FMC sf/t /eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_eventBTagWeight_v2/evVarFriend_{cname}.root"
+add  = "--RP=/eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217 -F sf/t /eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_both3dlooseClean_v2/evVarFriend_{cname}.root --FMC sf/t /eos/cms/store/cmst3/group/susy/SOS/trees_SOS_010217/0_eventBTagWeight_v2/evVarFriend_{cname}.root -R 'mll' 'mll' 'm2l<50'"
 #add  = "--SP era2017"
 #add = "--sP jetEta --sP nJet25Eta1p0 --sP nJet25Eta1p4 --sP nJet25Eta2p0"
 #add  = "--sP yields --sP SR_.*"
@@ -36,10 +37,10 @@ model   = "TChiWZ"
 treedirs = {
 ###            2016: "/data1/botta/trees_SOS_010217"  ,
 ###            2016: "/afs/cern.ch/user/p/peruzzi/work/sostrees/trees_SOS_010217/;/afs/cern.ch/work/v/vtavolar/SusySOSSW_2/cleanTest/CMSSW_8_0_25/src/CMGTools/TTHAnalysis/python/plotter/",
-            2016: "/afs/cern.ch/user/p/peruzzi/work/sostrees/trees_SOS_010217/",
+#-->	2016: "/afs/cern.ch/user/p/peruzzi/work/sostrees/trees_SOS_010217/",
 ##            2016: "/afs/cern.ch/user/v/vtavolar/SusySOS/cleanTest/CMSSW_8_0_25/src/CMGTools/TTHAnalysis/python/plotter/data1/botta/trees_SOS_010217/",
 
-#            2017: "/afs/cern.ch/user/v/vtavolar/SusySOS/cleanTest/CMSSW_8_0_25/src/CMGTools/TTHAnalysis/python/plotter/data1/peruzzi/trees_SOS_030518"         ,
+            2017: "/afs/cern.ch/user/v/vtavolar/SusySOS/cleanTest/CMSSW_8_0_25/src/CMGTools/TTHAnalysis/python/plotter/data1/peruzzi/trees_SOS_030518"         ,
            }
 
 plotdir  = "/afs/cern.ch/user/k/kpanos/work/CMSSW_releases/analysis/CMSSW_8_0_32/src/sosplots/test"
@@ -91,27 +92,27 @@ fullumi17 = 41.4
 
 regions = [
            #("sos2l16", "2lss16"      , fullumi16, "sig_T2tt_.*"), \
-           #("sos2l16", "2losEwkLow16", redlumi16, "sig_TChiWZ_.*"), \
-           ("sos2l16", "2losEwkMed16", fullumi16, "sig_TChiWZ_.*"), \
-           ("sos2l16", "2losEwkHig16", fullumi16, "sig_TChiWZ_.*"), \
+           # ("sos2l16", "2losEwkLow16", redlumi16, "sig_TChiWZ_.*"), \
+           # ("sos2l16", "2losEwkMed16", fullumi16, "sig_TChiWZ_.*"), \
+           # ("sos2l16", "2losEwkHig16", fullumi16, "sig_TChiWZ_.*"), \
            #("sos2l16", "2losColLow16", redlumi16, "sig_T2tt_.*"), \
            #("sos2l16", "2losColMed16", fullumi16, "sig_T2tt_.*"), \
            #("sos2l16", "2losColHig16", fullumi16, "sig_T2tt_.*"), \
            #("sos3l16", "3lMin16"     , redlumi16, "sig_TChiWZ_.*"), \
            #("sos3l16", "3lLow16"     , redlumi16, "sig_TChiWZ_.*"), \
            #("sos3l16", "3lMed16"     , fullumi16, "sig_TChiWZ_.*"), \
-           ("sos2l16", "dyLow16"     , redlumi16, "sig_T2tt_.*"), \
-           ("sos2l16", "dyMed16"     , fullumi16, "sig_T2tt_.*"), \
-           ("sos2l16", "ttLow16"     , redlumi16, "sig_T2tt_.*"), \
-           ("sos2l16", "ttMed16"     , fullumi16, "sig_T2tt_.*"), \
-           #("sos2l16", "vvLow16"     , redlumi16, "sig_TChiWZ_.*"), \
-           #("sos2l16", "vvMed16"     , fullumi16, "sig_TChiWZ_.*"), \
+	   #("sos2l16", "dyLow16"     , redlumi16, "sig_T2tt_.*"), \
+           # ("sos2l16", "dyMed16"     , fullumi16, "sig_T2tt_.*"), \
+           # ("sos2l16", "ttLow16"     , redlumi16, "sig_T2tt_.*"), \
+           # ("sos2l16", "ttMed16"     , fullumi16, "sig_T2tt_.*"), \
+           # ("sos2l16", "vvLow16"     , redlumi16, "sig_TChiWZ_.*"), \
+           # ("sos2l16", "vvMed16"     , fullumi16, "sig_TChiWZ_.*"), \
            #("sos3l16", "wzMin16"     , fullumi16, "sig_TChiWZ_.*"), \
            #("sos3l16", "wzLow16"     , fullumi16, "sig_TChiWZ_.*"), \
            #("sos3l16", "wzMed16"     , fullumi16, "sig_TChiWZ_.*"), \
 
            #("sos2l17", "2lss17"      , fullumi17, "sig_T2tt_.*"), \
-           #("sos2l17", "2losEwkLow17", redlumi17, "sig_TChiWZ_.*"), \
+           ("sos2l17", "2losEwkLow17", redlumi17, "sig_TChiWZ_.*"), \
            #("sos2l17", "2losEwkMed17", fullumi17, "sig_TChiWZ_.*"), \
            #("sos2l17", "2losEwkHig17", fullumi17, "sig_TChiWZ_.*"), \
            #("sos2l17", "2losColLow17", redlumi17, "sig_T2tt_.*"), \
