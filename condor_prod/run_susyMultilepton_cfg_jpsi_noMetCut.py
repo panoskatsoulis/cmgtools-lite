@@ -1072,16 +1072,18 @@ output_service = cfg.Service(
     )    
 outputService.append(output_service)
 
-# (kpanos) custom spliting to be used with 'sosTrees_production.sh'
+# #(kpanos) custom spliting to be used with 'sosTrees_production.sh'
 # for comp in selectedComponents:
 #     comp.files = comp.files[1:10]
 #     comp.splitFactor = 4
 #     #comp.fineSplitFactor = 1
 #     print(comp.name,len(comp.files))
-# print summary of components to process
-printSummary(selectedComponents)
-# for comp in selectedComponents:
+# #print summary of components to process
+# printSummary(selectedComponents)
+for comp in selectedComponents:
+    print comp.name
 #     print(comp.files)
+    print comp.splitFactor    
 
 # the following is declared in case this cfg is used in input to the heppy.py script
 from PhysicsTools.HeppyCore.framework.eventsfwlite import Events

@@ -6,7 +6,7 @@ arguments             = "--condor $(process) $(ClusterId) $(ProcId) /eos/user/k/
 output                = output/hello.$(ClusterId).$(ProcId).out
 error                 = error/hello.$(ClusterId).$(ProcId).err
 log                   = log/hello.$(ClusterId).$(ProcId).log
-RequestCpus           = 8
+RequestCpus           = 4
 max_retries           = 3
 
 +JobFlavour = "testmatch"

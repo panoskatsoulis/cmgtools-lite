@@ -16,10 +16,11 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "Exit codes:"
     echo "'0' all good"
     echo "'1' kerberos ticket doesn't exist somewhere in /afs (required by the heppy tool)"
-    echo "'2' problem with env-variables SOS_80X or/and EOS_USER_PATH"
+    echo "'2' problem with env-variables SOS_WORK_PATH or/and EOS_USER_PATH"
     echo "'3' sed command for selecting the process failed (script failure)"
     echo "'4' the final heppy command failed"
     echo "'101' unknown execution environment"
+    echo "'102' unknown command line argument (local only)"
     exit 0
 fi
 
@@ -31,13 +32,14 @@ if [ "$1" == "--local" ]; then
     FILE1=''
     FILE2='1'
     while [ ! -z $1 ]; do
-	[ "$1" == "--process" ] && { PROCESS=$2; shift 2; }
-	[ "$1" == "--out-path" ] && { OUTPUT_TREE_PATH=${2}; shift 2; }
-	[ "$1" == "--tree-producer" ] && { TREE_PRODUCER=$2; shift 2; }
-	[ "$1" == "--events" ] && { EVENTS=$2; shift 2; }
-	[ "$1" == "--begin-file" ] && { FILE1=$2; shift 2; }
-	[ "$1" == "--end-file" ] && { FILE2=$2; shift 2; }
-	[ "$1" == "--jobs-per-mcProcess" ] && { JOBS=$2; shift 2; }
+	[ "$1" == "--process" ] && { PROCESS=$2; shift 2; continue; }
+	[ "$1" == "--out-path" ] && { OUTPUT_TREE_PATH=$2; shift 2; continue; }
+	[ "$1" == "--tree-producer" ] && { TREE_PRODUCER=$2; shift 2; continue; }
+	[ "$1" == "--events" ] && { EVENTS=$2; shift 2; continue; }
+	[ "$1" == "--begin-file" ] && { FILE1=$2; shift 2; continue; }
+	[ "$1" == "--end-file" ] && { FILE2=$2; shift 2; continue; }
+	[ "$1" == "--jobs" ] && { JOBS=$2; shift 2; continue; }
+	echo "Unknown command line argument $1" && exit 102;
     done
 elif [ "$1" == "--condor" ]; then
     EXE_ENV="condor" && shift 1 #save and shift the "--condor" arg
@@ -82,12 +84,16 @@ export X509_USER_PROXY=$AFS_HOME/x509up_u${UID}
 
 echo "~~~~~"
 echo "-----> setting up cmssw env..."
-if [ ! -z $SOS_80X ] || [ ! -z $EOS_USER_PATH ]; then
-    cd $SOS_80X
+if [ ! -z $SOS_WORK_PATH ] && [ ! -z $EOS_USER_PATH ]; then
+    cd $SOS_WORK_PATH
     eval `scramv1 runtime -sh`
+    echo "-----> SOS_WORK_PATH = $SOS_WORK_PATH"
     echo "-----> CMSSW_VERSION = $CMSSW_VERSION"
-else 
-    echo "-----> [ERROR] SOS_80X or/and EOS_USER_PATH are empty variables" ; exit 2
+else
+    echo "-----> [ERROR] SOS_WORK_PATH or/and EOS_USER_PATH are empty variables"
+    echo "-----> [NOTE] sosTrees_production.sh uses these variables to setup the running environment and also save output trees in EOS."
+    echo "-----> [NOTE] Please export your \$CMSSW_BASE/src as SOS_WORK_PATH, your EOS path as EOS_USER_PATH, and rerun the script."
+    exit 2
 fi
 echo "-----> PWD = $(pwd)"
 
@@ -109,13 +115,24 @@ s@(comp\.splitFactor).*(#sosTrees_production)@\1 = ${JOBS} \2@;
 JOB_RUN_PATH=jobBase_${PROCESS}_${JOB_ID}
 [ -d "$JOB_RUN_PATH" ] && rm -rf $JOB_RUN_PATH
 mkdir $JOB_RUN_PATH && cd $JOB_RUN_PATH
-echo "-----> delete previous trees if exist"
-[ -d "$OUTPUT_TREE_PATH" ] && rm -rf $OUTPUT_TREE_PATH
+#
+## This commented out section is responsible for checking if similar pathe exist in the output dir and to create a new dir for output
+#
+# echo "-----> check if previous trees exist"
+# [ ! -z "$(ls -d ${OUTPUT_TREE_PATH}/*/ | grep ${PROCESS})" ] && {
+#     echo "-----> The following directories exist with similar name to that of the process ${PROCESS}:";
+#     ls -d ${OUTPUT_TREE_PATH}/*/ | grep ${PROCESS};
+#     echo "-----> Will create new directory inside the output directory using date information.";
+#     OUTPUT_TREE_PATH=${OUTPUT_TREE_PATH}/$(date | awk -F '[ :]*' '{print $1"-"$2"-"$3"-"$8"_time"$4$5}');
+#     mkdir $OUTPUT_TREE_PATH;
+# }
 
 echo "~~~~~"
 [ -z $EVENTS ] && { echo "-----> specific number of events has not been given as input, will run for 1000"; EVENTS='1000'; }
-echo "-----> will run the heppy tool with the tree producer $TREE_PRODUCER"
-HEPPY_COMMAND=$(heppy $OUTPUT_TREE_PATH ../prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} -f -N $EVENTS -o analysis=SOS -o test='sosTrees_production' -j 4 > ../prod_treeProducersPerProcess/heppy.${PROCESS}_${JOB_ID}.out 2>&1)
+echo "-----> will run the heppy tool with the tree producer $TREE_PRODUCER for $EVENTS events"
+echo "-----> OUTPUT_TREE_PATH = $OUTPUT_TREE_PATH"
+HEPPY_COMMAND=$(heppy $OUTPUT_TREE_PATH ../prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} \
+    -f -N $EVENTS -o analysis=SOS -o test=sosTrees_production -j 4 > ../prod_treeProducersPerProcess/heppy.${PROCESS}_${JOB_ID}.out 2>&1)
 $HEPPY_COMMAND || { echo "-----> [ERROR] heppy failure, would execute command:"; echo "$HEPPY_COMMAND"; exit 4; }
 echo "-----> heppy exited with code $?"
 
