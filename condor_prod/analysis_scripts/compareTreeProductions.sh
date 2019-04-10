@@ -92,7 +92,7 @@ $RM_OLD && rm -rf $OUTPUT_PATH
 ## Compare Trees
 if [ -d $OUTPUT_PATH/Nominal_Tree ] && [ -d $OUTPUT_PATH/Test_Tree ]; then
     echo "Comparing Nominal_Tree (Tree1) and Test_Tree (Tree2):"
-    python analysis_scripts/compareTrees.py $OUTPUT_PATH/Nominal_Tree $OUTPUT_PATH/Test_Tree
+    python analysis_scripts/compareTrees.py $OUTPUT_PATH/Nominal_Tree $OUTPUT_PATH/Test_Tree --events $EVENTS
 else
     echo "Cant find the tree paths Nominal_Tree or/and Test_Tree."
     echo "OUTPUT_PATH = $OUTPUT_PATH"

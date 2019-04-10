@@ -4,6 +4,7 @@ from ROOT import TFile, TTree
 parser = argparse.ArgumentParser(description='Compares the entries of tree1 and tree2.')
 parser.add_argument('tree1', type=str, help='Directory for tree1.')
 parser.add_argument('tree2', type=str, help='Directory for tree2.')
+parser.add_argument('--events', type=int, help='Entire initial sample which the tree producers have processed.')
 #parser.print_help()
 args = parser.parse_args()
 
@@ -24,7 +25,7 @@ else:
 
 ## Printing Results
 print 'Printing Results:'
-print 'Tree1 = '+str(tree1.GetEntries())+' entries'
-print 'Tree2 = '+str(tree2.GetEntries())+' entries'
+print 'Tree1 = '+str(tree1.GetEntries())+' entries ('+str(100*tree1.GetEntries()/args.events)+'%)'
+print 'Tree2 = '+str(tree2.GetEntries())+' entries ('+str(100*tree2.GetEntries()/args.events)+'%)'
 
 quit(0)
