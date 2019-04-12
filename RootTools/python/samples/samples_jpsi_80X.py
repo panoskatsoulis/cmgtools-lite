@@ -9,6 +9,8 @@ JPsiToMuMu = kreator.makeMCComponent("JPsiToMuMu", "/JPsiToMuMu_Pt20to100-pythia
 samples.append(JPsiToMuMu)
 JPsiToMuMu_OniaMuonFilter = kreator.makeMCComponent("JPsiToMuMu_OniaMuonFilter", "/JpsiToMuMu_OniaMuonFilter_TuneCUEP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "CMS", ".*root")
 samples.append(JPsiToMuMu_OniaMuonFilter)
+JPsiToMuMu_JPsiPt8 = kreator.makeMCComponent("JPsiToMuMu_JPsiPt8", "/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "CMS", ".*root")
+samples.append(JPsiToMuMu_JPsiPt8)
 
 # ---------------------------------------------------------------------                                                                                                                                          
 
