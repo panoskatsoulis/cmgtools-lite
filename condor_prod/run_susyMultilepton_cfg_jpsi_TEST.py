@@ -56,7 +56,7 @@ if not removeJecUncertainty:
     susyCoreSequence.insert(susyCoreSequence.index(metAna)+1, metAnaScaleDown)
     susyCoreSequence.insert(susyCoreSequence.index(metAna)+1, metAnaScaleUp)
 
-
+## isolation = None
 if analysis in ['SOS']:
 ## -- SOS preselection settings ---
     lepAna.doDirectionalIsolation = [0.3,0.4]
@@ -72,8 +72,8 @@ if analysis in ['SOS']:
     lepAna.loose_muon_pt  = 0
     lepAna.inclusive_electron_pt  = 5
     lepAna.loose_electron_pt  = 5
-    #isolation = "Iperbolic"
-    isolation = None
+    isolation = "Iperbolic"
+    # isolation = None
     lepAna.loose_electron_id = "POG_MVA_ID_Spring15_NonTrig_VLooseIdEmu"
     # Lepton-Jet Cleaning
     jetAna.cleanSelectedLeptons = False
@@ -108,8 +108,8 @@ jetAnaScaleDown.doQG = True
 photonAna.do_mc_match = False
 
 # Loose Tau configuration
-tauAna.loose_ptMin = 20
-tauAna.loose_etaMax = 2.3
+tauAna.loose_ptMin = 0
+tauAna.loose_etaMax = 5.
 tauAna.loose_decayModeID = "decayModeFindingNewDMs"
 tauAna.loose_tauID = "decayModeFindingNewDMs"
 
@@ -148,7 +148,7 @@ susyCoreSequence.insert(susyCoreSequence.index(ttHCoreEventAna),
 from CMGTools.TTHAnalysis.analyzers.ttHDeclusterJetsAnalyzer import ttHDeclusterJetsAnalyzer
 ttHDecluster = cfg.Analyzer(
     ttHDeclusterJetsAnalyzer, name='ttHDecluster',
-    lepCut     = lambda lep,ptrel : lep.pt() > 10,
+    lepCut     = lambda lep,ptrel : lep.pt() > 0,
     maxSubjets = 6, # for exclusive reclustering
     ptMinSubjets = 5, # for inclusive reclustering
     drMin      = 0.2, # minimal deltaR(l,subjet) required for a successful subjet match
@@ -173,10 +173,10 @@ from CMGTools.TTHAnalysis.analyzers.treeProducerSusyMultilepton import *
 if analysis=='SOS':
     # Soft lepton MVA
     ttHCoreEventAna.doLeptonMVASoft = True
-    leptonTypeSusyExtraLight.addVariables([
-            NTupleVariable("mvaSoftT2tt",    lambda lepton : lepton.mvaValueSoftT2tt, help="Lepton MVA (Soft T2tt version)"),
-            NTupleVariable("mvaSoftEWK",    lambda lepton : lepton.mvaValueSoftEWK, help="Lepton MVA (Soft EWK version)"),
-            ])
+    # leptonTypeSusyExtraLight.addVariables([
+    #         NTupleVariable("mvaSoftT2tt",    lambda lepton : lepton.mvaValueSoftT2tt, help="Lepton MVA (Soft T2tt version)"),
+    #         NTupleVariable("mvaSoftEWK",    lambda lepton : lepton.mvaValueSoftEWK, help="Lepton MVA (Soft EWK version)"),
+    #         ])
 
 # Spring16 electron MVA - follow instructions on pull request for correct area setup
 leptonTypeSusy.addVariables([
@@ -274,17 +274,17 @@ hbheAna = cfg.Analyzer(
     )
 if not runSMS:
     susyCoreSequence.insert(susyCoreSequence.index(ttHCoreEventAna),hbheAna)
-    treeProducer.globalVariables.append(NTupleVariable("hbheFilterNew50ns", lambda ev: ev.hbheFilterNew50ns, int, help="new HBHE filter for 50 ns"))
-    treeProducer.globalVariables.append(NTupleVariable("hbheFilterNew25ns", lambda ev: ev.hbheFilterNew25ns, int, help="new HBHE filter for 25 ns"))
-    treeProducer.globalVariables.append(NTupleVariable("hbheFilterIso", lambda ev: ev.hbheFilterIso, int, help="HBHE iso-based noise filter"))
-    treeProducer.globalVariables.append(NTupleVariable("Flag_badChargedHadronFilter", lambda ev: ev.badChargedHadron, help="bad charged hadron filter decision"))
-    treeProducer.globalVariables.append(NTupleVariable("Flag_badMuonFilter", lambda ev: ev.badMuon, help="bad muon filter decision"))
+    # treeProducer.globalVariables.append(NTupleVariable("hbheFilterNew50ns", lambda ev: ev.hbheFilterNew50ns, int, help="new HBHE filter for 50 ns"))
+    # treeProducer.globalVariables.append(NTupleVariable("hbheFilterNew25ns", lambda ev: ev.hbheFilterNew25ns, int, help="new HBHE filter for 25 ns"))
+    # treeProducer.globalVariables.append(NTupleVariable("hbheFilterIso", lambda ev: ev.hbheFilterIso, int, help="HBHE iso-based noise filter"))
+    # treeProducer.globalVariables.append(NTupleVariable("Flag_badChargedHadronFilter", lambda ev: ev.badChargedHadron, help="bad charged hadron filter decision"))
+    # treeProducer.globalVariables.append(NTupleVariable("Flag_badMuonFilter", lambda ev: ev.badMuon, help="bad muon filter decision"))
 
 
 #additional MET quantities
 metAna.doTkMet = True
-treeProducer.globalVariables.append(NTupleVariable("met_trkPt", lambda ev : ev.tkMet.pt() if  hasattr(ev,'tkMet') else  0, help="tkmet p_{T}"))
-treeProducer.globalVariables.append(NTupleVariable("met_trkPhi", lambda ev : ev.tkMet.phi() if  hasattr(ev,'tkMet') else  0, help="tkmet phi"))
+# treeProducer.globalVariables.append(NTupleVariable("met_trkPt", lambda ev : ev.tkMet.pt() if  hasattr(ev,'tkMet') else  0, help="tkmet p_{T}"))
+# treeProducer.globalVariables.append(NTupleVariable("met_trkPhi", lambda ev : ev.tkMet.phi() if  hasattr(ev,'tkMet') else  0, help="tkmet phi"))
 
 if not skipT1METCorr:
     if doMETpreprocessor: 
@@ -305,7 +305,7 @@ if analysis=='SOS' and not runData:
         NIsrAnalyzer, name='nIsrAnalyzer',
     )
     susyCoreSequence.insert(susyCoreSequence.index(jetAna)+1,nIsrAnalyzer)
-    treeProducer.globalVariables.append(NTupleVariable("nISR", lambda ev: ev.nIsr, int, help="number of ISR jets according to SUSY recommendations"))
+    #treeProducer.globalVariables.append(NTupleVariable("nISR", lambda ev: ev.nIsr, int, help="number of ISR jets according to SUSY recommendations"))
 
 
 
@@ -423,6 +423,31 @@ sequence = cfg.Sequence(susyCoreSequence+[
         treeProducer,
     ])
 preprocessor = None
+
+sequence.remove(triggerFlagsAna); ## kpanos
+sequence.remove(triggerAna); ## kpanos
+sequence.remove(ttHDecluster); ## kpanos
+# sequence.remove(lepAna); ## kpanos
+sequence.remove(ttHLepSkim); ## kpanos
+# sequence.remove(badMuonAna); ## kpanos
+# sequence.remove(jetAna); ## kpanos
+# sequence.remove(jetAnaScaleUp); ## kpanos
+# sequence.remove(jetAnaScaleDown); ## kpanos
+sequence.remove(nIsrAnalyzer); ## kpanos
+# sequence.remove(metAna); ## kpanos
+# sequence.remove(metAnaScaleUp); ## kpanos
+# sequence.remove(metAnaScaleDown); ## kpanos
+sequence.remove(ttHFatJetAna); ## kpanos
+# sequence.remove(badMuonAnaMoriond2017); ## kpanos
+# sequence.remove(badCloneMuonAnaMoriond2017); ## kpanos
+sequence.remove(ttHJetMETSkim); ## kpanos
+sequence.remove(ttHJetTauAna); ## kpanos
+sequence.remove(ttHEventAna); ## kpanos
+# sequence.remove(ttHSVAna); ## kpanos
+sequence.remove(ttHHeavyFlavourHadronAna); ## kpanos
+# sequence.remove(ttHCoreEventAna); ## kpanos
+
+print sequence
 
 #-------- HOW TO RUN -----------
 

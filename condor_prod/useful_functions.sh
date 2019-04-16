@@ -12,10 +12,10 @@ function checkHeppyFiles(){
 }
 
 function cleanProducts(){
-    rm -f output/* && rm -f error/* && rm -f log/*
-    rm -rf prod_treeProducersPerProcess
-    rm -f *~ && rm -f kpanos.cc
-    rm -rf jobBase_* && ll . log output error
+    { rm -f output/* && rm -f error/* && rm -f log/*; } || return 1
+    { rm -rf prod_treeProducersPerProcess; } || return 2
+    { rm -f *~ && rm -f kpanos.cc; } || return 3
+    { rm -rf jobBase_* && ll . log output error; } || return 4
     return 0
 }
 
