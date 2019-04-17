@@ -1,1 +1,53 @@
-../../TTHAnalysis/python/plotter/susy-sos-v1/2l/plots_sos.txt
+###########################################################
+# File that includes a collection of plots to be created. #
+# Customized for kpanos					  #
+###########################################################
+
+#######################
+# Analysis Note Plots #
+#######################
+# yields : 1 : 1,-0.5,0.5; XTitle="Total Event Yields"
+# map_{F}_{R}_fakes_bare
+# SR_2l_ewk	 : m2l			: [0,4,10,20,30,50]	; XTitle="M(ll) [GeV]", Legend='TR', LegendCutoff=0
+# SR_2l_col	 : LepGood1_pt 		: [5,12,20,30]	 	; XTitle="Leading lepton p_{T} [GeV]", Legend='TR', LegendCutoff=0
+# SR_2l_ewk_fine : m2l	       		: 23,4,50	 	; XTitle="M(ll) [GeV]", Legend='TR', LegendCutoff=0
+# SR_2l_col_fine : LepGood1_pt 		: 20,0,40	 	; XTitle="Leading lepton p_{T} [GeV]", Legend='TR', LegendCutoff=0
+		    
+###########
+# Leptons #
+###########
+# lep1pt	: LepGood1_pt		: 20,0,40    ; XTitle="Leading lepton p_{T} [GeV]"     , Legend='TL', IncludeOverflows=False, LegendCutoff=1e-10
+# lep2pt	: LepGood2_pt		: 20,0,40    ; XTitle="Subleading lepton p_{T} [GeV]"  , Legend='TR', IncludeOverflows=False, LegendCutoff=1e-10
+# lep1eta	: abs(LepGood1_eta)	: 10,0,2.5   ; XTitle="Leading lepton #||{#eta}"	     , Legend='TR', IncludeOverflows=False, MoreY=1.5
+# lep2eta	: abs(LepGood2_eta)	: 10,0,2.5   ; XTitle="Subleading lepton #||{#eta}"    , Legend='TR', IncludeOverflows=False, MoreY=1.5
+
+####################################
+# More Plots (related to the cuts) #
+####################################
+lep1ptext	: LepGood1_pt						   : 25,0,150  ; XTitle="Leading lepton p_{T} [GeV]" , Legend='TR', IncludeOverflows=False, LegendCutoff=1e-10
+# lep2ptext   	: LepGood2_pt						   : 25,0,150  ; XTitle="Subleading lepton p_{T} [GeV]" , Legend='TR', IncludeOverflows=False, LegendCutoff=1e-10
+mll	       	: m2l	     						   : 20,0,10   ; XTitle="M(ll) [GeV]", Legend='TR', LegendCutoff=0, IncludeOverflows=False
+# met	       	: met_pt	 					   : 12,0,300  ; XTitle="p_{T}^{miss}  [GeV]"
+# htJet25     	: htJet25Sel-LepGood1_pt-LepGood2_pt 			   : 12,0,300  ; XTitle="H_{T}(jet p_{T} > 25)	[GeV]"
+# ptll	       	: pt_2(LepGood1_pt,LepGood1_phi, LepGood2_pt,LepGood2_phi) : 16,0,80   ; XTitle="p_{T}(ll) [GeV]", Legend='TR'
+# metovht     	: (met_pt/(htJet25-LepGood1_pt-LepGood2_pt))		   : 10,0,2    ; XTitle="p_{T}^{miss}/H_{T}(jet p_{T} > 25)"
+# # lep1MetDphi 	: abs(deltaPhi(LepGood1_phi, met_phi))			   : 7,0,3.14  ; XTitle="#Delta#phi(l1\,p_{T}^{miss})", MoreY=1.5
+# # lep2MetDphi 	: abs(deltaPhi(LepGood2_phi, met_phi))			   : 7,0,3.14  ; XTitle="#Delta#phi(l2\,p_{T}^{miss})", MoreY=1.5
+# lep1MetMT	: mt_2(LepGood1_pt,LepGood1_phi, met_pt,met_phi)	   : 12,0,120  ; XTitle="M_{T}(l1\,p_{T}^{miss})", MoreY=1.5
+# lep2MetMT	: mt_2(LepGood2_pt,LepGood2_phi, met_pt,met_phi)	   : 12,0,120  ; XTitle="M_{T}(l2\,p_{T}^{miss})", MoreY=1.5
+
+#############
+# Jet Plots #
+#############
+# jetEta		: JetSel_eta			: 20,-2.5,2.5 ; XTitle="#eta(jet\, p_{T} > 25)", MoreY=1.5
+# # nJet25Eta1p0	: nJetSelEta1			: [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5] ; XTitle='N(jet\, p_{T} > 25\, #||{#eta} < 1.0)'
+# # nJet25Eta1p4	: nJetSelEta1p4			: [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5] ; XTitle='N(jet\, p_{T} > 25\, #||{#eta} < 1.44)'
+# # nJet25Eta2p0	: nJetSelEta2p0			: [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5] ; XTitle='N(jet\, p_{T} > 25\, #||{#eta} < 2.0)'
+# Jet1_id		: Jet1_id			: 16,0,15; XTitle="Jet1 ID"
+# nBJetLoose25	: nBJetLoose25			: 21,0,20; XTitle="N_{b} Jets"
+
+############
+# My Plots #
+############
+# metOfJPsiEvent	: f_MET_JPsi(met_pt, m2l)	: 12,0,300 ; XTitle="p_{T}^{miss} [GeV]"
+
