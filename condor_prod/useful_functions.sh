@@ -7,7 +7,7 @@ function printUsefulFunctions(){
 }
 
 function checkHeppyFiles(){
-    ll prod_treeProducersPerProcess/heppy.* | awk '{printf "----> "$6"-"$7"-"$8":\t"$9"\n"; system("tail -3 "$9)}'
+    ll prod_treeProducersPerProcess/heppy.* | awk '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail -3 "$9); printf "\n"}'
     return 0
 }
 
