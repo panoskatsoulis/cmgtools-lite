@@ -2,7 +2,7 @@ notification          = Complete
 notify_user	      = panos.katsoulis@cern.ch
 executable            = sosTrees_production.sh
 getenv                = True
-arguments             = "--condor $(process) $(ClusterId) $(ProcId) /eos/user/k/kpanos/sostrees/2016_80X run_susyMultilepton_cfg_jpsi_noMetCut 1400000 4 $(file1) $(file2) 2>&1"
+arguments             = "--condor $(process) $(ClusterId) $(ProcId) /eos/user/k/kpanos/sostrees/2016_80X run_susyMultilepton_cfg_jpsi_TEST 1400000 4 $(file1) $(file2) 2>&1"
 output                = output/hello.$(ClusterId).$(ProcId).out
 error                 = error/hello.$(ClusterId).$(ProcId).err
 log                   = log/hello.$(ClusterId).$(ProcId).log
@@ -11,29 +11,47 @@ max_retries           = 3
 
 +JobFlavour = "testmatch"
 queue process,file1,file2 from (
-  JPsiToMuMu_OniaMuonFilter,1,10
-  JPsiToMuMu_OniaMuonFilter,11,20
-  JPsiToMuMu_OniaMuonFilter,21,30
-  JPsiToMuMu_OniaMuonFilter,31,40
-  JPsiToMuMu_OniaMuonFilter,41,50
-  JPsiToMuMu_OniaMuonFilter,51,60
-  JPsiToMuMu_OniaMuonFilter,61,70
-  JPsiToMuMu_OniaMuonFilter,71,80
-  JPsiToMuMu_OniaMuonFilter,81,90
-  JPsiToMuMu_OniaMuonFilter,91,100
-  JPsiToMuMu_OniaMuonFilter,101,110
-  JPsiToMuMu_OniaMuonFilter,111,120
-  JPsiToMuMu_OniaMuonFilter,121,130
-  JPsiToMuMu_OniaMuonFilter,131,140
-  JPsiToMuMu_OniaMuonFilter,141,150
-  JPsiToMuMu_OniaMuonFilter,151,160
-  JPsiToMuMu_OniaMuonFilter,161,170
-  JPsiToMuMu_OniaMuonFilter,171,180
-  JPsiToMuMu_OniaMuonFilter,181,190
-  JPsiToMuMu_OniaMuonFilter,191,200
-  JPsiToMuMu_OniaMuonFilter,201,210
-  JPsiToMuMu_OniaMuonFilter,211,220
-  JPsiToMuMu_OniaMuonFilter,221,230
+  JPsiToMuMu_JPsiPt8,1,10
+  JPsiToMuMu_JPsiPt8,11,20
+  JPsiToMuMu_JPsiPt8,21,30
+  JPsiToMuMu_JPsiPt8,31,40
+  JPsiToMuMu_JPsiPt8,41,50
+  JPsiToMuMu_JPsiPt8,51,60
+  JPsiToMuMu_JPsiPt8,61,70
+  JPsiToMuMu_JPsiPt8,71,80
+  JPsiToMuMu_JPsiPt8,81,90
+  JPsiToMuMu_JPsiPt8,91,100
+  JPsiToMuMu_JPsiPt8,101,110
+  JPsiToMuMu_JPsiPt8,111,120
+  JPsiToMuMu_JPsiPt8,121,130
+  JPsiToMuMu_JPsiPt8,131,140
+  JPsiToMuMu_JPsiPt8,141,150
+  JPsiToMuMu_JPsiPt8,151,160
+  JPsiToMuMu_JPsiPt8,161,170
+  JPsiToMuMu_JPsiPt8,171,180
+  JPsiToMuMu_JPsiPt8,181,190
+  JPsiToMuMu_JPsiPt8,191,200
+  JPsiToMuMu_JPsiPt8,201,210
+  JPsiToMuMu_JPsiPt8,211,220
+  JPsiToMuMu_JPsiPt8,221,230
+  JPsiToMuMu_JPsiPt8,231,240
+  JPsiToMuMu_JPsiPt8,241,250
+  JPsiToMuMu_JPsiPt8,251,260
+  JPsiToMuMu_JPsiPt8,261,270
+  JPsiToMuMu_JPsiPt8,271,280
+  JPsiToMuMu_JPsiPt8,281,290
+  JPsiToMuMu_JPsiPt8,291,300
+  JPsiToMuMu_JPsiPt8,301,310
+  JPsiToMuMu_JPsiPt8,311,320
+  JPsiToMuMu_JPsiPt8,321,330
+  JPsiToMuMu_JPsiPt8,331,340
+  JPsiToMuMu_JPsiPt8,341,350
+  JPsiToMuMu_JPsiPt8,351,360
+  JPsiToMuMu_JPsiPt8,361,370
+  JPsiToMuMu_JPsiPt8,371,380
+  JPsiToMuMu_JPsiPt8,381,390
+  JPsiToMuMu_JPsiPt8,391,400
+  JPsiToMuMu_JPsiPt8,401,410
 #  ZToJPsiMuMu
 #  JPsiToMuMu
 )
