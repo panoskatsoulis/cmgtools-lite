@@ -10,6 +10,7 @@ Supported arguments
    --submit-file      : Input for the condor submit file which will be copied, modified and used.
    --failure-specific : Specify a pattern to search as the failure reason in the heppy files,
                         and produce a resubmit file for only the jobs failed this way.
+   --prod-done-false  : Will resubmit only jobs that have the PRODUCTION_DONE flag false.
 "
     exit 0
 }
@@ -21,12 +22,14 @@ while [ ! -z $1 ]; do
     [ "$1" == "--process" ] && { PROCESS=$2; shift 2; continue; }
     [ "$1" == "--submit-file" ] && { CONDOR_SUBMIT_FILE=$2; shift 2; continue; }
     [ "$1" == "--failure-specific" ] && { FAILURE_SPECIFIC=true; FAILURE=$2; shift 2; continue; }
+    [ "$1" == "--prod-done-false" ] && { PROD_FAILED_MODE=true; shift 1; continue; }
     echo "Unsupported argument, $1" && exit 101
 done
 
 { [ -z "$CONDOR_CLUSTER" ] || [ -z "$PROCESS" ] || [ -z "$CONDOR_SUBMIT_FILE" ]; } \
     && { echo "The cluster-id, the process and the initial condor submit file must be specified."; exit 1; }
 [ -z $FAILURE_SPECIFIC ] && FAILURE_SPECIFIC=false
+[ -z $PROD_FAILED_MODE ] && PROD_FAILED_MODE=false
 
 { [ -e ${CONDOR_SUBMIT_FILE}.resubmit ] && [ ! $FAILURE_SPECIFIC ]; } && {
     printf ".resubmit file for the given condor submit file alrady exist.\nDo you want to proceed and overwrite the old file? [y/n]";
@@ -50,6 +53,23 @@ else
     CONDOR_SUBMIT_FILE=${CONDOR_SUBMIT_FILE}.resubmit
 fi
 touch $CONDOR_SUBMIT_FILE # update the date of the file
+
+if $PROD_FAILED_MODE; then
+    ## This mode checks for the flag PRODUCTION_DONE in the out files of the sosTrees_production
+    ## if the flag is true comment out the job from the condor submit file
+    ## it works with the simple .resubmit file
+    for outfile in $(ls output/*.out); do
+	JOB=$(echo $outfile | sed -r 's@.*/hello\.(.*\..*)\.out$@\1@')
+	TREE_PRODUCER=$(find prod_treeProducersPerProcess/ | grep ${JOB}\.py$)
+	[ ! -e $TREE_PRODUCER ] && { echo "Tree producer for the job $JOB couldn't be found"; continue; }
+	FILES=$(grep files.*#sosTrees_production $TREE_PRODUCER | sed -r 's@.*\[(.*):(.*)\].*@\1,\2@')
+	PRODUCTION_DONE=$(grep PRODUCTION_DONE $outfile | sed 's/ //g' | awk -F = '{print $2}')
+	echo ">> $JOB, $TREE_PRODUCER, $(echo $FILES | tr ',' ':'), $PRODUCTION_DONE)"
+
+	$PRODUCTION_DONE && sed -i -r "s@(^.*${FILES}$)@#\1@" $CONDOR_SUBMIT_FILE
+    done
+    exit 0
+fi
 
 for heppyFile in $(ls prod_treeProducersPerProcess/heppy.${PROCESS}_${CONDOR_CLUSTER}.* | sort -n);
 do
