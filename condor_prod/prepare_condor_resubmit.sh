@@ -7,7 +7,7 @@ Supported arguments
    --help, -h         : Print this and exit
    --cluster          : Specify the condor cluster in which the production has been done.
    --process          : Specify the process for which the jobs were running.
-   --submit-file      : Input for the condor submit file which will be copied, modified and used.
+5B5B   --submit-file      : Input for the condor submit file which will be copied, modified and used.
    --failure-specific : Specify a pattern to search as the failure reason in the heppy files,
                         and produce a resubmit file for only the jobs failed this way.
    --prod-done-false  : Will resubmit only jobs that have the PRODUCTION_DONE flag false.
@@ -60,10 +60,22 @@ if $PROD_FAILED_MODE; then
     ## This mode checks for the flag PRODUCTION_DONE in the out files of the sosTrees_production
     ## if the flag is true comment out the job from the condor submit file
     ## it works with the simple .resubmit file
+    ## Also, here the procedure is inverted (because of the continue keywords used)
+    ## in a given commented out file, uncomment the failed jobs
+    sed -i -r "/${PROCESS}/ s/(.*)/#\1/" $CONDOR_SUBMIT_FILE
+
     ! ls output/*.out && { echo "No jobs exist in the output/ path yet."; exit 11; }
     for outfile in $(ls output/*.out); do
 	JOB=$(echo $outfile | sed -r 's@.*/hello\.(.*\..*)\.out$@\1@') && {
 	    [ ! -z $JOB ] && echo "job found."; }
+	[ ! -s $outfile ] && { # if the outfile is still empty, refresh the heppy links and skip the job
+	    echo "The job $JOB has not output written yet. Skipping, either it's running or is idle.";
+	    JOB_HEPPY_FILE=$(find jobBase*${JOB}/ | grep heppy.*\.out$ || continue;) && echo "JOB_HEPPY_FILE=$JOB_HEPPY_FILE"
+	    PROD_PATH_LINK=prod_treeProducersPerProcess/$(basename $JOB_HEPPY_FILE) && echo "PROD_PATH_LINK=$PROD_PATH_LINK"
+	    ln -sf ../$JOB_HEPPY_FILE $PROD_PATH_LINK
+	    continue;
+	}
+
 	TREE_PRODUCER=$(find prod_treeProducersPerProcess/ | grep ${JOB}\.py$) && {
 	    [ ! -z $TREE_PRODUCER ] && echo "producer found."; }
 	[ -z $TREE_PRODUCER ] && { echo "Tree producer for the job $JOB couldn't be found"; continue; }
@@ -75,11 +87,14 @@ if $PROD_FAILED_MODE; then
 	echo ">> $JOB, $TREE_PRODUCER, $(echo $FILES | tr ',' ':'), $PRODUCTION_DONE)"
 
 	echo $PRODUCTION_DONE
-	if $PRODUCTION_DONE; then
-	    sed -i -r "s@(^.*${FILES}$)@#\1@" $CONDOR_SUBMIT_FILE
-	else
-	    rm -f $outfile
-	fi
+	! $PRODUCTION_DONE && {
+	    printf "running sed.. "
+	    sed -i -r "s@^#(.*${FILES}$)@\1@" $CONDOR_SUBMIT_FILE;
+	    printf "sed exited $?.\n$ grep ${PROCESS}.*${FILES} $CONDOR_SUBMIT_FILE\n"
+	    grep ${PROCESS}.*${FILES} $CONDOR_SUBMIT_FILE
+	    rm -f $outfile prod_treeProducersPerProcess/*${JOB}*;
+	    condor_rm $JOB;
+	}
     done
     exit 0
 fi

@@ -1,0 +1,35 @@
+#!/bin/bash
+
+trap 'calm_the_dog' 2 #SIGINT
+
+function calm_the_dog() {
+    echo "Stopping..."
+    exit 0
+}
+
+{ [ -z $1 ] && FIRST_DO=nothing; } || FIRST_DO=$1
+
+if [[ $FIRST_DO =~ \-*help ]]; then
+    echo "Usage ./condor_resubmit.dog <action>"
+    echo "Actions: first-submit | resubmit | nothing | help"
+    exit 0
+elif [ "$FIRST_DO" == "first-submit" ]; then
+    condor_rm kpanos
+    condor_submit condor_submit_file_sosTrees_jpsi.resubmit
+elif [ "$FIRST_DO" == "resubmit" ]; then
+    ./prepare_condor_resubmit.sh --prod-done-false --submit-file condor_submit_file_sosTrees_jpsi --process JPsiToMuMu_JPsiPt8
+    condor_submit condor_submit_file_sosTrees_jpsi.resubmit
+elif [ "$FIRST_DO" == "nothing" ]; then
+    echo "Getting into the loop."
+else
+    echo "Action $FIRST_DO unknown."
+    exit 101
+fi
+
+while true;
+do
+    printf "\e[0;33mSleeping for 15m, $(date)\e[0m\n"
+    sleep 15m
+    ./prepare_condor_resubmit.sh --prod-done-false --submit-file condor_submit_file_sosTrees_jpsi --process JPsiToMuMu_JPsiPt8
+    condor_submit condor_submit_file_sosTrees_jpsi.resubmit
+done
