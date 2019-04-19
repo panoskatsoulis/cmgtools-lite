@@ -112,6 +112,8 @@ s@(^selectedComponents.*)\[.*\]@\1\[${PROCESS}\]@;
 s@(= comp\.files).*(#sosTrees_production)@\1\[${FILE1}:${FILE2}\] \2@;
 s@(comp\.splitFactor).*(#sosTrees_production)@\1 = ${JOBS} \2@;
 " prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} || { echo "-----> [ERROR] sed command failed"; exit 3; }
+
+## Preparing the running path and the remote path
 JOB_RUN_PATH=jobBase_${PROCESS}_${JOB_ID} # link to the remote path taht is defined next
 JOB_REMOTE_PATH=$EOS_USER_PATH/workspace/$JOB_RUN_PATH # real location of the job run path
 [ -d $JOB_REMOTE_PATH ] && rm -rf $JOB_REMOTE_PATH
@@ -134,8 +136,8 @@ echo "~~~~~"
 [ -z $EVENTS ] && { echo "-----> specific number of events has not been given as input, will run for 1000"; EVENTS='1000'; }
 echo "-----> will run the heppy tool with the tree producer $TREE_PRODUCER for $EVENTS events"
 echo "-----> OUTPUT_TREE_PATH = $OUTPUT_TREE_PATH"
-OUT_FILE=../prod_treeProducersPerProcess/heppy.${PROCESS}_${JOB_ID}.out
-HEPPY_COMMAND=$(heppy ./ ../prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} \
+OUT_FILE=heppy.${PROCESS}_${JOB_ID}.out && touch $OUT_FILE
+HEPPY_COMMAND=$(heppy ./ $SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} \
     -f -N $EVENTS -o analysis=SOS -o test=sosTrees_production -j 4 > $OUT_FILE 2>&1)
 $HEPPY_COMMAND || { echo "-----> [ERROR] heppy failure, would execute command:"; echo "$HEPPY_COMMAND"; exit 4; }
 echo "-----> heppy exited with code $?"
@@ -143,35 +145,67 @@ echo "-----> heppy exited with code $?"
 echo "~~~~~"
 echo "-----> Comparing chunks and checking if the production has been finished."
 PRODUCTION_DONE=false
-CHUNKS_SUBMITED=$(grep -w submitting $OUT_FILE | sed -r 's@^(submitting).*@\1@' | uniq -c | awk '{print $1}')
-CHUNKS_DONE=$(grep -w done $OUT_FILE | sed -r 's@^(.*done):.*@\1@' | uniq -c | awk '{print $1}')
-(( $CHUNKS_DONE == $CHUNKS_SUBMITED )) && PRODUCTION_DONE=true
-for LOCAL_CHUNK in $(ls . -d); do
+if [ "$EXE_ENV" == "local" ]; then
+    EVENTS_PRODUCED=$(grep 'events processed' $OUT_FILE | sed 's/ //g' | awk -F : '{print $2}')
+    (( $EVENTS_PRODUCED == $EVENTS )) && PRODUCTION_DONE=true
+elif [ "$EXE_ENV" == "condor" ]; then
+    CHUNKS_SUBMITED=0
+    CHUNKS_DONE=-1
+    CHUNKS_SUBMITED=$(grep -w submitting $OUT_FILE | sed -r 's@^(submitting).*@\1@' | uniq -c | awk '{print $1}')
+    CHUNKS_DONE=$(grep -w done $OUT_FILE | sed -r 's@^(.*done):.*@\1@' | uniq -c | awk '{print $1}')
+    (( $CHUNKS_DONE == $CHUNKS_SUBMITED )) && PRODUCTION_DONE=true
+else
+    echo "Unknown execution environment $EXE_ENV."
+    exit 101
+fi
+
+echo "In path: $PWD"
+for LOCAL_CHUNK in $(ls * -d | grep ^${PROCESS}); do
     LOCAL_CHUNK_LARGER=false
     REMOTE_CHUNK_EXIST=false
-    REMOTE_CHUNK=$OUTPUT_TREE_PATH/${CHUNK}_${FILE1}-${FILE2}
+    REMOTE_CHUNK=$OUTPUT_TREE_PATH/${LOCAL_CHUNK}_${FILE1}-${FILE2}
     [ -d $REMOTE_CHUNK ] && {
 	REMOTE_CHUNK_EXIST=true
 	REMOTE_SIZE=$(du --total $REMOTE_CHUNK | grep total | awk '{print $1}')
+	echo "REMOTE_SIZE=$REMOTE_SIZE"
 	LOCAL_SIZE=$(du --total $LOCAL_CHUNK | grep total | awk '{print $1}')
+	echo "LOCAL_SIZE=$LOCAL_SIZE"
 	(( $LOCAL_SIZE > $REMOTE_SIZE )) && LOCAL_CHUNK_LARGER=true
     }
+    echo ">> LOCAL_CHUNK_LARGER=$LOCAL_CHUNK_LARGER, REMOTE_CHUNK_EXIST=$REMOTE_CHUNK_EXIST, $LOCAL_CHUNK, $REMOTE_CHUNK"
 
     if ! $REMOTE_CHUNK_EXIST; then # if there is no remote chunk just copy the new one
-	cp -a $LOCAL_CHUNK $OUTPUT_TREE_PATH/${CHUNK}_${FILE1}-${FILE2} && rm -rf $LOCAL_CHUNK
-    else # there are 4 cases here
-	# PD+LCL or !PD+LCL or PD+!LCL or !PD+!LCL
+	printf "A remote chunk doesn't exist, copying the local chunk to ${OUTPUT_TREE_PATH}.\n"
+	cp -r $LOCAL_CHUNK $REMOTE_CHUNK && rm -rf $LOCAL_CHUNK
+	TARGET_HEPPY_FILE=$SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/$OUT_FILE
+	[ -e $TARGET_HEPPY_FILE ] && rm -f $TARGET_HEPPY_FILE
+	cp -a $OUT_FILE $SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/.
+    elif $PRODUCTION_DONE; then # there are 4 cases here, this elif holps 2 PD+LCL or PD+!LCL
+	printf "The production has been finished as expected. The file will be copied to $OUTPUT_TREE_PATH.\n"
+	rm -rf $REMOTE_CHUNK
+	cp -r $LOCAL_CHUNK $REMOTE_CHUNK && rm -rf $LOCAL_CHUNK
+	TARGET_HEPPY_FILE=$SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/$OUT_FILE
+	[ -e $TARGET_HEPPY_FILE ] && rm -f $TARGET_HEPPY_FILE
+	cp -a $OUT_FILE $SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/.
+	! $LOCAL_CHUNK_LARGER && \
+	    printf "\e[0;33mWARNING!\e[0m The local chunk $LOCAL_CHUNK is NOT larger than the remote, BUT the production has been finished.\nThe chunk won't be removed from $JOB_REMOTE_PATH.\n"
+    else # !PD+LCL or !PD+!LCL
 	$LOCAL_CHUNK_LARGER && { # if the new chunk is larger copy it regardless of if the production has been finished
-	    cp -a $LOCAL_CHUNK $OUTPUT_TREE_PATH/${CHUNK}_${FILE1}-${FILE2} && rm -rf $LOCAL_CHUNK; }
-	{ $PRODUCTION_DONE && ! $LOCAL_CHUNK_LARGER; } && {
-	    printf "\e[0;33mWARNING!\e[0m The local chunk $LOCAL_CHUNK is NOT larger than the remote, BUT the production has been finished.\nThe chunk won't be removed from $JOB_REMOTE_PATH.\n"; }
-	{ ! $PRODUCTION_DONE && ! $LOCAL_CHUNK_LARGER; } && {
-	    printf "Removing the local chunk.\nThe remote is larger and the production has not been finished.\n";
-	    rm -rf $LOCAL_CHUNK; }
+	    printf "The new chunk is larger, copying it to ${OUTPUT_TREE_PATH}.\n";
+	    rm -rf $REMOTE_CHUNK
+	    cp -r $LOCAL_CHUNK $REMOTE_CHUNK && rm -rf $LOCAL_CHUNK;
+	    TARGET_HEPPY_FILE=$SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/$OUT_FILE
+	    [ -e $TARGET_HEPPY_FILE ] && rm -f $TARGET_HEPPY_FILE
+	    cp -a $OUT_FILE $SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/.;
+	    continue;
+	}
+
+	printf "Removing the local chunk.\nThe remote is larger and the production has not been finished.\n";
+	rm -rf $LOCAL_CHUNK
     fi
 done
 { $PRODUCTION_DONE && printf "PRODUCTION_DONE = \e[0;32m$PRODUCTION_DONE\e[0m\n"; } || \
     printf "PRODUCTION_DONE = \e[0;31m$PRODUCTION_DONE\e[0m\n"
 
-cd - && rm -f $JOB_RUN_PATH # remove the link but NOT the remote path if it's not been removed yet
+cd - > /dev/null && rm -f $JOB_RUN_PATH # remove the link but NOT the remote path if it's not been removed yet
 exit 0

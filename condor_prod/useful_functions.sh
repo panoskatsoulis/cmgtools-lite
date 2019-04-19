@@ -7,8 +7,23 @@ function printUsefulFunctions(){
 }
 
 function checkHeppyFiles(){
-    CLUSTER=$1
-    ll prod_treeProducersPerProcess/heppy.*$CLUSTER* | awk '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail -3 "$9); printf "\n"}'
+    ll prod_treeProducersPerProcess/heppy.* | awk -v lines=$1 '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail "lines" "$9); printf "\n"}'
+    return 0
+}
+
+function checkLogFiles(){
+    IFS=$'\n'
+    for line in $(ll log/hello.*.log); do
+	file=$(echo $line | awk '{print $9}')
+	[ ! -e $(echo $file | sed 's/^log/output/; s/log$/out/;') ] && continue
+	echo $line | awk -v lines=$1 '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail "lines" "$9); printf "\n"}'
+    done
+    IFS=$' \t\n'
+    return 0
+}
+
+function checkOutputFiles(){
+    ll output/*.out | awk -v lines=$1 '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail "lines" "$9); printf "\n"}'
     return 0
 }
 
@@ -52,6 +67,20 @@ function disableSosLinks(){
 	mv analysis_scripts/sosplots.txt analysis_scripts/sosplots.link.disabled
 	mv analysis_scripts/sosplots.txt.disabled analysis_scripts/sosplots.txt
     }
+    return 0
+}
+
+function protectCondorScripts(){
+    echo "Disabled the writting permissions for all to files below:"
+    chmod a-w sosTrees_production.sh prepare_condor_resubmit.sh condor_resubmit.dog
+    ll sosTrees_production.sh prepare_condor_resubmit.sh condor_resubmit.dog
+    return 0
+}
+
+function releaseCondorScripts(){
+    echo "Enabled the writting permissions for all to files below:"
+    chmod a+w sosTrees_production.sh prepare_condor_resubmit.sh condor_resubmit.dog
+    ll sosTrees_production.sh prepare_condor_resubmit.sh condor_resubmit.dog
     return 0
 }
 
