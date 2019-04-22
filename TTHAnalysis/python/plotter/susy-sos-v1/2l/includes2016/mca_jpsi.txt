@@ -2,6 +2,6 @@
 ## -----------------------------------------------------------
 # jpsi : JPsiToMuMu                   : xsec ; Label="JPsiToMuMu", FakeRate="susy-sos-v1/2l/fakerate/fakerate_standard.txt", FillColor=ROOT.kGreen
 # jpsi : JPsiToMuMu_OniaMuonFilter    : xsec ; Label="JPsiToMuMu", FakeRate="susy-sos-v1/2l/fakerate/fakerate_standard.txt", FillColor=ROOT.kGreen
-jpsi : JPsiToMuMu_JPsiPt8             : xsec ; Label="JPsiToMuMu", FakeRate="susy-sos-v1/2l/fakerate/fakerate_standard.txt", FillColor=ROOT.kGreen
+jpsi : JPsiToMuMu_JPsiPt8             : 1.0 ; Label="JPsiToMuMu", FillColor=ROOT.kGreen
 jpsi-test : Test_Tree-JPsiPt8         : xsec ; Label="JPsiToMuMu", FakeRate="susy-sos-v1/2l/fakerate/fakerate_standard.txt", FillColor=ROOT.kGreen
-Zjpsi : ZToJPsiMuMu                   : xsec ; Label="ZToJPsiMuMu", FakeRate="susy-sos-v1/2l/fakerate/fakerate_standard.txt", FillColor=ROOT.kMagenta
+# Zjpsi : ZToJPsiMuMu                   : xsec ; Label="ZToJPsiMuMu", FakeRate="susy-sos-v1/2l/fakerate/fakerate_standard.txt", FillColor=ROOT.kMagenta
