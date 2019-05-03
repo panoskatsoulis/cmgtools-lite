@@ -5,7 +5,8 @@ today = datetime.datetime.now().strftime("%Y-%m-%d")
 
 ## == configuration =================================
 
-tag  = "test"
+##tag  = "vtavolarTest_newFtrees_SR_bkgOnly_noHLT"
+tag  = "plots_controlregions"
 
 pfx  = ""
 #####pfx  = "_sc"
@@ -43,7 +44,7 @@ treedirs = {
             2017: "/afs/cern.ch/user/v/vtavolar/SusySOS/cleanTest/CMSSW_8_0_25/src/CMGTools/TTHAnalysis/python/plotter/data1/peruzzi/trees_SOS_030518"         ,
            }
 
-plotdir  = "/afs/cern.ch/user/k/kpanos/work/CMSSW_releases/analysis/CMSSW_8_0_32/src/sosplots/test"
+plotdir  = "$OUTPUT_PATH"
 carddir  = "/afs/cern.ch/user/v/vtavolar/work/SusySOS/cards"
 
 scales = [
@@ -56,20 +57,21 @@ modes = {
              #("SR"       , "data;prompt_.*;rares;fakes_appldata"       , None                        ),
              #("SRmc"     , "data;prompt_.*;rares;fakes_matched_.*"     , None                        ),
              ("SRsemi"   , "data;prompt_.*;rares;fakes_applmcBoth"     , None                        ),
-             #("AR"       , "data;prompt_.*;rares;fakes_matched_.*"     , "-X twoTight -E oneNotTight"),
-             #("AR1F"     , "data;prompt_.*;rares;fakes_matched_.*"     , "-X twoTight -E oneLNT"     ),
-             #("AR2F"     , "data;prompt_.*;rares;fakes_matched_.*"     , "-X twoTight -E twoLNT"     )
-             #("AR_sc"    , "data;prompt_.*;rares;fakes_matchedBoth_.*" , "-X twoTight -E oneNotTight"),
-             #("AR1F_sc"  , "data;prompt_.*;rares;fakes_matched1_.*"    , "-X twoTight -E oneLNT"     ),
-             #("AR2F_sc"  , "data;prompt_.*;rares;fakes_matched2_.*"    , "-X twoTight -E twoLNT"     )
+             ("AR"       , "data;prompt_.*;rares;fakes_matched_.*"     , "-X twoTight -E oneNotTight"),
+             ("AR1F"     , "data;prompt_.*;rares;fakes_matched_.*"     , "-X twoTight -E oneLNT"     ),
+             ("AR2F"     , "data;prompt_.*;rares;fakes_matched_.*"     , "-X twoTight -E twoLNT"     )
+             ("AR_sc"    , "data;prompt_.*;rares;fakes_matchedBoth_.*" , "-X twoTight -E oneNotTight"),
+             ("AR1F_sc"  , "data;prompt_.*;rares;fakes_matched1_.*"    , "-X twoTight -E oneLNT"     ),
+             ("AR2F_sc"  , "data;prompt_.*;rares;fakes_matched2_.*"    , "-X twoTight -E twoLNT"     )
              #("closure"  , "fakes_matched_.*;fakes_applmcBoth"        , None                        ),
              #("closure1F", "fakes_matched1fake_.*;fakes_applmc1"      , None                        ),
              #("closure2F", "fakes_matched2fake_.*;fakes_applmc2"      , None                        ),
             ],
          3: [
              #("SR"       , "data;prompt_.*;rares;fakes_appldata"       , None                          ),
-             #("SRmc"     , "data;prompt_.*;rares;fakes_matched_.*"     , None                          ),
-	     #("SRsemi"   , "data;prompt_.*;rares;fakes_applmcBoth"     , None                          ),
+             ("SRmc"     , "data;prompt_.*;rares;fakes_matched_.*"     , None                          ),
+##		("SRmc"     , "prompt_.*;rares;fakes_matched_.*"     , None                          ),
+##             ("SRsemi"   , "data;prompt_.*;rares;fakes_applmcBoth"     , None                          ),
              #("AR"       , "data;prompt_.*;rares;fakes_matched_.*"     , "-X threeTight -E oneNotTight"),
              #("AR1F"     , "data;prompt_.*;rares;fakes_matched_.*"     , "-X threeTight -E oneLNT"     ),
              #("AR2F"     , "data;prompt_.*;rares;fakes_matched_.*"     , "-X threeTight -E twoLNT"     ),
@@ -91,22 +93,22 @@ redlumi17 = 37.1
 fullumi17 = 41.4
 
 regions = [
-           #("sos2l16", "2lss16"      , fullumi16, "sig_T2tt_.*"), \
+           # ("sos2l16", "2lss16"      , fullumi16, "sig_T2tt_.*"), \
            # ("sos2l16", "2losEwkLow16", redlumi16, "sig_TChiWZ_.*"), \
            # ("sos2l16", "2losEwkMed16", fullumi16, "sig_TChiWZ_.*"), \
            # ("sos2l16", "2losEwkHig16", fullumi16, "sig_TChiWZ_.*"), \
-           #("sos2l16", "2losColLow16", redlumi16, "sig_T2tt_.*"), \
-           #("sos2l16", "2losColMed16", fullumi16, "sig_T2tt_.*"), \
-           #("sos2l16", "2losColHig16", fullumi16, "sig_T2tt_.*"), \
-           #("sos3l16", "3lMin16"     , redlumi16, "sig_TChiWZ_.*"), \
-           #("sos3l16", "3lLow16"     , redlumi16, "sig_TChiWZ_.*"), \
-           #("sos3l16", "3lMed16"     , fullumi16, "sig_TChiWZ_.*"), \
-	   #("sos2l16", "dyLow16"     , redlumi16, "sig_T2tt_.*"), \
-           # ("sos2l16", "dyMed16"     , fullumi16, "sig_T2tt_.*"), \
-           # ("sos2l16", "ttLow16"     , redlumi16, "sig_T2tt_.*"), \
-           # ("sos2l16", "ttMed16"     , fullumi16, "sig_T2tt_.*"), \
-           # ("sos2l16", "vvLow16"     , redlumi16, "sig_TChiWZ_.*"), \
-           # ("sos2l16", "vvMed16"     , fullumi16, "sig_TChiWZ_.*"), \
+           # ("sos2l16", "2losColLow16", redlumi16, "sig_T2tt_.*"), \
+           # ("sos2l16", "2losColMed16", fullumi16, "sig_T2tt_.*"), \
+           # ("sos2l16", "2losColHig16", fullumi16, "sig_T2tt_.*"), \
+           # ("sos3l16", "3lMin16"     , redlumi16, "sig_TChiWZ_.*"), \
+           # ("sos3l16", "3lLow16"     , redlumi16, "sig_TChiWZ_.*"), \
+           # ("sos3l16", "3lMed16"     , fullumi16, "sig_TChiWZ_.*"), \
+           ("sos2l16", "dyLow16"     , redlumi16, "sig_T2tt_.*"), \
+           ("sos2l16", "dyMed16"     , fullumi16, "sig_T2tt_.*"), \
+           ("sos2l16", "ttLow16"     , redlumi16, "sig_T2tt_.*"), \
+           ("sos2l16", "ttMed16"     , fullumi16, "sig_T2tt_.*"), \
+           ("sos2l16", "vvLow16"     , redlumi16, "sig_TChiWZ_.*"), \
+           ("sos2l16", "vvMed16"     , fullumi16, "sig_TChiWZ_.*"), \
            #("sos3l16", "wzMin16"     , fullumi16, "sig_TChiWZ_.*"), \
            #("sos3l16", "wzLow16"     , fullumi16, "sig_TChiWZ_.*"), \
            #("sos3l16", "wzMed16"     , fullumi16, "sig_TChiWZ_.*"), \

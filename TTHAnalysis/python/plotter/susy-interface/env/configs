@@ -4,7 +4,8 @@ BEGIN::sos2l16
   firstCut     := alwaystrue
   mcafile      := susy-sos-v1/2l/mca_sos_2016.txt
   cutfile      := susy-sos-v1/2l/cuts_sos_2016.txt
-  plotfile     := susy-sos-v1/2l/plots_sos.txt
+#  plotfile     := susy-sos-v1/2l/plots_sos.txt
+  plotfile     := susy-sos-v1/2l/plots_sos_kpanos.txt
   sysfile      := susy-sos-v1/systs_sos_2016.txt
 #  sfriends    +:= both3dloose
 #  sfriends    +:= 0_both3dlooseClean_v2
