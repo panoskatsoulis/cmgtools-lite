@@ -20,8 +20,16 @@ class L1Particle(object):
         self.mass=mass
 '''
 
+class GenPart:
+    def __init__(self, part):
+        self.pdg_id = part.pdgId()
+        self.mother = part.mother().pdgId()
+        self.pt = part.pt()
+        self.eta = part.eta()
+        self.phi = part.phi()
+        self.mass = part.mass()
 
-class L1Analyzer( Analyzer ):
+class Analyzer_GEN_L1( Analyzer ):
     """
       
     """
@@ -34,14 +42,31 @@ class L1Analyzer( Analyzer ):
     #---------------------------------------------
     def declareHandles(self):
         super(L1Analyzer, self).declareHandles()
+        # GEN
+        self.handles['genParts'] = AutoHandle( 'prunedGenParticles', 'std::vector<reco::GenParticle>' )
+        # L1
         self.handles['l1muons'] = AutoHandle( ('gmtStage2Digis','Muon'), 'BXVector<l1t::Muon>' )
         self.handles['l1jets'] = AutoHandle( ('caloStage2Digis','Jet'), 'BXVector<l1t::Jet>')
         self.handles['l1met'] = AutoHandle( ('caloStage2Digis','EtSum'), 'BXVector<l1t::EtSum>' )
         self.handles['l1eg'] = AutoHandle( ('caloStage2Digis','EGamma'), 'BXVector<l1t::EGamma>' )
 
-
     def beginLoop(self, setup):
         super(L1Analyzer,self).beginLoop(setup)
+
+    def doGenParts(self, event):
+        genParts = self.handles['genParts'].product()
+        GENParticles = []
+        for part in genParts:
+            if part.isFirstCopy():
+                GENParticles.append(GenPart(part))
+
+        GENParticles.sort(key=lambda part.pt, reverse=True)
+        event.genPdgIds = [part.pdgId for part in GENParticles]
+        event.genMothers = [part.mother for part in GENParticles]
+        event.genPts = [part.pt for part in GENParticles]
+        event.genEtas = [part.eta for part in GENParticles]
+        event.genPhis = [part.phi for part in GENParticles]
+        event.genMasses = [part.mass for part in GENParticles]
 
 
     def doLeptons(self,event):
@@ -102,8 +127,9 @@ class L1Analyzer( Analyzer ):
 
     def process(self, event):
         self.readCollections( event.input )        
-        self.doLeptons(event) # registers in event L1muon list and L1muons variable
-        self.doEG(event) # registers in event L1eg list and L1egs variable
-        self.doJets(event) # registers in event L1jet list and L1jets variable
-        self.doMET(event) # registers in event L1met and L1met_phi variables
+        # self.doLeptons(event) # registers in event L1muon list and L1muons variable
+        # self.doEG(event) # registers in event L1eg list and L1egs variable
+        # self.doJets(event) # registers in event L1jet list and L1jets variable
+        # self.doMET(event) # registers in event L1met and L1met_phi variables
+        self.doGenParts(event) # registers in event the list GENParticles
         return True
