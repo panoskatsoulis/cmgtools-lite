@@ -3,9 +3,11 @@
 [ -e plotting_today.log ] && rm -f plotting_today.log
 DATE=$(date | sed -r 's@^(.* .* .*) .* .* (.*)$@\1_\2@' | tr ' ' '-' | sed -r 's@\-{2,}@\-@')
 
-MCPLOTS_COMAND="python mcPlots.py susy-sos-v1/2l/mca_sos_2016.txt susy-sos-v1/2l/cuts_sos_2016.txt susy-sos-v1/2l/plots_sos_kpanos.txt -P /eos/user/k/kpanos/sostrees/2016_80X --s2v --tree treeProducerSusyMultilepton -uf --cmsprel Preliminary --legendWidth 0.20 --legendFontSize 0.02 --mcc susy-sos-v1/mcc_triggerdefs.txt --mcc susy-sos-v1/2l/mcc2016/mcc_2l.txt --mcc susy-sos-v1/mcc_sos.txt --mcc susy-sos-v1/2l/mcc2016/mcc_sf_met125.txt --mcc susy-sos-v1/2l/mcc2016/mcc_sf_fakes_2losEwkLow.txt --load-macro susy-sos-v1/functionsSOS.cc --load-macro susy-sos-v1/functionsSF.cc --load-macro susy-sos-v1/functionsPUW.cc --load-macro functions-kpanos.cc -F sf/t /eos/user/k/kpanos/sostrees/2016_80X/0_both3dlooseClean_v2/evVarFriend_{cname}.root --print png,txt --neg --legendHeader Datasets -j 8"
+MCPLOTS_COMAND="python mcPlots.py susy-sos-v1/2l/mca_sos_2016.txt susy-sos-v1/2l/cuts_sos_2016.txt susy-sos-v1/2l/plots_sos_kpanos.txt -P /eos/user/k/kpanos/sostrees/2016_80X --s2v --tree treeProducerSusyMultilepton -uf --cmsprel Preliminary --legendWidth 0.20 --legendFontSize 0.02 --mcc susy-sos-v1/mcc_triggerdefs.txt --mcc susy-sos-v1/2l/mcc2016/mcc_2l.txt --mcc susy-sos-v1/mcc_sos.txt --mcc susy-sos-v1/2l/mcc2016/mcc_sf_met125.txt --mcc susy-sos-v1/2l/mcc2016/mcc_sf_fakes_2losEwkLow.txt --load-macro susy-sos-v1/functionsSOS.cc --load-macro susy-sos-v1/functionsSF.cc --load-macro susy-sos-v1/functionsPUW.cc --load-macro functions-kpanos.cc -F sf/t /eos/user/k/kpanos/sostrees/2016_80X/0_both3dlooseClean_v2/evVarFriend_{cname}.root --FMC sf/t /eos/user/k/kpanos/sostrees/2016_80X/0_eventBTagWeight_v2/evVarFriend_{cname}.root --print png,txt --neg --legendHeader Datasets -j 8"
 
 PROCS_CUTS_MOD_BASE="-p jpsi -E ewk_.* -R lepRel_mll lepRel_mll m2l<50 -X lepRel_upsilonVeto -X ^evRel_.*"
+
+WEIGHTS="--alias wBG puw_nInt_Moriond(nTrueInt)*getLepSF(LepGood_pt[iLepSel[0]],LepGood_eta[iLepSel[0]],LepGood_pdgId[iLepSel[0]])*getLepSF(LepGood_pt[iLepSel[1]],LepGood_eta[iLepSel[1]],LepGood_pdgId[iLepSel[1]])*bTagWeight*triggerSFfullsim(LepGood_pt[iLepSel[0]],LepGood_eta[iLepSel[0]],LepGood_pt[iLepSel[1]],LepGood_eta[iLepSel[1]],met_pt,metmm_pt(LepGood_pdgId[iLepSel[0]],LepGood_pt[iLepSel[0]],LepGood_phi[iLepSel[0]],LepGood_pdgId[iLepSel[1]],LepGood_pt[iLepSel[1]],LepGood_phi[iLepSel[1]],met_pt,met_phi)) --alias wFS getLepSFFS(LepGood_pt[iLepSel[0]],LepGood_eta[iLepSel[0]],LepGood_pdgId[iLepSel[0]])*getLepSFFS(LepGood_pt[iLepSel[1]],LepGood_eta[iLepSel[1]],LepGood_pdgId[iLepSel[1]])*ISREwkCor*bTagWeightFS*triggerEff(LepGood_pt[iLepSel[0]],LepGood_eta[iLepSel[0]],LepGood_pt[iLepSel[1]],LepGood_eta[iLepSel[1]],met_pt,metmm_pt(LepGood_pdgId[iLepSel[0]],LepGood_pt[iLepSel[0]],LepGood_phi[iLepSel[0]],LepGood_pdgId[iLepSel[1]],LepGood_pt[iLepSel[1]],LepGood_phi[iLepSel[1]],met_pt,met_phi)) -W wBG"
 
 ## Enable & Disable Workflows
 PLOTS1_JPsiFullStat=false
@@ -13,8 +15,8 @@ PLOTS1_JPsiFullStat=false
 PLOTS2to5_1_METbins=false
 
 PLOTS6_2to5_HTcut=true
-PLOTS7_2to5_METoverHTlowcut=true
-PLOTS8_2to5_METoverHThighcut=true
+PLOTS7_2to5_METoverHTlowcut=false
+PLOTS8_2to5_METoverHThighcut=false
 PLOTS9_2to5_METoverHTentirecut=true
 PLOTS10_2to5_METoverHTentirecut_HTcut=true
 
@@ -30,7 +32,7 @@ $PLOTS1_JPsiFullStat && {
     echo "Now plotting plots1.";
     [ -d /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-noMETcut ] && \
 	rm -rf /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-noMETcut;
-    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE \
+    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE $WEIGHTS \
 	--pdir /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-noMETcut 1>>plotting_today.log 2>&1 || { echo "Error"; exit 1; };
     echo "-----------------------------------">>plotting_today.log;
     echo "Finished";
@@ -46,7 +48,7 @@ function plots1_allMetBins() {
     echo "Now plotting plots2."
     [ -d /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_0-50${DIRNAME_MOD} ] && \
 	rm -rf /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_0-50${DIRNAME_MOD};
-    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE -E 'MET_0_50' $CUTS_MOD \
+    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE $WEIGHTS -E 'MET_0_50' $CUTS_MOD \
 	--pdir /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_0-50${DIRNAME_MOD} 1>>plotting_today.log 2>&1 || { echo "Error"; return 2; }
     echo "-----------------------------------">>plotting_today.log;
     echo "Finished"
@@ -54,7 +56,7 @@ function plots1_allMetBins() {
     echo "Now plotting plots3."
     [ -d /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_50-125${DIRNAME_MOD} ] && \
 	rm -rf /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_50-125${DIRNAME_MOD};
-    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE -E 'MET_50_125' $CUTS_MOD \
+    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE $WEIGHTS -E 'MET_50_125' $CUTS_MOD \
 	--pdir /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_50-125${DIRNAME_MOD} 1>>plotting_today.log 2>&1 || { echo "Error"; return 3; }
     echo "-----------------------------------">>plotting_today.log;
     echo "Finished"
@@ -62,7 +64,7 @@ function plots1_allMetBins() {
     echo "Now plotting plots4."
     [ -d /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_125-200${DIRNAME_MOD} ] && \
 	rm -rf /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_125-200${DIRNAME_MOD};
-    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE -E 'MET_125_200' $CUTS_MOD \
+    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE $WEIGHTS -E 'MET_125_200' $CUTS_MOD \
 	--pdir /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_125-200${DIRNAME_MOD} 1>>plotting_today.log 2>&1 || { echo "Error"; return 4; }
     echo "-----------------------------------">>plotting_today.log;
     echo "Finished"
@@ -70,7 +72,7 @@ function plots1_allMetBins() {
     echo "Now plotting plots5."
     [ -d /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_200-inf${DIRNAME_MOD} ] && \
 	rm -rf /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_200-inf${DIRNAME_MOD};
-    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE -E 'MET_200_inf' $CUTS_MOD \
+    $MCPLOTS_COMAND $PROCS_CUTS_MOD_BASE $WEIGHTS -E 'MET_200_inf' $CUTS_MOD \
 	--pdir /eos/user/k/kpanos/www/SOS/tests/${DATE}/${OUTNAME}-MET_200-inf${DIRNAME_MOD} 1>>plotting_today.log 2>&1 || { echo "Error"; return 5; }
     echo "-----------------------------------">>plotting_today.log;
     echo "Finished"
