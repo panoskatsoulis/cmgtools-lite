@@ -1,0 +1,4 @@
+## filters
+alwaysTrue  : 1
+##filtersAll  : $FASTSIM{1} $DATA{EventFilters16} $MC{1} 
+
