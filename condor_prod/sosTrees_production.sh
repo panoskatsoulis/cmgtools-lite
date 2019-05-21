@@ -147,6 +147,7 @@ echo "-----> Comparing chunks and checking if the production has been finished."
 PRODUCTION_DONE=false
 if [ "$EXE_ENV" == "local" ]; then
     EVENTS_PRODUCED=$(grep 'events processed' $OUT_FILE | sed 's/ //g' | awk -F : '{print $2}')
+    [ -z $EVENTS_PRODUCED ] && EVENTS_PRODUCED=0
     (( $EVENTS_PRODUCED == $EVENTS )) && PRODUCTION_DONE=true
 elif [ "$EXE_ENV" == "condor" ]; then
     CHUNKS_SUBMITED=0
