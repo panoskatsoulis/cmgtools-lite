@@ -24,18 +24,21 @@
 ####################################
 # More Plots (related to the cuts) #
 ####################################
-lep1ptext	: LepGood1_pt						   : 25,0,150  ; XTitle="Leading lepton p_{T} [GeV]" , Legend='TR', IncludeOverflows=False, LegendCutoff=1e-10
-lep2ptext   	: LepGood2_pt						   : 25,0,150  ; XTitle="Subleading lepton p_{T} [GeV]" , Legend='TR', IncludeOverflows=False, LegendCutoff=1e-10
+lep1ptext	: LepGood1_pt						   : 25,0,150  ; XTitle="Leading lepton p_{T} [GeV]" , Legend='TR', LegendCutoff=1e-10, IncludeOverflows=False
+lep2ptext   	: LepGood2_pt						   : 25,0,150  ; XTitle="Subleading lepton p_{T} [GeV]" , Legend='TR', LegendCutoff=1e-10, IncludeOverflows=False
 mll	       	: m2l	     						   : 20,0,10   ; XTitle="M(ll) [GeV]", Legend='TR', LegendCutoff=0, IncludeOverflows=False
-met	       	: met_pt	 					   : 12,0,300  ; XTitle="p_{T}^{miss}  [GeV]"
-# htJet25     	: htJet25Sel-LepGood1_pt-LepGood2_pt 			   : 12,0,300  ; XTitle="H_{T}(jet p_{T} > 25)	[GeV]"
-htJet25     	: htJet25-LepGood1_pt-LepGood2_pt 			   : 12,0,300  ; XTitle="H_{T}(jet p_{T} > 25)	[GeV]"
-ptll	       	: pt_2(LepGood1_pt,LepGood1_phi, LepGood2_pt,LepGood2_phi) : 16,0,80   ; XTitle="p_{T}(ll) [GeV]", Legend='TR'
-metovht     	: (met_pt/(htJet25-LepGood1_pt-LepGood2_pt))		   : 10,0,2    ; XTitle="p_{T}^{miss}/H_{T}(jet p_{T} > 25)"
-# lep1MetDphi 	: abs(deltaPhi(LepGood1_phi, met_phi))			   : 7,0,3.14  ; XTitle="#Delta#phi(l1\,p_{T}^{miss})", MoreY=1.5
-# lep2MetDphi 	: abs(deltaPhi(LepGood2_phi, met_phi))			   : 7,0,3.14  ; XTitle="#Delta#phi(l2\,p_{T}^{miss})", MoreY=1.5
-lep1MetMT	: mt_2(LepGood1_pt,LepGood1_phi, met_pt,met_phi)	   : 12,0,120  ; XTitle="M_{T}(l1\,p_{T}^{miss})", MoreY=1.5
-lep2MetMT	: mt_2(LepGood2_pt,LepGood2_phi, met_pt,met_phi)	   : 12,0,120  ; XTitle="M_{T}(l2\,p_{T}^{miss})", MoreY=1.5
+mll_binx2.5    	: m2l	     						   : 50,0,10   ; XTitle="M(ll) [GeV]", Legend='TR', LegendCutoff=0, IncludeOverflows=False
+mll_bin1perGeV 	: m2l	     						   : 10,0,10   ; XTitle="M(ll) [GeV]", Legend='TR', LegendCutoff=0, IncludeOverflows=False
+met	       	: met_pt	 					   : 12,0,300  ; XTitle="p_{T}^{miss}  [GeV]", IncludeOverflows=False
+htJet25Sel     	: htJet25Sel-LepGood1_pt-LepGood2_pt 			   : 12,0,300  ; XTitle="H_{T}(jet p_{T} > 25)	[GeV]", IncludeOverflows=False
+htJet25     	: htJet25-LepGood1_pt-LepGood2_pt 			   : 12,0,300  ; XTitle="H_{T}(jet p_{T} > 25)	[GeV]", IncludeOverflows=False
+htJet25Sel_only	: htJet25Sel						   : 12,0,300  ; XTitle="H_{T}(jet p_{T} > 25)	[GeV]", IncludeOverflows=False
+ptll	       	: pt_2(LepGood1_pt,LepGood1_phi, LepGood2_pt,LepGood2_phi) : 16,0,80   ; XTitle="p_{T}(ll) [GeV]", Legend='TR', IncludeOverflows=False
+metovht     	: (met_pt/(htJet25-LepGood1_pt-LepGood2_pt))		   : 10,0,2    ; XTitle="p_{T}^{miss}/H_{T}(jet p_{T} > 25)", IncludeOverflows=False
+# lep1MetDphi 	: abs(deltaPhi(LepGood1_phi, met_phi))			   : 7,0,3.14  ; XTitle="#Delta#phi(l1\,p_{T}^{miss})", MoreY=1.5, IncludeOverflows=False
+# lep2MetDphi 	: abs(deltaPhi(LepGood2_phi, met_phi))			   : 7,0,3.14  ; XTitle="#Delta#phi(l2\,p_{T}^{miss})", MoreY=1.5, IncludeOverflows=False
+lep1MetMT	: mt_2(LepGood1_pt,LepGood1_phi, met_pt,met_phi)	   : 12,0,120  ; XTitle="M_{T}(l1\,p_{T}^{miss})", MoreY=1.5, IncludeOverflows=False
+lep2MetMT	: mt_2(LepGood2_pt,LepGood2_phi, met_pt,met_phi)	   : 12,0,120  ; XTitle="M_{T}(l2\,p_{T}^{miss})", MoreY=1.5, IncludeOverflows=False
 
 #############
 # Jet Plots #
@@ -44,8 +47,8 @@ lep2MetMT	: mt_2(LepGood2_pt,LepGood2_phi, met_pt,met_phi)	   : 12,0,120  ; XTit
 # nJet25Eta1p0	: nJetSelEta1			: [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5] ; XTitle='N(jet\, p_{T} > 25\, #||{#eta} < 1.0)'
 # nJet25Eta1p4	: nJetSelEta1p4			: [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5] ; XTitle='N(jet\, p_{T} > 25\, #||{#eta} < 1.44)'
 # nJet25Eta2p0	: nJetSelEta2p0			: [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5] ; XTitle='N(jet\, p_{T} > 25\, #||{#eta} < 2.0)'
-Jet1_id		: Jet1_id			: 16,0,15; XTitle="Jet1 ID"
-nBJetLoose25	: nBJetLoose25			: 21,0,20; XTitle="N_{b} Jets"
+Jet1_id		: Jet1_id			: 16,0,15; XTitle="Jet1 ID", IncludeOverflows=False
+nBJetLoose25	: nBJetLoose25			: 21,0,20; XTitle="N_{b} Jets", IncludeOverflows=False
 
 ############
 # My Plots #
