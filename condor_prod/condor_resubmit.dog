@@ -1,4 +1,5 @@
 #!/bin/bash
+. useful_functions.sh > /dev/null
 
 trap 'calm_the_dog' 2 #SIGINT
 
@@ -7,18 +8,44 @@ function calm_the_dog() {
     exit 0
 }
 
+function renew_krb5_ticket() {
+    ## Renew Kerberos Ticket, once per 12 hours (60*60*12 = 43200 sec)
+    (( ($(date +%s) - $TIMESTAMP) >= 43200 )) && {
+	kinit -R || { echo "Problem to renew the Kerberos Ticket. Stopping..."; exit 0; }
+	echo "kinit -R succeed, resetting timestamp $(date)"
+	TIMESTAMP=$(date +%s)
+    }
+    return
+}
+
 { [ -z $1 ] && FIRST_DO=nothing; } || FIRST_DO=$1
+## Parameters (resub-freq, condor_user, condor-submit-file, physical_process)
+FREQ=15m
+CONDOR_USER=$USER
+SUBMIT_FILE=sosTrees_withL1Vars_prodslim.condorsub
+declare -a PROCESSES
+for PROCESS in $(cat $SUBMIT_FILE | grep '^[^ ,]*,[0-9]*,[0-9]*$' | sed 's/,.*//' | sort -u); do
+    PROCESSES+=($PROCESS)
+done
+
+## Prepare .resubmit file
+[ -e ${SUBMIT_FILE}.resubmit ] && rm -f ${SUBMIT_FILE}.resubmit
+#these 2 lines are duplicated in the prepare_condor_resubmit.sh script as well
+# cp -a $SUBMIT_FILE ${SUBMIT_FILE}.resubmit && SUBMIT_FILE=${SUBMIT_FILE}.resubmit
+# sed -ri 's/(^[^ ,#]*, [0-9]*, [0-9]*)/#\1/' $SUBMIT_FILE
 
 if [[ $FIRST_DO =~ \-*help ]]; then
     echo "Usage ./condor_resubmit.dog <action>"
     echo "Actions: first-submit | resubmit | nothing | help"
     exit 0
 elif [ "$FIRST_DO" == "first-submit" ]; then
-    condor_rm kpanos
-    condor_submit condor_submit_file_sosTrees_jpsi.resubmit
+    condor_rm $CONDOR_USER
+    condor_submit ${SUBMIT_FILE}.resubmit
 elif [ "$FIRST_DO" == "resubmit" ]; then
-    ./prepare_condor_resubmit.sh --prod-done-false --submit-file condor_submit_file_sosTrees_jpsi --process JPsiToMuMu_JPsiPt8
-    condor_submit condor_submit_file_sosTrees_jpsi.resubmit
+    for PROCESS in ${PROCESSES[*]}; do
+	./prepare_condor_resubmit.sh --prod-done-false --submit-file $SUBMIT_FILE --process $PROCESS
+    done
+    condor_submit ${SUBMIT_FILE}.resubmit
 elif [ "$FIRST_DO" == "nothing" ]; then
     echo "Getting into the loop."
 else
@@ -26,10 +53,18 @@ else
     exit 101
 fi
 
+TIMESTAMP=$(date +%s)
 while true;
 do
-    printf "\e[0;33mSleeping for 15m, $(date)\e[0m\n"
-    sleep 15m
-    ./prepare_condor_resubmit.sh --prod-done-false --submit-file condor_submit_file_sosTrees_jpsi --process JPsiToMuMu_JPsiPt8
-    condor_submit condor_submit_file_sosTrees_jpsi.resubmit
+    checkOutputFiles -1
+    printf "\e[0;33mSleeping for $FREQ, $(date)\e[0m\n"
+    sleep $FREQ
+    for PROCESS in ${PROCESSES[*]}; do
+	./prepare_condor_resubmit.sh --prod-done-false --submit-file $SUBMIT_FILE --process $PROCESS
+	condor_submit ${SUBMIT_FILE}.resubmit
+	printf "\e[0;33mJust submitted failed jobs for ${PROCESS}.\e[0m\n"
+    done
+
+    ## Check if needed to renew the krb5-ticket
+    renew_krb5_ticket
 done

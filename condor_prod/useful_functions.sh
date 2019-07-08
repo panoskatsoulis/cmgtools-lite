@@ -23,7 +23,7 @@ function checkLogFiles(){
 }
 
 function checkOutputFiles(){
-    ll output/*.out | awk -v lines=$1 '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail "lines" "$9); printf "\n"}'
+    ls -l output/*.out | awk -v lines=$1 '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail "lines" "$9); printf "\n"}'
     return 0
 }
 
