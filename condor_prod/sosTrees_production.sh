@@ -131,6 +131,9 @@ ln -s $JOB_REMOTE_PATH $JOB_RUN_PATH && cd $JOB_RUN_PATH
 #     OUTPUT_TREE_PATH=${OUTPUT_TREE_PATH}/$(date | awk -F '[ :]*' '{print $1"-"$2"-"$3"-"$8"_time"$4$5}');
 #     mkdir $OUTPUT_TREE_PATH;
 # }
+#
+## Create output directory if it doesn't exist already
+[ ! -e $OUTPUT_TREE_PATH ] && mkdir $OUTPUT_TREE_PATH
 
 echo "~~~~~"
 [ -z $EVENTS ] && { echo "-----> specific number of events has not been given as input, will run for 1000"; EVENTS='1000'; }
