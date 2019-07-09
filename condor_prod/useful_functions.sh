@@ -32,6 +32,11 @@ function cleanProducts(){
     { rm -rf prod_treeProducersPerProcess; } || return 2
     { rm -f *~ && rm -f kpanos.cc; } || return 3
     { rm -rf jobBase_* && ll . log output error; } || return 4
+    { [[ $1 =~ \-*all ]] && [ -d $EOS_USER_PATH/workspace ]; } && {
+	printf "Will remove also the $EOS_USER_PATH/workspace files.."
+	rm -rf $EOS_USER_PATH/workspace/* && printf " done.\n";
+	ll $EOS_USER_PATH/workspace;
+    }
     return 0
 }
 

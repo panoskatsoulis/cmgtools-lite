@@ -22,7 +22,7 @@ function renew_krb5_ticket() {
 ## Parameters (resub-freq, condor_user, condor-submit-file, physical_process)
 FREQ=15m
 CONDOR_USER=$USER
-SUBMIT_FILE=sosTrees_withL1Vars_prodslim.condorsub
+SUBMIT_FILE=sosTrees_withL1Vars_test.condorsub
 declare -a PROCESSES
 for PROCESS in $(cat $SUBMIT_FILE | grep '^[^ ,]*,[0-9]*,[0-9]*$' | sed 's/,.*//' | sort -u); do
     PROCESSES+=($PROCESS)
@@ -42,8 +42,11 @@ elif [ "$FIRST_DO" == "first-submit" ]; then
     condor_rm $CONDOR_USER
     condor_submit ${SUBMIT_FILE}.resubmit
 elif [ "$FIRST_DO" == "resubmit" ]; then
+    echo "This method needs development still. Don't use it. Failure specific resubmit needs necessarily the cluster info to run."; exit 150;
+    [ -z $2 ] && { echo "Usage: $0 resubmit <failure-to-search>"; exit 102; }
+    FAILURE="$2"
     for PROCESS in ${PROCESSES[*]}; do
-	./prepare_condor_resubmit.sh --prod-done-false --submit-file $SUBMIT_FILE --process $PROCESS
+	./prepare_condor_resubmit.sh --failure-specific "$FAILURE" --submit-file $SUBMIT_FILE --process $PROCESS
     done
     condor_submit ${SUBMIT_FILE}.resubmit
 elif [ "$FIRST_DO" == "nothing" ]; then
