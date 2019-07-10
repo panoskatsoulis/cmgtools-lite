@@ -13,7 +13,7 @@ function checkHeppyFiles(){
 
 function checkLogFiles(){
     IFS=$'\n'
-    for line in $(ll log/hello.*.log); do
+    for line in $(ll log/condor.*.log); do
 	file=$(echo $line | awk '{print $9}')
 	[ ! -e $(echo $file | sed 's/^log/output/; s/log$/out/;') ] && continue
 	echo $line | awk -v lines=$1 '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail "lines" "$9); printf "\n"}'

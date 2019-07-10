@@ -3,9 +3,9 @@ notify_user	      = panos.katsoulis@cern.ch
 executable            = sosTrees_production.sh
 getenv                = True
 arguments             = "--condor $(process) $(ClusterId) $(ProcId) /eos/user/k/kpanos/sostrees/2016_80X run_susyMultilepton_cfg_jpsi_TEST 1400000 4 $(file1) $(file2) 2>&1"
-output                = output/hello.$(ClusterId).$(ProcId).out
-error                 = error/hello.$(ClusterId).$(ProcId).err
-log                   = log/hello.$(ClusterId).$(ProcId).log
+output                = output/condor.$(ClusterId).$(ProcId).out
+error                 = error/condor.$(ClusterId).$(ProcId).err
+log                   = log/condor.$(ClusterId).$(ProcId).log
 RequestCpus           = 4
 max_retries           = 3
 

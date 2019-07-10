@@ -78,7 +78,7 @@ if $PROD_FAILED_MODE; then
     ! ls output/*.out &>/dev/null && { echo "No jobs exist in the output/ path yet."; exit 11; }
     for outfile in $(grep PROCESS output/*.out | grep $PROCESS | sed -r 's/^([^:]*\.out).*/\1/'); do
 	! [[ $(grep PROCESS $outfile) =~ .*$PROCESS ]] && continue
-	JOB=$(echo $outfile | sed -r 's@.*/hello\.(.*\..*)\.out$@\1@') && {
+	JOB=$(echo $outfile | sed -r 's@.*/condor\.(.*\..*)\.out$@\1@') && {
 	    [ ! -z $JOB ] && echo "job found."; }
 	[ ! -s $outfile ] && { # if the outfile is still empty, refresh the heppy links if possible and skip the job
 	    echo "The job $JOB has not output written yet. Skipping, either it's running or is idle.";
