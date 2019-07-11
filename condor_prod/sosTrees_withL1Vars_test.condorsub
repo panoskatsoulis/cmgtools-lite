@@ -1,0 +1,19 @@
+notification          = Complete
+notify_user	      = panos.katsoulis@cern.ch
+executable            = sosTrees_production.sh
+getenv                = True
+arguments             = "--condor $(process) $(ClusterId) $(ProcId) /eos/user/k/kpanos/sostrees/2016_80X_extraL1/tests run_susyMultilepton_cfg_prod 1400000 4 $(file1) $(file2) $(process) 2>&1"
+output                = output/condor.$(process).$(ClusterId).$(ProcId).out
+error                 = error/condor.$(process).$(ClusterId).$(ProcId).err
+log                   = log/condor.$(process).$(ClusterId).$(ProcId).log
+RequestCpus           = 4
+max_retries           = 3
+
++JobFlavour = "tomorrow"
+queue process,file1,file2 from (
+# SMS_TChiWZ,1,5
+TTJets_DiLepton,1,5
+TTJets_DiLepton,6,10
+DYJetsToLL_M5to50_HT70to100,1,5
+DYJetsToLL_M5to50_HT70to100,6,10
+)
