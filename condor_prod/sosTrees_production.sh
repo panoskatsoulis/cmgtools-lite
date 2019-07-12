@@ -4,14 +4,13 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "Supports 2 execution environments '--local' and '--condor', otherwise it returns code 101."
     echo "When running in condor environment, the parameters MUST be passed without the switches (--xyz) and using the following 'remote' format exactly as it is."
     echo "~~~"
-    echo "remote usage: sosTrees_production.sh --condor <process> <condor-job-id> <condor-proc> <output-path> <tree-producer-nosuffix> <events-per-job> <jobs-per-process> <begin-file> <end-file> [<task-name>]"
+    echo "remote usage: sosTrees_production.sh --condor <process> <condor-job-id> <condor-proc> <output-path> <tree-producer-nosuffix> <events-per-job> <jobs-per-process> <begin-file> <end-file>"
     echo " local usage: sosTrees_production.sh --local --process <process> --out-path <output-path> --tree-producer <tree-producer-nosuffix>"
     echo "  --local and --condor      : mandatory switches, this argument MUST be inserted as argument '\$1'"
     echo "  --events <events-per-job> : overwrites the number of events to be processed by each process-job (default '1000')"
     echo "  --jobs <jobs-per-process> : overwrites the number of jobs to split the range that is defined by '--begin-file' and '--end-file' (default '1')"
     echo "  --begin-file <begin-file> : overwrites the first root file to process (default '')"
     echo "  --end-file <end-file>     : overwrites the last root file to process (default '1')"
-    echo "  --task <task-name>        : overwrites the task name for jobs of a given process using a specific tree producer (default '<process>.<tree-producer-nosuffix>')"
     echo "  --help, -h                : prints this help message."
     echo "~~~"
     echo "Exit codes:"
@@ -40,7 +39,6 @@ if [ "$1" == "--local" ]; then
 	[ "$1" == "--begin-file" ] && { FILE1=$2; shift 2; continue; }
 	[ "$1" == "--end-file" ] && { FILE2=$2; shift 2; continue; }
 	[ "$1" == "--jobs" ] && { JOBS=$2; shift 2; continue; }
-	[ "$1" == "--task" ] && { TASK_NAME=$2; shift 2; continue; }
 	echo "Unknown command line argument $1" && exit 102;
     done
 elif [ "$1" == "--condor" ]; then
@@ -54,12 +52,10 @@ elif [ "$1" == "--condor" ]; then
     JOBS=$7
     FILE1=$8
     FILE2=$9
-    TASK_NAME=${10}
 else
     echo "-----> [ERROR] unknown execution environment $1"
     exit 101
 fi
-[ -z $TASK_NAME ] && TASK_NAME=${PROCESS}.$TREE_PRODUCER # fill the task name if it's not given.
 
 echo "-----> SOS Tree Production"
 echo "-----> checking hostname..."
@@ -89,31 +85,16 @@ export X509_USER_PROXY=$AFS_HOME/x509up_u${UID}
 echo "~~~~~"
 echo "-----> setting up cmssw env..."
 if [ ! -z $SOS_WORK_PATH ] && [ ! -z $EOS_USER_PATH ]; then
-    echo "-----> [NOTE] SOS_WORK_PATH and EOS_USER_PATH variables are set as expected."
-elif [ -z $SOS_WORK_PATH ] && [ ! -z $EOS_USER_PATH ]; then
-    echo "-----> [WARNING] SOS_WORK_PATH is empty, will set it to \$CMSSW_BASE/src if CMSSW environment has already been set."
-    [ ! -z $CMSSW_VERSION ] && export SOS_WORK_PATH=$CMSSW_BASE/src
+    cd $SOS_WORK_PATH
+    eval `scramv1 runtime -sh`
+    echo "-----> SOS_WORK_PATH = $SOS_WORK_PATH"
+    echo "-----> CMSSW_VERSION = $CMSSW_VERSION"
 else
     echo "-----> [ERROR] SOS_WORK_PATH or/and EOS_USER_PATH are empty variables"
     echo "-----> [NOTE] sosTrees_production.sh uses these variables to setup the running environment and also save output trees in EOS."
     echo "-----> [NOTE] Please export your \$CMSSW_BASE/src as SOS_WORK_PATH, your EOS path as EOS_USER_PATH, and rerun the script."
     exit 2
 fi
-INITIAL_PATH=$(pwd) && cd $SOS_WORK_PATH
-eval `scramv1 runtime -sh`
-echo "-----> SOS_WORK_PATH = $SOS_WORK_PATH"
-echo "-----> CMSSW_VERSION = $CMSSW_VERSION"
-echo "-----> PWD = $(pwd)"
-
-echo "-----> finding the relative task..."
-cd CMGTools/condor_prod # get into the condor_prod package
-# create the TASK path if it doesn't exist and get into there
-[ ! -d $TASK_NAME ] && mkdir $TASK_NAME
-cd $TASK_NAME
-# prepare the task path in a way that the rest script will be able to run unchanged from inside the task folder
-[ ! -d prod_treeProducersPerProcess ] && mkdir prod_treeProducersPerProcess
-[ ! -e $TREE_PRODUCER.py ] && cp -a ../$TREE_PRODUCER.py .
-echo "-----> TASK = $TASK_NAME"
 echo "-----> PWD = $(pwd)"
 
 echo "~~~~~"
@@ -123,6 +104,7 @@ echo "-----> JOB_ID = $JOB_ID"
 echo "-----> FILES = [${FILE1}:${FILE2}]"
 echo "-----> JOBS = $JOBS"
 echo "-----> configuring env and files"
+cd CMGTools/condor_prod && { [ ! -d prod_treeProducersPerProcess ] && mkdir prod_treeProducersPerProcess; }
 NEW_TREE_PRODUCER=${TREE_PRODUCER}_${PROCESS}.${JOB_ID}.py
 cp -a ${TREE_PRODUCER}.py prod_treeProducersPerProcess/${NEW_TREE_PRODUCER}
 sed -r -i "
@@ -158,8 +140,8 @@ echo "~~~~~"
 echo "-----> will run the heppy tool with the tree producer $TREE_PRODUCER for $EVENTS events"
 echo "-----> OUTPUT_TREE_PATH = $OUTPUT_TREE_PATH"
 OUT_FILE=heppy.${PROCESS}_${JOB_ID}.out && touch $OUT_FILE
-HEPPY_COMMAND="heppy ./ prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} -f -N $EVENTS -o analysis=SOS -o test=sosTrees_production -j 4 > $OUT_FILE 2>&1"
-echo "-----> HEPPY CMD: $HEPPY_COMMAND"
+HEPPY_COMMAND=$(heppy ./ $SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} \
+    -f -N $EVENTS -o analysis=SOS -o test=sosTrees_production -j 4 > $OUT_FILE 2>&1)
 $HEPPY_COMMAND || { echo "-----> [ERROR] heppy failure, would execute command:"; echo "$HEPPY_COMMAND"; exit 4; }
 echo "-----> heppy exited with code $?"
 
@@ -230,5 +212,4 @@ done
     printf "PRODUCTION_DONE = \e[0;31m$PRODUCTION_DONE\e[0m\n"
 
 cd - > /dev/null && rm -f $JOB_RUN_PATH # remove the link but NOT the remote path if it's not been removed yet
-cd $INITIAL_PATH
 exit 0
