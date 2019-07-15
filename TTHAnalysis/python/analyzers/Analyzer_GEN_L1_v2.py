@@ -62,8 +62,10 @@ class Analyzer_GEN_L1( Analyzer ):
         self.handles['l1met'] = AutoHandle( ('caloStage2Digis','EtSum'), 'BXVector<l1t::EtSum>' )
         self.handles['l1eg'] = AutoHandle( ('caloStage2Digis','EGamma'), 'BXVector<l1t::EGamma>' )
 
+
     def beginLoop(self, setup):
         super(Analyzer_GEN_L1, self).beginLoop(setup)
+
 
     def doGenParts(self, event):
         genParts = self.handles['genParts'].product()
@@ -85,66 +87,45 @@ class Analyzer_GEN_L1( Analyzer ):
 
 
     def doLeptons(self,event):
-        event.L1muons = 0
-        event.L1muon=[]
-        l1=self.handles['l1muons'].product()
-
-        for l in range(0,l1.size(0)):
-              mu=l1.at(0,l)               
-              event.L1muons +=1 
-              event.L1muon.append(mu)       
-
+        l1muons = self.handles['l1muons'].product()
+        event.L1muon = []
+        for mu in l1muons:
+            event.L1muon.append(mu)       
         event.L1muon.sort(key=lambda mu: mu.pt(), reverse=True)
+        event.L1muons = len(event.L1muon)
 
 
     def doJets(self,event):
-         event.L1jets = 0
-         event.L1jet=[]       
-         l1=self.handles['l1jets'].product()
-         for j in range(0,l1.size(0)):
-              jet=l1.at(0,j) 
-              event.L1jet.append(jet)
-              event.L1jets+=1
-
+         l1jets = self.handles['l1jets'].product()
+         event.L1jet=[]
+         for jet in l1jets:
+             event.L1jet.append(jet)
          event.L1jet.sort(key=lambda jet: jet.pt(), reverse=True)
+         event.L1jets = len(event.L1jet)
  
 
     def doEG(self,event):
-         event.L1egs = 0
-         event.L1eg=[]
-         l1=self.handles['l1eg'].product() 
-         for e in range(0,l1.size(0)):
-              eg=l1.at(0,e)
-              event.L1eg.append(eg)
-              event.L1egs+=1
-
-         event.L1eg.sort(key=lambda eg: eg.pt(), reverse=True)
+        l1egs=self.handles['l1eg'].product() 
+        event.L1eg = []
+        for eg in l1egs:
+            event.L1eg.append(eg)
+        event.L1eg.sort(key=lambda eg: eg.pt(), reverse=True)
+        event.L1egs = len(event.L1eg)
 
 
     def doMET(self,event):
-          event.L1met = -1
-          event.L1met_phi = -999
-          if self.cfg_comp.isMC:
-            for m in self.handles['l1met'].product():
-               if m.getType()=='kMissingEtHF': 
-                    event.L1met =l1met.pt()
-                    event.L1met_phi =l1met.phi()
-          else:
-           l1met=[]
-           l1metphi=[]
-           for m in self.handles['l1met'].product():
-               if m.getType()=='kMissingEtHF':
-                    l1met =l1met.pt()
-                    l1met_phi =l1met.phi()       
-           event.L1met =l1met[2]
-           event.L1met_phi =l1met_phi[2]
+        l1met = self.handles['l1met'].product()
+        event.L1met = l1met[2].pt() # 2=kMissingEt
+        event.L1met_phi = l1met[2].phi()
+        event.L1methf = l1met[8].pt() # 8=kMissingEtHF
+        event.L1methf_phi = l1met[8].phi()
           
 
     def process(self, event):
         self.readCollections( event.input )        
-        # self.doLeptons(event) # registers in event L1muon list and L1muons variable
-        # self.doEG(event) # registers in event L1eg list and L1egs variable
-        # self.doJets(event) # registers in event L1jet list and L1jets variable
-        # self.doMET(event) # registers in event L1met and L1met_phi variables
+        self.doLeptons(event) # registers in event L1muon list and L1muons variable
+        self.doEG(event) # registers in event L1eg list and L1egs variable
+        self.doJets(event) # registers in event L1jet list and L1jets variable
+        self.doMET(event) # registers in event L1met and L1met_phi variables
         self.doGenParts(event) # registers in event the list GENParticles
         return True
