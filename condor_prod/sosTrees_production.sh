@@ -12,6 +12,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "  --begin-file <begin-file> : overwrites the first root file to process (default '')"
     echo "  --end-file <end-file>     : overwrites the last root file to process (default '1')"
     echo "  --task <task-name>        : overwrites the task name for jobs of a given process using a specific tree producer (default '<process>.<tree-producer-nosuffix>')"
+    echo "  --dont-rm-link            : configures the script to keep the link that points to the workspace (for debugging)"
     echo "  --help, -h                : prints this help message."
     echo "~~~"
     echo "Exit codes:"
@@ -41,6 +42,7 @@ if [ "$1" == "--local" ]; then
 	[ "$1" == "--end-file" ] && { FILE2=$2; shift 2; continue; }
 	[ "$1" == "--jobs" ] && { JOBS=$2; shift 2; continue; }
 	[ "$1" == "--task" ] && { TASK_NAME=$2; shift 2; continue; }
+	[ "$1" == "--dont-rm-link" ] && { KEEP_JOB_LINK=true; shift; continue; }
 	echo "Unknown command line argument $1" && exit 102;
     done
 elif [ "$1" == "--condor" ]; then
@@ -59,7 +61,9 @@ else
     echo "-----> [ERROR] unknown execution environment $1"
     exit 101
 fi
+[ -z $KEEP_JOB_LINK ] && KEEP_JOB_LINK=false
 [ -z $TASK_NAME ] && TASK_NAME=${PROCESS}.$TREE_PRODUCER # fill the task name if it's not given.
+TASK_NAME=task_$TASK_NAME
 
 echo "-----> SOS Tree Production"
 echo "-----> checking hostname..."
@@ -132,7 +136,7 @@ s@(comp\.splitFactor).*(#sosTrees_production)@\1 = ${JOBS} \2@;
 " prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} || { echo "-----> [ERROR] sed command failed"; exit 3; }
 
 ## Preparing the running path and the remote path
-JOB_RUN_PATH=jobBase_${PROCESS}_${JOB_ID} # link to the remote path taht is defined next
+JOB_RUN_PATH=jobBase_${PROCESS}_${JOB_ID} # link to the remote path that is defined next
 JOB_REMOTE_PATH=$EOS_USER_PATH/workspace/$JOB_RUN_PATH # real location of the job run path
 [ -d $JOB_REMOTE_PATH ] && rm -rf $JOB_REMOTE_PATH
 mkdir $JOB_REMOTE_PATH
@@ -158,9 +162,9 @@ echo "~~~~~"
 echo "-----> will run the heppy tool with the tree producer $TREE_PRODUCER for $EVENTS events"
 echo "-----> OUTPUT_TREE_PATH = $OUTPUT_TREE_PATH"
 OUT_FILE=heppy.${PROCESS}_${JOB_ID}.out && touch $OUT_FILE
-HEPPY_COMMAND="heppy ./ prod_treeProducersPerProcess/${NEW_TREE_PRODUCER} -f -N $EVENTS -o analysis=SOS -o test=sosTrees_production -j 4 > $OUT_FILE 2>&1"
+HEPPY_COMMAND="heppy ./ $SOS_WORK_PATH/CMGTools/condor_prod/$TASK_NAME/prod_treeProducersPerProcess/$NEW_TREE_PRODUCER -f -N $EVENTS -o analysis=SOS -o test=sosTrees_production -j 4 > $OUT_FILE 2>&1"
 echo "-----> HEPPY CMD: $HEPPY_COMMAND"
-$HEPPY_COMMAND || { echo "-----> [ERROR] heppy failure, would execute command:"; echo "$HEPPY_COMMAND"; exit 4; }
+eval $HEPPY_COMMAND || { echo "-----> [ERROR] heppy failure, exited with code: $?"; exit 4; }
 echo "-----> heppy exited with code $?"
 
 echo "~~~~~"
@@ -183,6 +187,12 @@ fi
 
 echo "In path: $PWD"
 for LOCAL_CHUNK in $(ls * -d | grep ^${PROCESS}); do
+    ## Copy the output heppy file to the task's prod_treeProducersPerProcess folder
+    TARGET_HEPPY_FILE=$SOS_WORK_PATH/CMGTools/condor_prod/$TASK_NAME/prod_treeProducersPerProcess/$OUT_FILE
+    [ -e $TARGET_HEPPY_FILE ] && rm -f $TARGET_HEPPY_FILE
+    cp -a $OUT_FILE $TARGET_HEPPY_FILE
+
+    ## Compare the chunks and copy them to EOS if needed
     LOCAL_CHUNK_LARGER=false
     REMOTE_CHUNK_EXIST=false
     REMOTE_CHUNK=$OUTPUT_TREE_PATH/${LOCAL_CHUNK}_${FILE1}-${FILE2}
@@ -199,16 +209,10 @@ for LOCAL_CHUNK in $(ls * -d | grep ^${PROCESS}); do
     if ! $REMOTE_CHUNK_EXIST; then # if there is no remote chunk just copy the new one
 	printf "A remote chunk doesn't exist, copying the local chunk to ${OUTPUT_TREE_PATH}.\n"
 	cp -r $LOCAL_CHUNK $REMOTE_CHUNK && rm -rf $LOCAL_CHUNK
-	TARGET_HEPPY_FILE=$SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/$OUT_FILE
-	[ -e $TARGET_HEPPY_FILE ] && rm -f $TARGET_HEPPY_FILE
-	cp -a $OUT_FILE $SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/.
     elif $PRODUCTION_DONE; then # there are 4 cases here, this elif holps 2 PD+LCL or PD+!LCL
 	printf "The production has been finished as expected. The file will be copied to $OUTPUT_TREE_PATH.\n"
 	rm -rf $REMOTE_CHUNK
 	cp -r $LOCAL_CHUNK $REMOTE_CHUNK && rm -rf $LOCAL_CHUNK
-	TARGET_HEPPY_FILE=$SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/$OUT_FILE
-	[ -e $TARGET_HEPPY_FILE ] && rm -f $TARGET_HEPPY_FILE
-	cp -a $OUT_FILE $SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/.
 	! $LOCAL_CHUNK_LARGER && \
 	    printf "\e[0;33mWARNING!\e[0m The local chunk $LOCAL_CHUNK is NOT larger than the remote, BUT the production has been finished.\nThe chunk won't be removed from $JOB_REMOTE_PATH.\n"
     else # !PD+LCL or !PD+!LCL
@@ -216,9 +220,6 @@ for LOCAL_CHUNK in $(ls * -d | grep ^${PROCESS}); do
 	    printf "The new chunk is larger, copying it to ${OUTPUT_TREE_PATH}.\n";
 	    rm -rf $REMOTE_CHUNK
 	    cp -r $LOCAL_CHUNK $REMOTE_CHUNK && rm -rf $LOCAL_CHUNK;
-	    TARGET_HEPPY_FILE=$SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/$OUT_FILE
-	    [ -e $TARGET_HEPPY_FILE ] && rm -f $TARGET_HEPPY_FILE
-	    cp -a $OUT_FILE $SOS_WORK_PATH/CMGTools/condor_prod/prod_treeProducersPerProcess/.;
 	    continue;
 	}
 
@@ -229,6 +230,6 @@ done
 { $PRODUCTION_DONE && printf "PRODUCTION_DONE = \e[0;32m$PRODUCTION_DONE\e[0m\n"; } || \
     printf "PRODUCTION_DONE = \e[0;31m$PRODUCTION_DONE\e[0m\n"
 
-cd - > /dev/null && rm -f $JOB_RUN_PATH # remove the link but NOT the remote path if it's not been removed yet
+cd - > /dev/null && ! $KEEP_JOB_LINK && rm -f $JOB_RUN_PATH # remove the link but NOT the remote path if it's not been removed yet
 cd $INITIAL_PATH
 exit 0

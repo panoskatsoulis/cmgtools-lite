@@ -7,7 +7,7 @@ function printUsefulFunctions(){
 }
 
 function checkHeppyFiles(){
-    ll prod_treeProducersPerProcess/heppy.* | awk -v lines=$1 '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail "lines" "$9); printf "\n"}'
+    ll task_*/prod_treeProducersPerProcess/heppy.* | awk -v lines=$1 '{printf "\033[0;33mFile created at "$6"-"$7"-"$8"|\t"$9"\033[0m\n"; system("tail "lines" "$9); printf "\n"}'
     return 0
 }
 
@@ -28,10 +28,9 @@ function checkOutputFiles(){
 }
 
 function cleanProducts(){
-    { rm -f output/* && rm -f error/* && rm -f log/*; } || return 1
-    { rm -rf prod_treeProducersPerProcess; } || return 2
-    { rm -f *~ && rm -f kpanos.cc; } || return 3
-    { rm -rf jobBase_* && ll . log output error; } || return 4
+    { rm -f output/condor.* && rm -f error/condor.* && rm -f log/condor.*; } || return 1
+    { rm -rf task_* && rm -f *~ && rm -f kpanos.cc; } || return 2
+    ls -l ./ log/ output/ error/
     { [[ $1 =~ \-*all ]] && [ -d $EOS_USER_PATH/workspace ]; } && {
 	printf "Will remove also the $EOS_USER_PATH/workspace files.."
 	rm -rf $EOS_USER_PATH/workspace/* && printf " done.\n";
