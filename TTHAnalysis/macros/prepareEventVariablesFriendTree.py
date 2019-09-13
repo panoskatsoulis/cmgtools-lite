@@ -93,6 +93,7 @@ parser.add_option("--checkrunning", dest="checkrunning",   action="store_true", 
 parser.add_option("--checkaliens", dest="checkaliens",   action="store_true", default=False, help="Check for aliens (existing files in friends dir corresponding to no input samples)");
 parser.add_option("--quiet", dest="quiet",   action="store_true", default=False, help="Check chunks that have been produced");
 parser.add_option("-q", "--queue",   dest="queue",     type="string", default=None, help="Run jobs on lxbatch queue or condor instead of locally");
+parser.add_option("--batch-name", dest="batch_name", type="string", default="CMD:", help="Name of the task in the queue");
 parser.add_option("-a", "--accounting-group", dest="accounting_group", default=None, help="Accounting group for condor jobs");
 parser.add_option("--maxruntime", "--time",  dest="maxruntime", type="int", default=360, help="Condor job wall clock time in minutes (default: 6h)");
 parser.add_option("-n", "--new",  dest="newOnly", action="store_true", default=False, help="Make only missing trees");
@@ -103,6 +104,7 @@ parser.add_option("--run",   dest="runner",     type="string", default="lxbatch_
 parser.add_option("--bk",   dest="bookkeeping",  action="store_true", default=False, help="If given the command used to run the friend tree will be stored");
 parser.add_option("--tra2",  dest="useTRAv2", action="store_true", default=False, help="Use the new version of treeReAnalyzer");
 parser.add_option("-t", "--tree", dest="tree", default='NanoAOD', help="Pattern for tree name");
+parser.add_option("--parse-only",  dest="checkParser", action="store_true", default=False, help="Will not run the command, will only print the parsed options");
 # input friends
 parser.add_option("-F", "--add-friend",    dest="friendTrees",  action="append", default=[], nargs=2, help="Add a friend tree (treename, filename). Can use {name}, {cname} patterns in the treename")
 parser.add_option("--FMC", "--add-friend-mc",    dest="friendTreesMC",  action="append", default=[], nargs=2, help="Add a friend tree (treename, filename) to MC only. Can use {name}, {cname} patterns in the treename")
@@ -123,7 +125,14 @@ else: # old CMGTools options
     parser.add_option("-o", "--outPattern",   dest="outPattern",     type="string", default="evVarFriend_%s", help="Pattern string for output file name");
     parser.add_option("-T", "--tree-dir",   dest="treeDir",     type="string", default="sf", help="Directory of the friend tree in the file (default: 'sf')");
 (options, args) = parser.parse_args()
-
+if options.checkParser:
+    print type(options)
+    print type(args)
+    print options
+    for i,arg in enumerate(args):
+        if i == 0: print "trees : ", arg
+        if i == 1: print "output: ", arg
+    quit(0)
 
 if not isNano:
     if options.imports:
@@ -384,6 +393,7 @@ Log        = {logdir}/log.$(cluster).$(Dataset).$({chunk})
 use_x509userproxy = $ENV(X509_USER_PROXY)
 getenv = True
 request_memory = 2000
+on_exit_remove = (ExitBySignal == False) && (ExitCode == 0)
 +MaxRuntime = {maxruntime}
 {accounting_group}
 """.format(runner = options.runner, logdir = logdir, maxruntime = options.maxruntime * 60, chunk = chunk,
@@ -456,7 +466,13 @@ if options.queue:
       subfile.close()
       print "Saved condor submit file to %s" % options.subfile
       if not options.pretend:
-         os.system("condor_submit "+options.subfile)
+          if options.batch_name == "CMD:":
+              batch_name = " -batch-name '"+options.batch_name+options.runner+"'"
+          else:
+              batch_name = " -batch-name '"+options.batch_name+"'"
+          condor_submit_command = "condor_submit "+options.subfile+batch_name
+          print "Running:", condor_submit_command
+          os.system(condor_submit_command)
     else:
       for (name,fin,fout,data,range,chunk,fs) in jobs:
         if chunk != -1:
