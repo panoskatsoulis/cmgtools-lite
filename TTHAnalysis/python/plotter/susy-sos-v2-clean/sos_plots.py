@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import sys
 import re
 import os
@@ -19,6 +20,7 @@ parser.add_argument("--norm", action="store_true", default=False, help="Normaliz
 parser.add_argument("--unc", action="store_true", default=False, help="Include uncertainties")
 parser.add_argument("--inPlots", default=None, help="Select plots, separated by commas, no spaces")
 parser.add_argument("--exPlots", default=None, help="Exclude plots, separated by commas, no spaces")
+parser.add_argument("--study-mod", dest="study", default=None, help="Select modifications (mcas,cuts,mccs) to be done related to a study")
 args = parser.parse_args()
 
 ODIR=args.outDir
@@ -116,11 +118,12 @@ def runIt(GO,name):
     if args.data: name=name+"_data"
     if args.norm: name=name+"_norm"
     if args.unc: name=name+"_unc"
-    if dowhat == "plots":  print submit.format(command=' '.join(['python mcPlots.py',"--pdir %s/%s/%s"%(ODIR,YEAR,name),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ])]))
+    if dowhat == "plots":
+        return submit.format(command=' '.join(['python mcPlots.py',"--pdir %s/%s/%s"%(ODIR,YEAR,name),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ])]))
     # What is supposed to be included in sys.argv[4] and after?
-    #elif dowhat == "yields": print 'echo %s; python mcAnalysis.py'%name,GO,' '.join(sys.argv[4:])
-    #elif dowhat == "dumps":  print 'echo %s; python mcDump.py'%name,GO,' '.join(sys.argv[4:])
-    #elif dowhat == "ntuple": print 'echo %s; python mcNtuple.py'%name,GO,' '.join(sys.argv[4:])
+    #elif dowhat == "yields": print('echo %s; python mcAnalysis.py'%name,GO,' '.join(sys.argv[4:]))
+    #elif dowhat == "dumps":  print('echo %s; python mcDump.py'%name,GO,' '.join(sys.argv[4:]))
+    #elif dowhat == "ntuple": print('echo %s; python mcNtuple.py'%name,GO,' '.join(sys.argv[4:]))
 
 def add(GO,opt):
     return '%s %s'%(GO,opt)
@@ -144,10 +147,15 @@ def binYearChoice(x,torun,YEAR):
         metBin = 'met250'
         x2 = add(x2,'-X ^mm$ ')
     if metBin != '': x2 = add(x2,'-E ^'+metBin+'$ -E ^'+metBin+'_trig_'+YEAR[-2:]+'$ ')
-    else: print "\n--- NO TRIGGER APPLIED! ---\n"
+    else: print("\n--- NO TRIGGER APPLIED! ---\n")
     return x2
 
 allow_unblinding = False
+
+
+## Study Modification
+## def modifyAnalysis(plotCmd,study):
+    ## SingleMuon Trigger
 
 
 if __name__ == '__main__':
@@ -236,8 +244,26 @@ if __name__ == '__main__':
         if YEAR=="2016": x = x.replace(LUMI," -l 33.2 ")
         if YEAR=="2017": x = x.replace(LUMI," -l 36.74 ")
 
+    ## Build the plotting command for the Unmodified SOS
+    unmodSosCmd = runIt(x,'%s'%torun)
 
-    runIt(x,'%s'%torun)
+    ## Check if modifications have been requested and apply them
+    if not (args.study is None):
+        print("A study has been selected:", args.study)
+        print "not implemented yet."
+        quit(0)
+        #plottingCmd = modifyAnalysis(unmodSosCmd, args.study)
+    else:
+        print("Unmodified SOS analysis has been requested.")
+        plottingCmd = unmodSosCmd
+    print(plottingCmd)
+
+    ## Run the command is the user accept it
+    ans = ''
+    while not (ans in ['y','n']):
+        print("Want to execute it? [y/n]", end=''); ans = raw_input();
+    if ans is 'y':
+        os.system(plottingCmd)
 
 ######################################################################################
 # Useful options for plotting, to be used when needed
