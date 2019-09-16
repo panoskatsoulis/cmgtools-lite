@@ -8,7 +8,7 @@ import argparse
 helpText = "LEP = '2los', '3los'\n\
 REG = 'sr', 'sr_col', 'cr_dy', 'cr_tt', 'cr_vv', 'cr_ss', 'cr_wz', 'appl'\n\
 BIN = 'min', 'low', 'med', 'high'"
-parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                  epilog=helpText)
 parser.add_argument("outDir", help="Choose the output directory.\nOutput will be saved to 'outDir/year/LEP_REG_BIN'")
 parser.add_argument("year", help="Choose the year: '2016', '2017' or '2018'")
@@ -20,7 +20,11 @@ parser.add_argument("--norm", action="store_true", default=False, help="Normaliz
 parser.add_argument("--unc", action="store_true", default=False, help="Include uncertainties")
 parser.add_argument("--inPlots", default=None, help="Select plots, separated by commas, no spaces")
 parser.add_argument("--exPlots", default=None, help="Exclude plots, separated by commas, no spaces")
-parser.add_argument("--study-mod", dest="study", default=None, help="Select modifications (mcas,cuts,mccs) to be done related to a study")
+parser.add_argument("--dont-run", dest="dontrun", action="store_true", default=False, help="Do not run the command, just print it")
+parser.add_argument("--study-mod", dest="studyScenarioPrint", action="store", metavar=("STUDYNAME","SCENARIO"), default=[],
+                    nargs='+', help="Perform a study. STUDYNAME (dir in the Study/ path) is required. SCENARIO can be one\
+                    of {'alt','alternative','2'}, is used to perform analysis for the alternative scenario wrt the unmodified\
+                    SOS ({'sos','original','1'} not required). A 3rd-arg (bool) controls verbosity.")
 args = parser.parse_args()
 
 ODIR=args.outDir
@@ -154,8 +158,50 @@ allow_unblinding = False
 
 
 ## Study Modification
-## def modifyAnalysis(plotCmd,study):
-    ## SingleMuon Trigger
+def modifyAnalysis(plotCmd, study_mods):
+    ## convers string to the required boolean (handles verbosity)
+    if len(study_mods) < 3:
+        study_mods.append(False)
+    else:
+        study_mods[2] = bool(study_mods[2])
+
+    ## vars to be used
+    moddedCmd = plotCmd
+    regexs = []; targets = []
+
+    ## study dedicated code >>>-------------------------------------------------------------------------------------------------------------------------
+    if study_mods[0] == "SingleMuonTrigger":
+        ## general for both scenarios
+        regexs.append(" susy\-sos\-v2\-clean/([^ ]*mca[^ ]*txt) ")
+        regexs.append(" susy\-sos\-v2\-clean/([^ ]*plots[^ ]*txt) ")
+        regexs.append(" susy\-sos\-v2\-clean/([^ ]*cuts[^ ]*txt) ")
+        targets.extend([" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 " for i in range(3)])
+        ## scenario specific
+        if study_mods[1] in ['sos','original','1']:
+            regexs.append(" *$"); targets.append(" --xp data_1Mu")
+        if study_mods[1] in ['alt','alternative','2']:
+            regexs.append(" -\P [^ ]* "); targets.append(" -P /eos/user/k/kpanos/sostrees/2018/trees ")
+            regexs.append(" \--\Fs [^ ]* "); targets.append(" --Fs /eos/user/k/kpanos/sostrees/2018/trees/friends ")
+            regexs.append(" \-\-mcc [^ ]*triggerdefs.txt "); targets.append(" --mcc susy-sos-v2-clean/Studies/SingleMuonTrigger/mcc_triggerdefs.txt ")
+            regexs.append(" *$"); targets.append(" -E trg_SingleMu")
+
+    ## study dedicated code <<<-------------------------------------------------------------------------------------------------------------------------
+
+    ## printing section
+    if study_mods[2]:
+        print("--"*80)
+        print(moddedCmd)
+        print("Changes to be applied:")
+        for regex,target in zip(regexs, targets):
+            match = re.search(regex, moddedCmd)
+            print(match.group(0), "----------->", match.expand(target))
+        print("--"*80)
+
+    ## apply the changes
+    for regex,target in zip(regexs, targets):
+        moddedCmd = re.sub(r'{}'.format(regex), target, moddedCmd)
+
+    return moddedCmd
 
 
 if __name__ == '__main__':
@@ -248,22 +294,25 @@ if __name__ == '__main__':
     unmodSosCmd = runIt(x,'%s'%torun)
 
     ## Check if modifications have been requested and apply them
-    if not (args.study is None):
-        print("A study has been selected:", args.study)
-        print "not implemented yet."
-        quit(0)
-        #plottingCmd = modifyAnalysis(unmodSosCmd, args.study)
+    if len(args.studyScenarioPrint) > 0:
+        print("A study has been selected:", args.studyScenarioPrint[0])
+        if len(args.studyScenarioPrint) < 2: # if scenario has not been given, use 'sos'
+            args.studyScenarioPrint.append('sos')
+        plottingCmd = modifyAnalysis(unmodSosCmd, args.studyScenarioPrint)
     else:
         print("Unmodified SOS analysis has been requested.")
         plottingCmd = unmodSosCmd
     print(plottingCmd)
 
-    ## Run the command is the user accept it
+    ## Run the command if the user accept it
+    if args.dontrun: quit(0)
     ans = ''
     while not (ans in ['y','n']):
         print("Want to execute it? [y/n]", end=''); ans = raw_input();
-    if ans is 'y':
-        os.system(plottingCmd)
+    exit_code = 0
+    if ans == 'y':
+        exit_code = os.system(plottingCmd) ## in case the code will be needed in the future
+    quit(exit_code)
 
 ######################################################################################
 # Useful options for plotting, to be used when needed
