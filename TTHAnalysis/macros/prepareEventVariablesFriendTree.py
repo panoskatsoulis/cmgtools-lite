@@ -125,6 +125,7 @@ else: # old CMGTools options
     parser.add_option("-o", "--outPattern",   dest="outPattern",     type="string", default="evVarFriend_%s", help="Pattern string for output file name");
     parser.add_option("-T", "--tree-dir",   dest="treeDir",     type="string", default="sf", help="Directory of the friend tree in the file (default: 'sf')");
 (options, args) = parser.parse_args()
+
 if options.checkParser:
     print type(options)
     print type(args)
