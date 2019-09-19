@@ -1,0 +1,117 @@
+#!/bin/bash
+
+function do_treeProd_help() {
+    printf "Usage: $(basename $0) --task <task-name> --type <data/mc> --year <year> -in <cfg.py> -out <dir>                   (Full Production Mode)
+Usage: $(basename $0) --friends-only --task <task-name> --type <data/mc> --year <year> -in <trees-dir> -out <dir> (Friends Only Mode)
+Options:
+    --task <arg>         : Task name
+    --type <arg>         : data/mc, configs the recleaner
+    --year <arg>         : 2016,2017,2018
+    --input, -in <arg>   : Input to the script as described above (file or dir)
+    --output, -out <arg> : Output directory to store products (hadd'ed)
+    --events <arg>       : Maximum events per chunk
+    --freq <arg>         : Check frequency for the watchdogs
+    --friends-only       : Enables the Friends Only mode
+    --skip-jetCorrs      : Skips the calculation of the jetMetCorrections,
+                           needs to setup correctly the 'input' argument
+                           {one (1) level above the jetmet directory}
+    --force-rm           : Forces to remove <out-dir> and <src/task_name> (if exist)
+    --debug              : Runs 'set -x' (super verbosive)
+"
+    [ "$1" == "all" ] && {
+	printf "Local afs directories:
+SRC/TASK --+-- postprocessor_chunks
+           |-- friends_chunks
+           +-- jetmetUncertainties_chunks
+"
+	printf "Output directories Structure (Full Production):
+OUT_PATH/YEAR/TASK_NAME --+-- postprocessor_chunks
+                          |-- friends_chunks
+                          +-- jetmetUncertainties_chunks
+                          +-- trees --+-- <trees>.root
+                                      +-- friends --+-- <ftrees>.root
+                                                    +-- jetmetUncertainties --+-- <jetmet-trees>.root
+"
+	printf "Output directories Structure (Friends Only):
+OUT_PATH/YEAR/TASK_NAME --+-- postprocessor_chunks
+                          |-- friends_chunks
+                          +-- jetmetUncertainties_chunks
+
+"
+    } || {
+	echo "Run $(basename $0) -h all for information about the directories."
+    }
+    exit 0
+}
+
+
+## tool that asks the user if wants to remove the given directory
+## Usage: checkRmPath <dir> <force-bool>
+function checkRmPath() {
+    DIR2RM=$1
+    FORCE=$2
+    $FORCE && { rm -rf $DIR2RM; return; }
+    [ -e $DIR2RM ] && {
+	ans=''
+	while ! [[ $ans =~ [yn] ]]; do printf "The working path $DIR2RM exists, want to remove it? [y/n]"; read -p ans; done
+	[ "$ans" == "y" ] && rm -rf $DIR2RM
+    }
+    return
+}
+
+## tool that checks if the friend trees module finished
+## Usage: wait_friendsModule <output-dir> <sleep-freq>
+function wait_friendsModule() {
+    DIR=$1
+    FREQ=$2
+    while true; do
+	jobs_logs=$(ls $DIR/logs/log.* | wc | awk '{print $1}')
+	jobs_finished=$(grep -o "return value 0" $DIR/logs/log.* | wc | awk '{print $1}')
+	root_files=$(ls $DIR/*.root | wc | awk '{print $1}')
+	echo "jobs_logs=$jobs_logs, jobs_finished=$jobs_finished, root_files=$root_files"
+	echo "logs = finished : $(( $jobs_logs == $jobs_finished ))"
+	echo "logs = files    : $(( $jobs_logs == $root_files ))"
+	echo "logs > files    : $(( $jobs_logs > $root_files ))"
+	if (( $jobs_logs == $jobs_finished )) && (( $jobs_logs == $root_files )); then
+	    echo "true is (( $jobs_logs == $jobs_finished )) && (( $jobs_logs == $root_files ))"
+	    return 0
+	elif (( $jobs_logs == $jobs_finished )) && (( $jobs_logs > $root_files )); then
+	    echo "true is (( $jobs_logs == $jobs_finished )) && (( $jobs_logs > $root_files ))"
+	    echo "[ ERROR ]"
+	    echo "All jobs included in $DIR finished, but the number of the produced root files is less than the jobs run."
+	    return 1
+	else
+	    echo "none is true"
+	    jobs_failed=$(grep -o "return value [1-9]+" $DIR/logs/log.* | wc | awk '{print $1}')
+	    (( $jobs_failed > 0 )) && echo "[ WARNING ] $jobs_failed have failed in directory $DIR"
+	    sleep $FREQ
+	fi
+    done
+}
+
+## tool that hadds all processes in a given path and stores them wherever specified
+## Usage: haddProcesses <in-dir> <out-dir>
+function haddProcesses() {
+    IN_DIR=$1
+    OUT_DIR=$2
+    ## loop over processes which split into more than 1 chunk
+    processes=$(ls $IN_DIR/*root | sed -r 's@^.*/([^/\.]*).*[Cc]hunk[0-9]*\.root$@\1@; /chunk/d' | sort -u)
+    for process in $processes; do
+	chunks=$(ls $IN_DIR/$process.chunk*.root | wc | awk '{print $1}')
+	(( $chunks == 0 )) && {
+	    cp -a $IN_DIR/$process.root $OUT_DIR/$process.root || echo "$IN_DIR/$process is missing" >> errors_treeProduction
+	    continue
+	}
+	hadd -ff $OUT_DIR/$process.root $IN_DIR/$process.chunk*.root || {
+	    echo "hadd failed for path $IN_DIR and process $process"
+	    return 1
+	}
+    done
+    ## copy the files from processes which split in 1 chunk
+    files=$(ls $IN_DIR/*root | sed -r 's@^.*/([^/\.]*).*[Cc]hunk[0-9]*\.root$@\1@' | grep .*root$)
+    for file in $files; do
+	cp -a $file $OUT_DIR/.
+    done
+    return 0
+}
+
