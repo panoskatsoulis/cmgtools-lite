@@ -53,7 +53,7 @@ function checkRmPath() {
     $FORCE && { rm -rf $DIR2RM; return; }
     [ -e $DIR2RM ] && {
 	ans=''
-	while ! [[ $ans =~ [yn] ]]; do printf "The working path $DIR2RM exists, want to remove it? [y/n]"; read -p ans; done
+	while ! [[ $ans =~ [yn] ]]; do printf "The working path $DIR2RM exists, want to remove it? [y/n]"; read ans; done
 	[ "$ans" == "y" ] && rm -rf $DIR2RM
     }
     return
