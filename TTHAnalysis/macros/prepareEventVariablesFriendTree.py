@@ -93,6 +93,7 @@ parser.add_option("--checkrunning", dest="checkrunning",   action="store_true", 
 parser.add_option("--checkaliens", dest="checkaliens",   action="store_true", default=False, help="Check for aliens (existing files in friends dir corresponding to no input samples)");
 parser.add_option("--quiet", dest="quiet",   action="store_true", default=False, help="Check chunks that have been produced");
 parser.add_option("-q", "--queue",   dest="queue",     type="string", default=None, help="Run jobs on lxbatch queue or condor instead of locally");
+parser.add_option("--batch-name", dest="batch_name", type="string", default="CMD:", help="Name of the task in the queue");
 parser.add_option("-a", "--accounting-group", dest="accounting_group", default=None, help="Accounting group for condor jobs");
 parser.add_option("--maxruntime", "--time",  dest="maxruntime", type="int", default=360, help="Condor job wall clock time in minutes (default: 6h)");
 parser.add_option("-n", "--new",  dest="newOnly", action="store_true", default=False, help="Make only missing trees");
@@ -123,7 +124,6 @@ else: # old CMGTools options
     parser.add_option("-o", "--outPattern",   dest="outPattern",     type="string", default="evVarFriend_%s", help="Pattern string for output file name");
     parser.add_option("-T", "--tree-dir",   dest="treeDir",     type="string", default="sf", help="Directory of the friend tree in the file (default: 'sf')");
 (options, args) = parser.parse_args()
-
 
 if not isNano:
     if options.imports:
@@ -455,7 +455,13 @@ if options.queue:
       subfile.close()
       print "Saved condor submit file to %s" % options.subfile
       if not options.pretend:
-         os.system("condor_submit "+options.subfile)
+          if options.batch_name == "CMD:":
+              batch_name = " -batch-name '"+options.batch_name+options.runner+"'"
+          else:
+              batch_name = " -batch-name '"+options.batch_name+"'"
+          condor_submit_command = "condor_submit "+options.subfile+batch_name
+          print "Running:", condor_submit_command
+          os.system(condor_submit_command)
     else:
       for (name,fin,fout,data,range,chunk,fs) in jobs:
         if chunk != -1:
