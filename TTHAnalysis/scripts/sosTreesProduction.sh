@@ -103,17 +103,19 @@ fi
 ! [ -d $IN_FILE_DIR ] && { echo "Input must be a directory in the Friends Only mode."; exit 2; } 
 cd $TTHANALYSIS_MACRO_PATH && echo "$PWD"
 if [ $TASK_TYPE == "data" ]; then
-    python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_data,tightLepCR_seq -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-data
+    DATA_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_data,tightLepCR_seq -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-data"
+    eval $DATA_CMD
 
-    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ \
+    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ $DATA_CMD \
 	&& haddProcesses $AFS_DIR_FRIENDS_CHUNKS $OUT_PATH_FRIENDS \
 	|| exit 1
 
 elif [ $TASK_TYPE == "mc" ]; then
     ! $SKIP_JETCORRS && {
-	python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_JETMET_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules jetmetUncertainties$TASK_YEAR -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-mc_jetcorrs
+	JETMET_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_JETMET_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules jetmetUncertainties$TASK_YEAR -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-mc_jetcorrs"
+	eval $JETMET_CMD
 
-	wait_friendsModule $AFS_DIR_JETMET_CHUNKS $FREQ \
+	wait_friendsModule $AFS_DIR_JETMET_CHUNKS $FREQ $JETMET_CMD \
 	    && haddProcesses $AFS_DIR_JETMET_CHUNKS $OUT_PATH_JETMET \
 	    || exit 1
     }
@@ -121,9 +123,10 @@ elif [ $TASK_TYPE == "mc" ]; then
     echo "Files ($(ls $OUT_PATH_JETMET | wc | awk '{print $1}')) in the directory $IN_FILE_DIR/$FRIENDS_DIR/jetmetUncertainties:"
     ls $OUT_PATH_JETMET
 
-    python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_mc,tightLepCR_seq -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-mc
+    MC_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_mc,tightLepCR_seq -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-mc"
+    eval $MC_CMD
 
-    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ \
+    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ $MC_CMD \
 	&& haddProcesses $AFS_DIR_FRIENDS_CHUNKS $OUT_PATH_FRIENDS \
 	|| exit 1
 
