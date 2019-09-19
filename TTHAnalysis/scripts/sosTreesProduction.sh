@@ -120,7 +120,7 @@ elif [ $TASK_TYPE == "mc" ]; then
 	    || exit 1
     }
 
-    echo "Files ($(ls $OUT_PATH_JETMET | wc | awk '{print $1}')) in the directory $IN_FILE_DIR/$FRIENDS_DIR/jetmetUncertainties:"
+    echo "Files ($(ls $OUT_PATH_JETMET | wc | awk '{print $1}')) in the directory $OUT_PATH_JETMET:"
     ls $OUT_PATH_JETMET
 
     MC_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_mc,tightLepCR_seq -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-mc"
@@ -136,4 +136,5 @@ else
 fi
 
 cd -
+echo "Done"
 exit 0
