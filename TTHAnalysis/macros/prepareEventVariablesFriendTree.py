@@ -582,7 +582,7 @@ def _runItNano(myargs):
     command += [ "-z", options.compression ]
     fin = fin
     friends = options.friendTrees[:] + (options.friendTreesData if data else options.friendTreesMC)
-    for tf_tree,tf_file in friends:
+    for tf_file,tf_tree in friends:
         if tf_tree not in ("Friends", "Events"): print "Unsupported friend tree name %s" % tf_tree
         fin += ",%s" % tf_file.format(name=name, cname=name, P=args[0])
     command += [ fin, "--first-entry", str(range[0]), "-N", str(range[1] - range[0]) ]
