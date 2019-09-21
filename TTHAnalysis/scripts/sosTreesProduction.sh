@@ -34,8 +34,8 @@ done
 [ -z "$FORCE_RM_DIRS" ] && FORCE_RM_DIRS=false
 [ -z "$N_EVENTS" ] && N_EVENTS=500000
 [ -z "$FREQ" ] && FREQ=10m
-{ [ -z $DATASET ] && [ "$TASK_TYPE" == "data" ]; } && DATASET='.*Run.*'
-{ [ -z $DATASET ] && [ "$TASK_TYPE" == "mc" ]; } && DATASET='^(?!.*Run).*'
+{ [ -z $DATASET ] && [ "$TASK_TYPE" == "data" ]; } && DATASET="'.*Run.*'"
+{ [ -z $DATASET ] && [ "$TASK_TYPE" == "mc" ]; } && DATASET="'^(?!.*Run).*'"
 { [ -z $PY_CFG ] && ! $FRIENDS_ONLY; } && {
     echo "Either a Python cfg file is required or the Friends Only mode must be specified."
     exit 1
@@ -46,10 +46,9 @@ done
 }
 
 ## setup environment
-OUT_PATH=$OUT_TREES_DIR/$YEAR/$TASK_NAME-$(date | awk '{print $3$2$6}')
+OUT_PATH=$OUT_TREES_DIR/$TASK_YEAR/$TASK_NAME-$(date | awk '{print $3$2$6}')
 # SPACE_CLEANER=$CMSSW_DIR/spaceCleaner-v2.dog ## required for the Full Production mode (to be fixed)
-PY_FTREES_CMD=prepareEventVariablesFriendTree.py
-TTHANALYSIS_MACRO_PATH=$CMSSW_DIR/CMGTools/TTHAnalysis/macros
+PY_FTREES_CMD=$CMSSW_DIR/CMGTools/TTHAnalysis/macros/prepareEventVariablesFriendTree.py
 FRIENDS_DIR=friends
 
 ## clean existing working paths if the user allows
@@ -57,15 +56,18 @@ checkRmPath $OUT_PATH $FORCE_RM_DIRS
 checkRmPath $CMSSW_DIR/$TASK_NAME $FORCE_RM_DIRS
 
 ## setup the required directories
-mkdir $OUT_PATH/postprocessor_chunks -p
+mkdir $OUT_PATH/postprocessor_chunks -p ## remote directories
 mkdir $OUT_PATH/friends_chunks
 mkdir $OUT_PATH/jetmetUncertainties_chunks
-OUT_PATH_POSTPROC=$OUT_PATH/postprocessor_chunks
-OUT_PATH_FRIENDS=$OUT_PATH/friends_chunks
-OUT_PATH_JETMET=$OUT_PATH/jetmetUncertainties_chunks
-# AFS_DIR_POSTPROC_CHUNKS=$CMSSW_DIR/$TASK_NAME
-AFS_DIR_FRIENDS_CHUNKS=$CMSSW_DIR/$TASK_NAME/friends_chunks
-AFS_DIR_JETMET_CHUNKS=$CMSSW_DIR/$TASK_NAME/jetmetUncertainties_chunks
+OUT_PATH_POSTPROC=$OUT_PATH/postprocessor_hadd
+OUT_PATH_FRIENDS=$OUT_PATH/friends_hadd
+OUT_PATH_JETMET=$OUT_PATH/jetmetUncertainties_hadd
+mkdir $CMSSW_DIR/$TASK_NAME ## local directories
+cd $CMSSW_DIR/$TASK_NAME && echo "$PWD"
+ln -s ../CMGTools/TTHAnalysis/macros/lxbatch_runner.sh lxbatch_runner.sh
+# AFS_DIR_POSTPROC_CHUNKS=
+AFS_DIR_JETMET_CHUNKS=jetmetUncertainties_chunks
+AFS_DIR_FRIENDS_CHUNKS=friends_chunks
 
 ## the postprocessor block won't run in case of the Friends Only mode ============================================ NEEDS TO BE TESTED =========================================
 if ! $FRIENDS_ONLY; then
@@ -100,13 +102,12 @@ fi
 ## =============================================================================================================== NEEDS TO BE TESTED =========================================
 
 ## run the friend tree modules
-! [ -d $IN_FILE_DIR ] && { echo "Input must be a directory in the Friends Only mode."; exit 2; } 
-cd $TTHANALYSIS_MACRO_PATH && echo "$PWD"
+! [ -d $IN_FILE_DIR ] && { echo "Input must be a directory in the Friends Only mode."; exit 2; }
 if [ $TASK_TYPE == "data" ]; then
     DATA_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_data,tightLepCR_seq -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-data"
     eval $DATA_CMD
 
-    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ $DATA_CMD \
+    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ "$DATA_CMD" $TASK_NAME-data \
 	&& haddProcesses $AFS_DIR_FRIENDS_CHUNKS $OUT_PATH_FRIENDS \
 	|| exit 1
 
@@ -115,7 +116,7 @@ elif [ $TASK_TYPE == "mc" ]; then
 	JETMET_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_JETMET_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules jetmetUncertainties$TASK_YEAR -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-mc_jetcorrs"
 	eval $JETMET_CMD
 
-	wait_friendsModule $AFS_DIR_JETMET_CHUNKS $FREQ $JETMET_CMD \
+	wait_friendsModule $AFS_DIR_JETMET_CHUNKS $FREQ "$JETMET_CMD" $TASK_NAME-mc_jetcorrs \
 	    && haddProcesses $AFS_DIR_JETMET_CHUNKS $OUT_PATH_JETMET \
 	    || exit 1
     }
@@ -123,10 +124,10 @@ elif [ $TASK_TYPE == "mc" ]; then
     echo "Files ($(ls $OUT_PATH_JETMET | wc | awk '{print $1}')) in the directory $OUT_PATH_JETMET:"
     ls $OUT_PATH_JETMET
 
-    MC_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_mc,tightLepCR_seq -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-mc"
+    MC_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_mc,mcMatch_seq,tightLepCR_seq -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-mc"
     eval $MC_CMD
 
-    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ $MC_CMD \
+    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ "$MC_CMD" $TASK_NAME-mc \
 	&& haddProcesses $AFS_DIR_FRIENDS_CHUNKS $OUT_PATH_FRIENDS \
 	|| exit 1
 
