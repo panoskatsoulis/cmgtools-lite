@@ -14,7 +14,7 @@ Options:
     --dataset <arg>      : RegEx to specify a collection of datasets to process
     --friends-only       : Enables the Friends Only mode
     --skip-jetCorrs      : Skips the calculation of the jetMetCorrections,
-                           needs to setup correctly the 'input' argument
+                           one needs to setup correctly the 'input' argument
                            {one (1) level above the jetmet directory}
     --force-rm           : Forces to remove <out-dir> and <src/task_name> (if exist)
     --debug              : Runs 'set -x' (super verbosive)
@@ -61,20 +61,27 @@ function checkRmPath() {
 }
 
 ## tool that resubmits a task using the command given
-## Usage: task_resubmit <cmd-string> <output-dir>
+## Usage: task_resubmit <task-name> <cmd-string> <output-dir>
 function task_resubmit() {
-    CMD=$1
-    DIR_OUTPUT=$2
+    TASK=$1
+    CMD="$2"
+    DIR_OUTPUT=$3
+    CONDOR_CLUSTER=$(condor_q | grep $TASK | awk '{print $9}' | sed -r s/\.[^\.]+$//)
+    echo "Waiting for the old job to be included in the schedd..." && sleep 30s
+    condor_rm $CONDOR_CLUSTER || { echo "condor_rm $CONDOR_CLUSTER failed with $?"; return 1; }
+    echo "Waiting for the old job to stop creating files..." && sleep 1m
     rm -rf $DIR_OUTPUT
     echo "Running $CMD"
-    return $(eval $CMD)
+    eval $CMD && return 0 || return $?
 }
 
 ## tool that checks if the friend trees module finished
-## Usage: wait_friendsModule <output-dir> <sleep-freq> <string-cmd>
+## Usage: wait_friendsModule <output-dir> <sleep-freq> <string-cmd> <task-name>
 function wait_friendsModule() {
     DIR=$1
     FREQ=$2
+    PY_CMD="$3"
+    _TASK=$4
     times_waited=0
     while true; do
 	jobs_logs=$(ls $DIR/logs/log.* | wc | awk '{print $1}')
@@ -87,22 +94,23 @@ function wait_friendsModule() {
 
 	## if no logs exist yet
 	if (( $jobs_logs == 0 )); then
+	    echo "true is: (( logs == 0 ))"
 	    times_tried=$(( $times_tried + 1 ))
 	    (( $times_tried == 3 )) && {
 		echo "Tried 3 submits. Probably a CondorHT problem. Exiting..."
 		return 1
 	    }
 	    echo "Log files have not yet been created. Resubmitting..."
-	    task_resubmit $CMD $DIR && sleep $FREQ || return $?
+	    task_resubmit $_TASK "$PY_CMD" $DIR && sleep 1m || return $?
 
 	## if logs == finished == files, task finished
 	elif (( $jobs_logs == $jobs_finished )) && (( $jobs_logs == $root_files )); then
-	    echo "true is (( $jobs_logs == $jobs_finished )) && (( $jobs_logs == $root_files ))"
+	    echo "true is: (( logs == finished-jobs )) && (( logs == root-files ))"
 	    return 0
 
 	## if logs == finished but root files missing
 	elif (( $jobs_logs == $jobs_finished )) && (( $jobs_logs > $root_files )); then
-	    echo "true is (( $jobs_logs == $jobs_finished )) && (( $jobs_logs > $root_files ))"
+	    echo "true is: (( logs == finished-jobs )) && (( logs > root-files ))"
 	    echo "[ ERROR ]"
 	    echo "All jobs included in $DIR finished, but the number of the produced root files is less than the jobs run."
 	    return 1
