@@ -51,13 +51,16 @@ OUT_PATH/YEAR/TASK_NAME --+-- postprocessor_chunks
 function checkRmPath() {
     DIR2RM=$1
     FORCE=$2
-    $FORCE && { rm -rf $DIR2RM; return; }
-    [ -e $DIR2RM ] && {
+    $FORCE && {	rm -rf $DIR2RM;	return 0; }
+    if [ -e $DIR2RM ]; then
 	ans=''
 	while ! [[ $ans =~ [yn] ]]; do printf "The working path $DIR2RM exists, want to remove it? [y/n]"; read ans; done
 	[ "$ans" == "y" ] && rm -rf $DIR2RM
-    }
-    return
+    else
+	echo "Requested directory $DIR2RM to removed, but it doesn't exist."
+	return 1
+    fi
+    return 0
 }
 
 ## tool that resubmits a task using the command given
@@ -117,7 +120,7 @@ function wait_friendsModule() {
 
 	## else some jobs are still running, sleep
 	else
-	    jobs_failed=$(grep -o "return value [1-9]+" $DIR/logs/log.* | wc | awk '{print $1}')
+	    jobs_failed=$(grep -o "return value [1-9]\+" $DIR/logs/log.* | wc | awk '{print $1}')
 	    echo "Jobs are still running, failed jobs $jobs_failed"
 	    (( $jobs_failed > 0 )) && echo "[ WARNING ] $jobs_failed jobs have failed in directory $DIR"
 	    sleep $FREQ
