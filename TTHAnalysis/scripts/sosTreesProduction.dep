@@ -64,27 +64,44 @@ function checkRmPath() {
 }
 
 ## tool that resubmits a task using the command given
-## Usage: task_resubmit <task-name> <cmd-string> <output-dir>
+## Usage: task_resubmit <cluster-id> <cmd-string> <output-dir>
 function task_resubmit() {
-    TASK=$1
+    CONDOR_CLUSTER=$1
     CMD="$2"
     DIR_OUTPUT=$3
-    CONDOR_CLUSTER=$(condor_q | grep $TASK | awk '{print $9}' | sed -r s/\.[^\.]+$//)
-    echo "Waiting for the old job to be included in the schedd..." && sleep 30s
+    ## prepare environment
+    touch resubmit.log
+    printf "New resubmit attempt:\ncluster-id = $CONDOR_CLUSTER\noutput-dir = $DIR_OUTPUT\n" >> resubmit.log
+    echo "Waiting for the old task to be included in the schedd..." >> resubmit.log
+    sleep 30s
     condor_rm $CONDOR_CLUSTER || { echo "condor_rm $CONDOR_CLUSTER failed with $?"; return 1; }
-    echo "Waiting for the old job to stop creating files..." && sleep 1m
-    rm -rf $DIR_OUTPUT
-    echo "Running $CMD"
-    eval $CMD && return 0 || return $?
+    echo "Waiting for the old task to stop creating files..." >> resubmit.log
+    sleep 1m
+    rm -rf $DIR_OUTPUT && echo "Removed $DIR_OUTPUT" >> resubmit.log
+    rm -f last-submit-info && echo "Removed the old 'last-submit-info' file" >> resubmit.log
+    ## run the given command and parse the new cluster-id
+    echo "Running $CMD" >> resubmit.log
+    if eval $CMD; then
+	CONDOR_CLUSTER=$(grep -o "cluster [0-9]\+" last-submit-info | sed 's/[^0-9]*//')
+	[ -z "$CLUSTER" ] && {
+	    echo "Couldn't parse new cluster-id." >> resubmit.log
+	    return 1
+	}
+	echo $CONDOR_CLUSTER ## echo it to be captured by the caller
+    else
+	echo "eval \"$CMD\" failed with return value $?" >> resubmit.log
+	return $1
+    fi
+    return 0
 }
 
 ## tool that checks if the friend trees module finished
-## Usage: wait_friendsModule <output-dir> <sleep-freq> <string-cmd> <task-name>
+## Usage: wait_friendsModule <output-dir> <sleep-freq> <string-cmd> <cluster-id>
 function wait_friendsModule() {
     DIR=$1
     FREQ=$2
     PY_CMD="$3"
-    _TASK=$4
+    _CLUSTER=$4
     times_waited=0
     while true; do
 	jobs_logs=$(ls $DIR/logs/log.* | wc | awk '{print $1}')
@@ -104,7 +121,8 @@ function wait_friendsModule() {
 		return 1
 	    }
 	    echo "Log files have not yet been created. Resubmitting..."
-	    task_resubmit $_TASK "$PY_CMD" $DIR && sleep 1m || return $?
+	    _CLUSTER=$(task_resubmit $_CLUSTER "$PY_CMD" $DIR || return $?)
+	    sleep 1m
 
 	## if logs == finished == files, task finished
 	elif (( $jobs_logs == $jobs_finished )) && (( $jobs_logs == $root_files )); then
@@ -123,6 +141,11 @@ function wait_friendsModule() {
 	    jobs_failed=$(grep -o "return value [1-9]\+" $DIR/logs/log.* | wc | awk '{print $1}')
 	    echo "Jobs are still running, failed jobs $jobs_failed"
 	    (( $jobs_failed > 0 )) && echo "[ WARNING ] $jobs_failed jobs have failed in directory $DIR"
+	    (( $jobs_finished + $jobs_failed == $jobs_logs )) && {
+		grep -o "return value [1-9]\+" $DIR/logs/log.* | awk -F [:/.] '{print "step:"$1", cluster.chunk="$4"."$6", process="$5}' >> failed-jobs.log
+		echo "Task has finished, but $jobs_failed jobs have failed. Failed jobs have been saved in failed-jobs.log"
+		return 1 ## this value will end the script while not allowing to run the next prepareEvents command
+	    }
 	    sleep $FREQ
 	fi
     done
