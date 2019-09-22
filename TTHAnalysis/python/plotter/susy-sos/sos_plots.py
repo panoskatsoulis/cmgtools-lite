@@ -188,18 +188,18 @@ def modifyAnalysis(plotCmd, study_mods):
     ## study dedicated code >>>-------------------------------------------------------------------------------------------------------------------------
     if study_mods[0] == "SingleMuonTrigger":
         ## general for both scenarios
-        regexs.append(" susy\-sos\-v2\-clean/([^ ]*mca[^ ]*txt) ")
         regexs.append(" susy\-sos\-v2\-clean/([^ ]*plots[^ ]*txt) ")
         regexs.append(" susy\-sos\-v2\-clean/([^ ]*cuts[^ ]*txt) ")
-        targets.extend([" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 " for i in range(3)])
+        targets.extend([" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 " for i in range(2)])
         ## scenario specific
         if study_mods[1] in ['sos','original','1']:
-            regexs.append(" *$"); targets.append(" --xp data_1Mu")
+            regexs.append(" *$"); targets.append(" --xp Fakes,Convs,Rares")
         if study_mods[1] in ['alt','alternative','2']:
+            regexs.append(" susy\-sos\-v2\-clean/([^ ]*mca[^ ]*txt) "); targets.append(" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 ")
             regexs.append(" -\P [^ ]* "); targets.append(" -P /eos/user/k/kpanos/sostrees/2018/trees ")
             regexs.append(" \--\Fs [^ ]* "); targets.append(" --Fs /eos/user/k/kpanos/sostrees/2018/trees/friends ")
             regexs.append(" \-\-mcc [^ ]*triggerdefs.txt "); targets.append(" --mcc susy-sos-v2-clean/Studies/SingleMuonTrigger/mcc_triggerdefs.txt ")
-            regexs.append(" *$"); targets.append(" -E trg_SingleMu")
+            regexs.append(" *$"); targets.append(" -E trg_SingleMu --xp Fakes,Convs,Rares")
 
     ## study dedicated code <<<-------------------------------------------------------------------------------------------------------------------------
 
