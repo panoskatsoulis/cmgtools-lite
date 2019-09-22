@@ -131,13 +131,15 @@ MC_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D
 ## run the friend tree modules
 if [ $TASK_TYPE == "data" ]; then
     eval $DATA_CMD
-    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ "$DATA_CMD" $TASK_NAME && \
+    CLUSTER=$(grep -o "cluster [0-9]\+" last-submit-info | sed 's/[^0-9]*//')
+    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ "$DATA_CMD" $CLUSTER && \
 	haddProcesses $AFS_DIR_FRIENDS_CHUNKS $OUT_PATH_FRIENDS || \
 	exit 1
 elif [ $TASK_TYPE == "mc" ]; then
     ! $SKIP_JETCORRS && {
 	eval $JETMET_CMD
-	wait_friendsModule $AFS_DIR_JETMET_CHUNKS $FREQ "$JETMET_CMD" $TASK_NAME-jetcorrs && \
+	CLUSTER=$(grep -o "cluster [0-9]\+" last-submit-info | sed 's/[^0-9]*//')
+	wait_friendsModule $AFS_DIR_JETMET_CHUNKS $FREQ "$JETMET_CMD" $CLUSTER && \
 	    haddProcesses $AFS_DIR_JETMET_CHUNKS $OUT_PATH_JETMET || \
 	    exit 1
     }
@@ -145,7 +147,8 @@ elif [ $TASK_TYPE == "mc" ]; then
     ls $OUT_PATH_JETMET
     ## now run the step1 and mc step 2
     eval $MC_CMD
-    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ "$MC_CMD" $TASK_NAME && \
+    CLUSTER=$(grep -o "cluster [0-9]\+" last-submit-info | sed 's/[^0-9]*//')
+    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ "$MC_CMD" $CLUSTER && \
 	haddProcesses $AFS_DIR_FRIENDS_CHUNKS $OUT_PATH_FRIENDS || \
 	exit 1
 else
