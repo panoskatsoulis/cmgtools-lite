@@ -47,7 +47,7 @@ done
 
 ## setup environment
 OUT_PATH=$OUT_TREES_DIR/$TASK_YEAR/$TASK_NAME-$(date | awk '{print $3$2$6}')
-# SPACE_CLEANER=$CMSSW_DIR/spaceCleaner-v2.dog ## required for the Full Production mode (to be fixed)
+SPACE_CLEANER=$CMSSW_DIR/CMGTools/TTHAnalysis/scripts/spaceCleaner-v2.dog
 PY_FTREES_CMD=$CMSSW_DIR/CMGTools/TTHAnalysis/macros/prepareEventVariablesFriendTree.py
 FRIENDS_DIR=friends
 
@@ -72,7 +72,7 @@ else
 fi
 
 ## setup the required directories
-OUT_PATH_POSTPROC=$OUT_PATH/postprocessor_hadd ## remote directories
+OUT_PATH_POSTPROC=$OUT_PATH/postprocessor_chunks ## remote directories
 OUT_PATH_FRIENDS=$OUT_PATH/friends_hadd
 OUT_PATH_JETMET=$OUT_PATH/jetmetUncertainties_hadd
 mkdir $OUT_PATH_POSTPROC -p
@@ -81,41 +81,49 @@ mkdir $OUT_PATH_JETMET
 mkdir $CMSSW_DIR/$TASK_NAME ## local directories
 cd $CMSSW_DIR/$TASK_NAME && echo "$PWD"
 ln -s ../CMGTools/TTHAnalysis/macros/lxbatch_runner.sh lxbatch_runner.sh
-# AFS_DIR_POSTPROC_CHUNKS=
+AFS_DIR_POSTPROC_CHUNKS=postprocessor_chunks
 AFS_DIR_JETMET_CHUNKS=jetmetUncertainties_chunks
 AFS_DIR_FRIENDS_CHUNKS=friends_chunks
 
-## the postprocessor block won't run in case of the Friends Only mode ============================================ NEEDS TO BE TESTED =========================================
+## the postprocessor block won't run in case of the Friends Only mode
 if ! $FRIENDS_ONLY; then
-    echo "===================================================<< THIS MODE NEEDS TO BE TESTED >>==================================================="
-    sleep 2s
-    echo "===================================================<< THIS MODE NEEDS TO BE TESTED >>==================================================="
-    exit 0
 
-    # ! [ -f $IN_FILE_DIR ] && { echo "Input must be a file in the Full Production mode."; exit 2; }
-    # ## step1 condor submit the nanoAOD postprocessor
-    # nanopy_batch.py -o $TASK_NAME $py_CFG --option year=$YEAR -B -b 'run_condor_simple.sh -t 1200 ./batchScript.sh' || \
-    # 	{ echo "nanopy_batch failed, returned $?";  exit 1; }
-    # printf "Submimtted tasks for 2018 from $py_CFG\nnanopy_batch returned $?\n"
+    ## check the input and prepate the command
+    ! [ -f $IN_FILE_DIR ] && { echo "Input must be a file in the Full Production mode."; exit 2; }
+    PY_CFG=$IN_FILE_DIR
+    POSTPROC_CMD="nanopy_batch.py -o $TASK_NAME $PY_CFG --option year=$TASK_YEAR -B -b 'run_condor_simple.sh -t 1200 ./batchScript.sh'"
 
-    # ## setup env and wait untill the batch jobs finish
-    # $SPACE_CLEANER $FREQ $TASK_NAME $OUT_PATH_POSTPROC # add logic to the dog to move to eos all the root files before it exits
-    # wait $!
+    ## step1 condor submit the nanoAOD postprocessor
+    eval $POSTPROC_CMD || { echo "nanopy_batch failed, returned $?";  exit 1; }
+    printf "Submimtted tasks for $TASK_YEAR from $PY_CFG\nnanopy_batch returned $?\n"
 
-    # ## hadd the nanoAOD chuncks
-    # postprocessor_LOGS=$(ls $TASK_NAME/*_Chunk*/*.log)
-    # JOBS=$(echo $postprocessor_LOGS | tr ' ' '\n' | wc | awk '{print $1}')
-    # FINISHED_JOBS=$(grep "return value 0" $postprocessor_LOGS | wc | awk '{print $1}')
-    # (( $FINISHED_JOBS == $JOBS )) && { ## if the jobs finished for each process hadd the chunks
-    # 	for process in $(ls $OUT_PATH/postprocessor_chunks | sed 's/_Chunk.*$//' | sort -u); do
-    # 	    hadd $OUT_TREES_DIR/$process.root $(ls $OUT_PATH_POSTPROC | grep $process)
-    # 	done
+    ## wait until the batch jobs finish (CMD: 'watchdog <in-dir> <out-dir> <freq>')
+    $SPACE_CLEANER $AFS_DIR_POSTPROC_CHUNKS $OUT_PATH_POSTPROC $FREQ > spaceCleaner.log
+
+    ## hadd the nanoAOD chuncks
+    # haddProcesses $AFS_DIR_POSTPROC_CHUNKS $OUT_PATH_POSTPROC/_hadd || {
+    # 	echo "haddProcess on the chunks in $OUT_PATH_POSTPROC/_hadd failed"
+    # 	exit 1
     # }
+    ## probably this block will be overwritten by the block above
+    JOBS=$(ls $AFS_DIR_POSTPROC_CHUNKS/*.log | wc | awk '{print $1}')
+    FINISHED_JOBS=$(grep "return value 0" $AFS_DIR_POSTPROC_CHUNKS/*.log | wc | awk '{print $1}')
+    if (( $FINISHED_JOBS == $JOBS )); then ## if the jobs finished for each process hadd the chunks
+    	for process in $(ls $OUT_PATH_POSTPROC | sed 's/_Chunk.*$//' | sort -u); do
+	    CHUNKS_COUNTED=$(ls $OUT_PATH_POSTPROC | grep $process | wc | awk '{print $1}')
+	    ## if the process was split into 1 chunk, skip it
+	    (( $CHUNKS_COUNTED < 2 )) && continue
+	    ## else hadd the chunks
+    	    hadd -ff $OUT_PATH_POSTPROC/$process.root $(ls $OUT_PATH_POSTPROC | grep $process)
+    	done
+    else
+	printf "Finished jobs are not equal to the jobs ran.\nJOBS = $JOBS\nFINISHED_JOBS = $FINISHED_JOBS\n"
+	exit 1
+    fi
 
     ## redirecting the input to be the directory which is expected below
     IN_FILE_DIR=$OUT_PATH_POSTPROC
 fi
-## =============================================================================================================== NEEDS TO BE TESTED =========================================
 
 ## prepare the friend tree commands
 DATA_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_data,tightLepCR_seq -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME | tee last-submit-info"
