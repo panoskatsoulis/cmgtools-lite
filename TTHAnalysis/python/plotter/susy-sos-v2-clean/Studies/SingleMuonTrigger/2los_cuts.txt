@@ -104,4 +104,4 @@ oneNotTight	: !(LepGood1_isLepTight) || !(LepGood2_isLepTight)	; Disable=True
 #col200_trig : $FASTSIM{1} $DATA{HLT_HighMET16} $MC{HLT_HighMET16}                                                          ; Disable=True
 
 ## enable or disable the SingleMuon trigger
-trg_SingleMu : $FASTSIM{1} $DATA{HLT_SingleMu18} $MC{HLT_SingleMu18}                                                        ; Disable=True 
+trg_SingleMu : $DATA{HLT_SingleMu18} $MC{HLT_SingleMu18}								    ; Disable=True 
