@@ -46,88 +46,89 @@ if year == 2018:
         mcSamples = byCompName(mcSamples_, [
 
 ##            "DYJetsToLL_M10to50_LO",
+##            "DYJetsToLL_M50_LO",
 ##            "DYJetsToLL_M50_LO_ext",
 
 
-            "T_tWch_noFullyHad$",
-            "TBar_tWch_noFullyHad$",
+##            "T_tWch_noFullyHad$",
+##            "TBar_tWch_noFullyHad$",
+##
+           "DYJetsToLL_M4to50_HT70to100",
+           "DYJetsToLL_M4to50_HT100to200",
+           "DYJetsToLL_M4to50_HT200to400",
+           "DYJetsToLL_M4to50_HT400to600",
+           "DYJetsToLL_M4to50_HT600toInf",
 
-            "DYJetsToLL_M4to50_HT70to100",
-            "DYJetsToLL_M4to50_HT100to200",
-            "DYJetsToLL_M4to50_HT200to400",
-            "DYJetsToLL_M4to50_HT400to600",
-            "DYJetsToLL_M4to50_HT600toInf",
+           "DYJetsToLL_M50_HT100to200",
+           "DYJetsToLL_M50_HT200to400",
+           "DYJetsToLL_M50_HT400to600," 
+           "DYJetsToLL_M50_HT400to600_ext2",
+           "DYJetsToLL_M50_HT600to800",
+           "DYJetsToLL_M50_HT800to1200",
+           "DYJetsToLL_M50_HT1200to2500",
+           "DYJetsToLL_M50_HT2500toInf",
 
-            "DYJetsToLL_M50_HT100to200",
-            "DYJetsToLL_M50_HT200to400",
-            "DYJetsToLL_M50_HT400to600," 
-##            "DYJetsToLL_M50_HT400to600_ext2",
-            "DYJetsToLL_M50_HT600to800",
-            "DYJetsToLL_M50_HT800to1200",
-            "DYJetsToLL_M50_HT1200to2500",
-            "DYJetsToLL_M50_HT2500toInf",
-
-            "TTJets_DiLepton$",
-
-            #check if VVTo2L2Nu is there
-            "WWTo2L2Nu$",
-            "ZZTo2L2Nu",
-            "TTJets_SingleLeptonFromT$", "TTJets_SingleLeptonFromTbar$", 
-            
-            "WJetsToLNu_HT100to200",
-            "WJetsToLNu_HT200to400",
-            "WJetsToLNu_HT400to600",
-            "WJetsToLNu_HT600to800",
-            "WJetsToLNu_HT800to1200",
-            "WJetsToLNu_HT1200to2500",
-            "WJetsToLNu_HT2500toInf",
-
-            "WZTo3LNu_fxfx$",
-            "WWToLNuQQ",
-            #"WZTo1L1Nu2Q",
-            "ZZTo4L$",
-            "WWW",#_4F
-            "WZZ$",
-            "WWZ", #FIX! not _4F
-            "ZZZ$",
-            "T_tch$",
-            "TBar_tch$",
-            "T_sch_lep$",
-            #"WWTo2L2Nu_DPS_hpp",           
-            "TTWToLNu_fxfx$",
-            "TTZToLLNuNu_amc$",
-            "TTZToLLNuNu_m1to10$",
-            "TTGJets$",
-            "TGJets_lep", 
-
-            #missing tbc
-#            "ZZTo2L2Q", 
-            "WpWpJJ",
-#            "WZTo1L3Nu",
-#            "WGToLNuG_amcatnlo_ext",
-#            "ZGTo2LG_ext",
-#            "WZTo2L2Q",
-
-            ##signal SUSY
+           "TTJets_DiLepton$",
+##
+##            #check if VVTo2L2Nu is there
+           "WWTo2L2Nu$",
+           "ZZTo2L2Nu",
+           "TTJets_SingleLeptonFromT$", "TTJets_SingleLeptonFromTbar$", 
+##            
+           "WJetsToLNu_HT100to200",
+           "WJetsToLNu_HT200to400",
+           "WJetsToLNu_HT400to600",
+           "WJetsToLNu_HT600to800",
+           "WJetsToLNu_HT800to1200",
+           "WJetsToLNu_HT1200to2500",
+           "WJetsToLNu_HT2500toInf",
+##
+##            "WZTo3LNu_fxfx$",
+##            "WWToLNuQQ",
+##            #"WZTo1L1Nu2Q",
+##            "ZZTo4L$",
+##            "WWW",#_4F
+##            "WZZ$",
+##            "WWZ", #FIX! not _4F
+##            "ZZZ$",
+##            "T_tch$",
+##            "TBar_tch$",
+##            "T_sch_lep$",
+##            #"WWTo2L2Nu_DPS_hpp",           
+##            "TTWToLNu_fxfx$",
+##            "TTZToLLNuNu_amc$",
+##            "TTZToLLNuNu_m1to10$",
+##            "TTGJets$",
+##            "TGJets_lep", 
+##
+##            #missing tbc
+###            "ZZTo2L2Q", 
+##            "WpWpJJ",
+###            "WZTo1L3Nu",
+###            "WGToLNuG_amcatnlo_ext",
+###            "ZGTo2LG_ext",
+###            "WZTo2L2Q",
+##
+##            ##signal SUSY
             "SMS_TChiWZ"
-            
-###relics from tth             
-###            "TT[WZ]_LO$",
-###            "TTHnobb_pow$",
-###            "TZQToLL$", "tWll$", "TTTT$", "TTWW$",
-###            "WpWpJJ$",
-###            "GGHZZ4L$", "VHToNonbb_ll$",
-###            "WWW_ll$", "WWZ$", "WZG$",  "WW_DPS$", 
+##            
+#####relics from tth             
+#####            "TT[WZ]_LO$",
+#####            "TTHnobb_pow$",
+#####            "TZQToLL$", "tWll$", "TTTT$", "TTWW$",
+#####            "WpWpJJ$",
+#####            "GGHZZ4L$", "VHToNonbb_ll$",
+#####            "WWW_ll$", "WWZ$", "WZG$",  "WW_DPS$", 
             
 
         ])
 
     if analysis == "main":
-##        DatasetsAndTriggers.append( ("DoubleMuon", triggers["mumu_iso"] + triggers["3mu"]) )
+        print "ciao"
+######        DatasetsAndTriggers.append( ("DoubleMuon", triggers["mumu_iso"] + triggers["3mu"]) )
         DatasetsAndTriggers.append( ("DoubleMuon", triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
         DatasetsAndTriggers.append( ("MET",     triggers["SOS_highMET"] ) )
-##        DatasetsAndTriggers.append( ("SingleMuon", triggers["1mu_iso"]) ) ##which one?? ##PD SingleMuon o MET?
-##conf db e cercare stream dato il nome del trigger
+        DatasetsAndTriggers.append( ("SingleMuon", triggers["SOS_singleMu"]) )
 
 elif year == 2017:
     mcSamples = byCompName(mcSamples_, [
