@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -x
+#set -x
 
 ## help
 function _help() {
@@ -10,11 +10,14 @@ for arg in ${@}; do
 done
 
 ## env variables
+[ -z "$CMSSW_BASE" ] && { echo "do cmsenv"; exit 1; }
 input=$1
 output=$2
 dogfreq=$3
 quotaThreshold=60
 finishedBefore=0
+mkdir $output/trees -p
+fileChecker=$CMSSW_BASE/src/CMGTools/TTHAnalysis/scripts/checkFiles.py
 { [ -z $input ] || [ -z $output ]; } && _help
 
 ## signal handler
@@ -35,14 +38,14 @@ input > " > /dev/stderr
 
 ## this tool returns if find that more jobs have finished its previous check
 ## help: checkIfJobsFinished <dogfreq>
-function checkIfJobsFinished() {
-    while true; do
-	finishedJobs=$(condor_q | grep $USER | awk 'BEGIN{sum=0};{sum+=$6};END{print sum}')
-	(( $finishedJobs < $finishedBefore )) && return 0
-	finishedBefore=$finishedJobs
-	sleep $1
-    done
-}
+# function checkIfJobsFinished() {
+#     while true; do
+# 	finishedJobs=$(condor_q | grep $USER | awk 'BEGIN{sum=0};{sum+=$6};END{print sum}')
+# 	(( $finishedJobs < $finishedBefore )) && return 0
+# 	finishedBefore=$finishedJobs
+# 	sleep $1
+#     done
+# }
 
 ## this tools checks in the log files of the chunks and if they're done it copies them to eos
 ## help: moveFinishedToEOS <chunksPath> <eosPath>
@@ -58,19 +61,71 @@ function moveFinishedToEOS() {
     return 0
 }
 
-
+## this tool checks the remote files associated to a task given and if are not corrupted is hadds them
+## help: checkAndHadd <remotePath> <taskName> 
+function checkAndHadd() {
+    remotePath=$1
+    taskName=$2
+    rm -f taskfiles.log
+    python $fileChecker --log taskfiles.log $remotePath/$taskName*/*.root
+    # if the file with the corrupted files list is empty
+    ! [ -s taskfiles.log ] && {
+	hadd -ff $remotePath/trees/$taskName.root $remotePath/$taskName*/*.root || return 1
+    }
+    return 0
+}
 
 ##############################################################################################
 
+## info fetched for all the jobs
 logFiles=$(ls $input/*Chunk*/*log | wc | awk '{print $1}')
 (( $logFiles == 0 )) && { echo "Zero (0) log files in $taskDir."; exit 1; }
+
+## info fetched for each sample(task) seperately
+taskNames=($(grep "Bulk submission" $input/nanopy.log | awk -F '[ (]' '{print $4}'))
+taskChunks=($(grep "Bulk submission" $input/nanopy.log | awk -F '[ (]' '{print $6}'))
+taskFilesInEOS=($(for value in ${taskNames[@]}; do printf "0 "; done)) # fill it with 0s
+
 while true; do
-    ## checkIfJobsFinished $dogfreq
+
+    #### checkIfJobsFinished $dogfreq
+
+    ## getting indo about fs quota and finished jobs
     quota=$(fs quota | awk '{print $1}' | sed s/%//); echo "Current afs-quota ${quota}% (action to be taken after ${quotaThreshold}%)"
     finishedJobs=$(grep -o "return value 0" $input/*Chunk*/*log | wc | awk '{print $1}')
-    (( $quota > $quotaThreshold )) && moveFinishedToEOS $input $output
-    (( $finishedJobs == $logFiles )) && { moveFinishedToEOS $input $output; break; }
-    echo "Will sleep for $dogfreq"
+
+    ## if quota threshold exceeded -> run
+    (( $quota > $quotaThreshold )) && {
+	# move finished to EOS
+	moveFinishedToEOS $input $output
+	# update taskFilesInEOS array
+	for i in "${!taskNames[@]}"; do
+	    ls $output/${taskNames[$i]}* &>dev/null && \ # if directories of the task exist in the output-dir
+		${taskFilesInEOS[$i]}=$(ls $output | grep ${taskNames[$i]} | sed s/_Chunk[0-9]*// | grep -v .*root | grep -v trees | sort | uniq --count | awk '{print $1}')
+	done
+	# run checkAndHadd for the finished tasks and update the taskFilesInEOS array again
+	for i in "${!taskNames[@]}"; do
+	    (( ${taskFilesInEOS[$i]} == ${taskChunks[$i]} )) && {
+		checkAndHadd $output ${taskNames[$i]} && {
+		    unset taskNames[$i]
+		    unset taskChunks[$i]
+		    unset taskFilesInEOS[$i]
+		}
+	    }
+	done
+    }
+
+    ## if finished move the last local files to EOS and break the loop
+    { (( $finishedJobs == $logFiles )) || (( ${#taskNames[@]} == 0 )); } && {
+	moveFinishedToEOS $input $output
+	break
+    }
+
+    echo "Tasks running still:"
+    echo ${taskNames[@]} | tr ' ' ', '
+    echo "Moved files for each:"
+    echo ${taskFilesInEOS[@]} | tr ' ' ', '    
+    echo "Will sleep for $dogfreq | $(date)"
     sleep $dogfreq
 done
 
