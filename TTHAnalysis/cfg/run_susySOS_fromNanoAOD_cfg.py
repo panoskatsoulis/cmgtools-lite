@@ -53,40 +53,40 @@ if year == 2018:
 ##            "T_tWch_noFullyHad$",
 ##            "TBar_tWch_noFullyHad$",
 ##
-           "DYJetsToLL_M4to50_HT70to100",
-           "DYJetsToLL_M4to50_HT100to200",
-           "DYJetsToLL_M4to50_HT200to400",
-           "DYJetsToLL_M4to50_HT400to600",
-           "DYJetsToLL_M4to50_HT600toInf",
+           # "DYJetsToLL_M4to50_HT70to100",
+           # "DYJetsToLL_M4to50_HT100to200",
+           # "DYJetsToLL_M4to50_HT200to400",
+           # "DYJetsToLL_M4to50_HT400to600",
+           # "DYJetsToLL_M4to50_HT600toInf",
 
            "DYJetsToLL_M50_HT100to200",
            "DYJetsToLL_M50_HT200to400",
-           "DYJetsToLL_M50_HT400to600," 
+           # "DYJetsToLL_M50_HT400to600," 
            "DYJetsToLL_M50_HT400to600_ext2",
            "DYJetsToLL_M50_HT600to800",
            "DYJetsToLL_M50_HT800to1200",
            "DYJetsToLL_M50_HT1200to2500",
            "DYJetsToLL_M50_HT2500toInf",
 
-           "TTJets_DiLepton$",
+           # "TTJets_DiLepton$",
 ##
 ##            #check if VVTo2L2Nu is there
-           "WWTo2L2Nu$",
-           "ZZTo2L2Nu",
-           "TTJets_SingleLeptonFromT$", "TTJets_SingleLeptonFromTbar$", 
+           # "WWTo2L2Nu$",
+           # "ZZTo2L2Nu",
+           # "TTJets_SingleLeptonFromT$", "TTJets_SingleLeptonFromTbar$", 
 ##            
-           "WJetsToLNu_HT100to200",
-           "WJetsToLNu_HT200to400",
-           "WJetsToLNu_HT400to600",
-           "WJetsToLNu_HT600to800",
-           "WJetsToLNu_HT800to1200",
-           "WJetsToLNu_HT1200to2500",
-           "WJetsToLNu_HT2500toInf",
+           # "WJetsToLNu_HT100to200",
+           # "WJetsToLNu_HT200to400",
+           # "WJetsToLNu_HT400to600",
+           # "WJetsToLNu_HT600to800",
+           # "WJetsToLNu_HT800to1200",
+           # "WJetsToLNu_HT1200to2500",
+           # "WJetsToLNu_HT2500toInf",
 ##
-##            "WZTo3LNu_fxfx$",
+            "WZTo3LNu_fxfx$",
 ##            "WWToLNuQQ",
 ##            #"WZTo1L1Nu2Q",
-##            "ZZTo4L$",
+            "ZZTo4L$",
 ##            "WWW",#_4F
 ##            "WZZ$",
 ##            "WWZ", #FIX! not _4F
@@ -103,7 +103,7 @@ if year == 2018:
 ##
 ##            #missing tbc
 ###            "ZZTo2L2Q", 
-##            "WpWpJJ",
+             "WpWpJJ",
 ###            "WZTo1L3Nu",
 ###            "WGToLNuG_amcatnlo_ext",
 ###            "ZGTo2LG_ext",
