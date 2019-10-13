@@ -23,7 +23,9 @@ parser.add_argument("--inPlots", default=None, help="Select plots, separated by 
 parser.add_argument("--exPlots", default=None, help="Exclude plots, separated by commas, no spaces")
 parser.add_argument("--signalMasses", default=None, help="Select only these signal samples (e.g 'signal_TChiWZ_100_70+'), comma separated. Use only when doing 'cards'")
 parser.add_argument("--doWhat", default="plots", help="Do 'plots' or 'cards'. Default = '%(default)s'")
+parser.add_argument("--recursive-cuts", dest="recur_cuts", action="store_true", default=False, help="Make plots for each cut separately.")
 parser.add_argument("--dont-run", dest="dontrun", action="store_true", default=False, help="Do not run the command, just print it")
+parser.add_argument("--run", dest="run_cmd", action="store_true", default=False, help="Run the command, do not just print it")
 parser.add_argument("--study-mod", dest="studyScenarioPrint", action="store", metavar=("STUDYNAME","SCENARIO"), default=[],
                     nargs='+', help="Perform a study. STUDYNAME (dir in the Study/ path) is required. SCENARIO can be one\
                     of {'alt','alternative','2'}, is used to perform analysis for the alternative scenario wrt the unmodified\
@@ -175,7 +177,7 @@ allow_unblinding = False
 
 ## Study Modification
 def modifyAnalysis(plotCmd, study_mods):
-    ## convers string to the required boolean (handles verbosity)
+    ## converts string to the required boolean (handles verbosity)
     if len(study_mods) < 3:
         study_mods.append(False)
     else:
@@ -188,18 +190,18 @@ def modifyAnalysis(plotCmd, study_mods):
     ## study dedicated code >>>-------------------------------------------------------------------------------------------------------------------------
     if study_mods[0] == "SingleMuonTrigger":
         ## general for both scenarios
-        regexs.append(" susy\-sos\-v2\-clean/([^ ]*plots[^ ]*txt) ")
-        regexs.append(" susy\-sos\-v2\-clean/([^ ]*cuts[^ ]*txt) ")
-        targets.extend([" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 " for i in range(2)])
+        regexs.append(" -\P [^ ]* "); targets.append(" -P /eos/user/k/kpanos/sostrees/2018/trees ")
+        regexs.append(" \--\Fs [^ ]* "); targets.append(" --Fs {P}/friends ")
+        regexs.append(" susy\-sos\-v2\-clean/([^ ]*plots[^ ]*txt) "); targets.append(" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 ")
+        regexs.append(" susy\-sos\-v2\-clean/([^ ]*mca[^ ]*txt) "); targets.append(" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 ")
         ## scenario specific
         if study_mods[1] in ['sos','original','1']:
             regexs.append(" *$"); targets.append(" --xp Fakes,Convs,Rares")
         if study_mods[1] in ['alt','alternative','2']:
-            regexs.append(" susy\-sos\-v2\-clean/([^ ]*mca[^ ]*txt) "); targets.append(" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 ")
-            regexs.append(" -\P [^ ]* "); targets.append(" -P /eos/user/k/kpanos/sostrees/2018/trees ")
-            regexs.append(" \--\Fs [^ ]* "); targets.append(" --Fs /eos/user/k/kpanos/sostrees/2018/trees/friends ")
+            ## mca needs to be here because includes the SingleMuon dataset
+            regexs.append(" susy\-sos\-v2\-clean/([^ ]*cuts[^ ]*txt) "); targets.append(" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 ")
             regexs.append(" \-\-mcc [^ ]*triggerdefs.txt "); targets.append(" --mcc susy-sos-v2-clean/Studies/SingleMuonTrigger/mcc_triggerdefs.txt ")
-            regexs.append(" *$"); targets.append(" -E trg_SingleMu --xp Fakes,Convs,Rares")
+            regexs.append(" *$"); targets.append(" --xp Fakes,Convs,Rares")
 
     ## study dedicated code <<<-------------------------------------------------------------------------------------------------------------------------
 
@@ -334,6 +336,7 @@ if __name__ == '__main__':
     ## Run the command if the user accept it
     if args.dontrun: quit(0)
     ans = ''
+    if args.run_cmd: ans = 'y'
     while not (ans in ['y','n']):
         print("Want to execute it? [y/n]", end=''); ans = raw_input();
     exit_code = 0
