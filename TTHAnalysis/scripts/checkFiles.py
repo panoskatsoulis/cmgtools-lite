@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import ROOT, argparse
 
 parser = argparse.ArgumentParser(description='Check a list of files if they are corrupted.')
@@ -6,12 +7,14 @@ parser.add_argument('--log', type=str, action='store', help="filename to create 
 args = parser.parse_args()
 
 ##print(args.files)
-log = open(args.log+".log","w+")
+log = open(args.log,"w+")
 
 file_has_issue = False
 for f in args.files:
-    if ROOT.TFile.Open(f):
+    _file=ROOT.TFile.Open(f)
+    if _file:
         print("File "+f+" has openned.")
+        _file.GetListOfKeys().Print()
     else:
         print("File "+f+" has failed to open.")
         file_has_issue = True

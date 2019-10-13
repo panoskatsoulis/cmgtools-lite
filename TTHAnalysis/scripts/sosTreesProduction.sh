@@ -36,18 +36,18 @@ done
 [ -z "$FREQ" ] && FREQ=10m
 { [ -z $DATASET ] && [ "$TASK_TYPE" == "data" ]; } && DATASET="'.*Run.*'"
 { [ -z $DATASET ] && [ "$TASK_TYPE" == "mc" ]; } && DATASET="'^(?!.*Run).*'"
-{ [ -z $PY_CFG ] && ! $FRIENDS_ONLY; } && {
+{ [ -z $IN_FILE_DIR ] && ! $FRIENDS_ONLY; } && {
     echo "Either a Python cfg file is required or the Friends Only mode must be specified."
     exit 1
 }
-{ ! [ -z $PY_CFG ] && $FRIENDS_ONLY; } && {
-    echo "The Friends Only mode has been selected but a Python cfg has been given as input. The PyCfg is not required for this mode. Aborting.."
-    exit 1
-}
+# { ! [ -z $IN_FILE_DIR ] && $FRIENDS_ONLY; } && {
+#     echo "The Friends Only mode has been selected but a Python cfg has been given as input. The PyCfg is not required for this mode. Aborting.."
+#     exit 1
+# }
 
 ## setup environment
 OUT_PATH=$OUT_TREES_DIR/$TASK_YEAR/$TASK_NAME-$(date | awk '{print $3$2$6}')
-SPACE_CLEANER=$CMSSW_DIR/CMGTools/TTHAnalysis/scripts/spaceCleaner-v2.dog
+SPACE_CLEANER=$CMSSW_DIR/CMGTools/TTHAnalysis/scripts/spaceCleaner.dog
 PY_FTREES_CMD=$CMSSW_DIR/CMGTools/TTHAnalysis/macros/prepareEventVariablesFriendTree.py
 FRIENDS_DIR=friends
 
@@ -91,14 +91,15 @@ if ! $FRIENDS_ONLY; then
     ## check the input and prepate the command
     ! [ -f $IN_FILE_DIR ] && { echo "Input must be a file in the Full Production mode."; exit 2; }
     PY_CFG=$IN_FILE_DIR
-    POSTPROC_CMD="nanopy_batch.py -o $TASK_NAME $PY_CFG --option year=$TASK_YEAR -B -b 'run_condor_simple.sh -t 1200 ./batchScript.sh'"
+    POSTPROC_CMD="nanopy_batch.py -o $AFS_DIR_POSTPROC_CHUNKS $PY_CFG --option year=$TASK_YEAR -B -b 'run_condor_simple.sh -t 1200 ./batchScript.sh' > nanopy_batch.log"
 
     ## step1 condor submit the nanoAOD postprocessor
     eval $POSTPROC_CMD || { echo "nanopy_batch failed, returned $?";  exit 1; }
     printf "Submimtted tasks for $TASK_YEAR from $PY_CFG\nnanopy_batch returned $?\n"
 
     ## wait until the batch jobs finish (CMD: 'watchdog <in-dir> <out-dir> <freq>')
-    $SPACE_CLEANER $AFS_DIR_POSTPROC_CHUNKS $OUT_PATH_POSTPROC $FREQ > spaceCleaner.log
+    $SPACE_CLEANER $AFS_DIR_POSTPROC_CHUNKS $OUT_PATH_POSTPROC $FREQ > spaceCleaner.log || \
+	{ echo "SpaceCleaner returned $?"; exit 1; }
 
     ## hadd the nanoAOD chuncks
     # haddProcesses $AFS_DIR_POSTPROC_CHUNKS $OUT_PATH_POSTPROC/_hadd || {
