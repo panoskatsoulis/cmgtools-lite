@@ -34,7 +34,6 @@ outdir  = options.outdir+"/" if options.outdir else ""
 if not os.path.exists(outdir): os.mkdir(outdir)
 
 scanpoints = []
-print(options.params)
 pattern = re.compile( options.scanregex ) 
 
 for psig in mca.listSignals(True):
@@ -43,7 +42,6 @@ for psig in mca.listSignals(True):
         raise RuntimeError("Signal %s does not match the regexp"%psig)
     point = [ match.group( p ) for p in options.params.split(',') ]
     if point not in scanpoints: scanpoints.append( point ) 
-    print(point)
 
 report={}
 if options.infile:
