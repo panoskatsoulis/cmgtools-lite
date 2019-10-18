@@ -28,7 +28,7 @@ parser.add_argument("--dont-run", dest="dontrun", action="store_true", default=F
 parser.add_argument("--run", dest="run_cmd", action="store_true", default=False, help="Run the command, do not just print it")
 parser.add_argument("--study-mod", dest="studyScenarioPrint", action="store", metavar=("STUDYNAME","SCENARIO"), default=[],
                     nargs='+', help="Perform a study. STUDYNAME (dir in the Study/ path) is required. SCENARIO can be one\
-                    of {'alt','alternative','2'}, is used to perform analysis for the alternative scenario wrt the unmodified\
+                    of {'alt','alternative','2','alt_muPt2gt3p5','alt_muPt2gt3'}, is used to perform analysis for the alternative scenario wrt the unmodified\
                     SOS ({'sos','original','1'} not required). A 3rd-arg (bool) controls verbosity.")
 args = parser.parse_args()
 
@@ -41,7 +41,7 @@ if args.lep not in ["2los","3l"]: raise RuntimeError("Unknown choice for LEP opt
 if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss", "cr_wz", "appl", "appl_col"]: raise RuntimeError("Unknown choice for REG option. Please check help." )
 if args.bin not in ["min", "low", "med", "high"]: raise RuntimeError("Unknown choice for BIN option. Please check help." )
 if args.doWhat not in ["plots", "cards"]: raise RuntimeError("Unknown choice for DOWHAT option. Please check help." ) # More options to be added
-if args.signalMasses and args.doWhat != "cards": print "Option SIGNALMASSES to be used only with the 'cards' option. Ignoring it...\n"
+if args.signalMasses and args.doWhat != "cards": print("Option SIGNALMASSES to be used only with the 'cards' option. Ignoring it...\n")
 
 lumis = {
 '2016': '35.9', # '33.2' for low MET
@@ -139,7 +139,7 @@ def runIt(GO,name):
     if args.norm: name=name+"_norm"
     if args.unc: name=name+"_unc"
 
-    print name+"\n"
+    print(name+"\n")
     if args.doWhat == "plots":
         return submit.format(command=' '.join(['python mcPlots.py',"--pdir %s/%s/%s"%(ODIR,YEAR,name),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ])]))
     if args.doWhat == "cards":
@@ -194,16 +194,20 @@ def modifyAnalysis(plotCmd, study_mods):
         ## general for both scenarios
         regexs.append(" -\P [^ ]* "); targets.append(" -P /eos/user/k/kpanos/sostrees/2018/trees ")
         regexs.append(" \--\Fs [^ ]* "); targets.append(" --Fs {P}/friends ")
-        regexs.append(" susy\-sos\-v2\-clean/([^ ]*plots[^ ]*txt) "); targets.append(" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 ")
-        regexs.append(" susy\-sos\-v2\-clean/([^ ]*mca[^ ]*txt) "); targets.append(" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 ")
+        regexs.append(" susy\-sos/([^ ]*plots[^ ]*txt) "); targets.append(" susy-sos/Studies/"+study_mods[0]+"/\\1 ")
+        regexs.append(" susy\-sos/([^ ]*mca[^ ]*txt) "); targets.append(" susy-sos/Studies/"+study_mods[0]+"/\\1 ")
         ## scenario specific
         if study_mods[1] in ['sos','original','1']:
             regexs.append(" *$"); targets.append(" --xp Fakes,Convs,Rares")
-        if study_mods[1] in ['alt','alternative','2']:
+        if study_mods[1] in ['alt','alternative','2','alt_muPt2gt3p5','alt_muPt2gt3']:
             ## mca needs to be here because includes the SingleMuon dataset
-            regexs.append(" susy\-sos\-v2\-clean/([^ ]*cuts[^ ]*txt) "); targets.append(" susy-sos-v2-clean/Studies/"+study_mods[0]+"/\\1 ")
-            regexs.append(" \-\-mcc [^ ]*triggerdefs.txt "); targets.append(" --mcc susy-sos-v2-clean/Studies/SingleMuonTrigger/mcc_triggerdefs.txt ")
+            regexs.append(" susy\-sos/([^ ]*cuts[^ ]*txt) "); targets.append(" susy-sos/Studies/"+study_mods[0]+"/\\1 ")
+            regexs.append(" \-\-mcc [^ ]*triggerdefs.txt "); targets.append(" --mcc susy-sos/Studies/SingleMuonTrigger/mcc_triggerdefs.txt ")
             regexs.append(" *$"); targets.append(" --xp Fakes,Convs,Rares")
+            if study_mods[1] == 'alt_muPt2gt3':
+                regexs.append(" *$"); targets.append(" -X ^sublepPt$ -X ^pt5sublep$ -E ^pt3sublep$")
+            elif study_mods[1] == 'alt_muPt2gt3p5':
+                regexs.append(" *$"); targets.append(" -X ^sublepPt$ -X ^pt5sublep$ -E ^pt3p5sublep$")
 
     ## study dedicated code <<<-------------------------------------------------------------------------------------------------------------------------
 

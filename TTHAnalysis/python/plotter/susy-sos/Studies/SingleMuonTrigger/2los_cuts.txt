@@ -52,6 +52,8 @@ SF		: abs(LepGood1_pdgId*LepGood2_pdgId)==169 || abs(LepGood1_pdgId*LepGood2_pdg
 mm		: abs(LepGood1_pdgId)==13 && abs(LepGood2_pdgId)==13
 ### EWK OR Low MET
 pt5sublep	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 5) || (fabs(LepGood2_pdgId)==11 && LepGood2_pt > 5)
+pt3p5sublep	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 3.5) || (fabs(LepGood2_pdgId)==11 && LepGood2_pt > 5)	; Disable=True
+pt3sublep	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 3) || (fabs(LepGood2_pdgId)==11 && LepGood2_pt > 5)	; Disable=True
 
 
 ##### DY CR
