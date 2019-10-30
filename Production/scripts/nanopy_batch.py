@@ -37,14 +37,17 @@ fi"""
 
    if remoteDir=='':
       cpCmd=dirCopy
-   elif  remoteDir.startswith("root://eoscms.cern.ch//eos/cms/store/"):
-       cpCmd="""echo '==== sending root files to remote dir ===='
+   elif  remoteDir.startswith("root://eoscms.cern.ch//eos/cms/store/") or remoteDir.startswith("root://eosuser.cern.ch//eos/user"):
+      urlMGM="root://eoscms.cern.ch/"
+      if remoteDir.startswith("root://eosuser"):
+         urlMGM="root://eosuser.cern.ch/"
+      cpCmd="""echo '==== sending root files to remote dir ===='
 echo
 export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH # 
 for f in Loop/*.root
 do
    ff=`echo $f | cut -d/ -f2`
-   ff="${{ff}}_`basename $f | cut -d . -f 1`"
+   #   ff="${{ff}}_`basename $f | cut -d . -f 1`"
    echo $f
    echo $ff
    export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
@@ -53,16 +56,17 @@ do
       echo "Stageout try $try"
       echo "eos mkdir {srm}"
       eos mkdir {srm}
-      echo "eos cp `pwd`/$f {srm}/${{ff}}_{idx}.root"
-      eos cp `pwd`/$f {srm}/${{ff}}_{idx}.root
+      echo "eos cp $f {srm}/$ff"
+      eos cp $f {srm}/$ff
       if [ $? -ne 0 ]; then
          echo "ERROR: remote copy failed for file $ff"
          continue
       fi
       echo "remote copy succeeded"
-      remsize=$(eos find --size {srm}/${{ff}}_{idx}.root | cut -d= -f3) 
-      locsize=$(cat `pwd`/$f | wc -c)
-      ok=$(($remsize==$locsize))
+      remsize=$(eos find --size {srm}/$ff | cut -d= -f3)
+      locsize=$(cat $f | wc -c)
+      echo "remsize=$remsize"; echo "locsize=$locsize" 
+      ok=$((remsize==locsize))
       if [ $ok -ne 1 ]; then
          echo "Problem with copy (file sizes don't match), will retry in 30s"
          sleep 30
@@ -70,7 +74,7 @@ do
       fi
       echo "everything ok"
       rm $f
-      echo root://eoscms.cern.ch/{srm}/${{ff}}_{idx}.root > $f.url
+      echo {mgm}/{srm}/$ff > $f.url
       break
    done
 done
@@ -80,7 +84,8 @@ echo
 {dirCopy}
 """.format(
           idx = jobDir[jobDir.find("_Chunk")+6:].strip("/") if '_Chunk' in jobDir else 'all',
-          srm = (""+remoteDir+jobDir[ jobDir.rfind("/") : (jobDir.find("_Chunk") if '_Chunk' in jobDir else len(jobDir)) ]).replace("root://eoscms.cern.ch/",""),
+          srm = (""+remoteDir+jobDir[ jobDir.rfind("/") : (jobDir.find("_Chunk") if '_Chunk' in jobDir else len(jobDir)) ]).replace(urlMGM,""),
+          mgm = urlMGM,
           dirCopy = dirCopy
           )
    else:

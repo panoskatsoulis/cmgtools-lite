@@ -1,4 +1,5 @@
 #!/bin/bash
+
 Q="8nh"; T="240"; HAST=false
 if [[ "$1" == "" || "$1" == "-h" || "$1" == "--help" ]]; then
     echo "Usage: $0 [ -q <queue> | -t <time-in-minutes> ] <Component_ChunkXYZ> [ <JobName> ] "
@@ -17,8 +18,12 @@ if [[ "$1" == "-t" ]]; then
     Q="HTCondor"; T=$2; HAST=true; shift; shift;
 fi;
 
+PROCESS=''
 if [[ "$1" != "" ]] && test -d $1 && test -f $1/batchScript.sh; then
-    cd $1; shift;
+    cd $1
+    PROCESS=$(echo $1 | sed -r "s@.*/([^/]*)\$@\1@")
+    echo "PROCESS = $PROCESS"
+    shift
 elif test \! -f batchScript.sh; then
     echo "You did not specify a valid chunk to resubmit and you're not in a chunk directory.";
     exit 1;
@@ -39,7 +44,7 @@ else
             run_condor.sh -t $T batchScript.sh
         else
             echo "Will resubmit with run_condor_simple.sh"
-            run_condor_simple.sh -t $T batchScript.sh
+            run_condor_simple.sh -t $T batchScript.sh -batch-name $PROCESS
         fi
     else
         if [ -f job_desc.cfg ]; then
