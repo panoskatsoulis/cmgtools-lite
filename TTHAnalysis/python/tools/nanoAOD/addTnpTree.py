@@ -6,6 +6,19 @@ import os
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
+
+from CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules import calculateRawMVA, SOSTightID2018, susyEleIdParametrization, VLooseFOEleID, tightEleID, clean_and_FO_selection_SOS
+conf = dict(muPt = 3.0, elePt = 5.0, sip3d = 2.5, dxy =  0.05, dz = 0.1, minMet = 50.0, ip3d = 0.0175, iperbolic_iso_0 = 20.0, iperbolic_iso_1 = 300.0)
+
+muonSelection = lambda l : abs(l.eta) < 2.4 and l.pt > conf["muPt"]  and l.sip3d < conf["sip3d"] and abs(l.dxy) < conf["dxy"] and abs(l.dz) < conf["dz"]  and l.pfRelIso03_all*l.pt < ( conf["iperbolic_iso_0"]+conf["iperbolic_iso_1"]/l.pt) and abs(l.ip3d) < conf["ip3d"]
+electronSelection = lambda l : abs(l.eta) < 2.5 and l.pt > conf["elePt"]  and l.sip3d < conf["sip3d"] and abs(l.dxy) < conf["dxy"] and abs(l.dz) < conf["dz"] and l.pfRelIso03_all*l.pt < ( conf["iperbolic_iso_0"]+conf["iperbolic_iso_1"]/l.pt) and abs(l.ip3d) < conf["ip3d"]
+
+def isSOSLoose(lep,year,flavor):
+    return clean_and_FO_selection_SOS(lep,year) and ( (flavor=="Muon" and muonSelection(lep)) or (flavor=="Electron" and electronSelection(lep)) )
+def isSOSTight(lep,year,flavor):
+    return isSOSLoose(lep,year,flavor) and ((abs(lep.pdgId)==13 or tightEleID(lep, year)) and lep.pfRelIso03_all<0.5 and (lep.pfRelIso03_all*lep.pt)<5. and abs(lep.ip3d)<0.01 and lep.sip3d<2)
+
+
 _rootLeafType2rootBranchType = { 'UChar_t':'b', 'Char_t':'B', 'UInt_t':'i', 'Int_t':'I', 'Float_t':'F', 'Double_t':'D', 'ULong64_t':'l', 'Long64_t':'L', 'Bool_t':'O' }
 
 class addTnpTree(Module):
@@ -52,8 +65,14 @@ class addTnpTree(Module):
             self.out.branch('Probe_%s'%branch[0], _rootLeafType2rootBranchType[branch[1]])
 
         ## Additional variables  added by hand 
-        self.out.branch("Tag_isGenMatched", "I")
-        self.out.branch("Probe_isGenMatched",     "I")
+        self.out.branch("Tag_isGenMatched"      , "I")
+        self.out.branch("Tag_jetBTagDeepCSV"    , "F")
+        self.out.branch("Tag_isClean"           , "I")
+        self.out.branch("Tag_isTight"           , "I")
+        self.out.branch("Probe_isGenMatched"    , "I")
+        self.out.branch("Probe_jetBTagDeepCSV"  , "F")
+        self.out.branch("Probe_isClean"         , "I")
+        self.out.branch("Probe_isTight"         , "I")
 
         self.out.branch("TnP_mass", "F")
         self.out.branch("TnP_ht",   "F")
@@ -158,17 +177,23 @@ class addTnpTree(Module):
               self.out.fillBranch("Probe_%s"%branchName, getattr(probe,branchName))
               
           tagMatch = 1 if isdata else self.matchesPrompt(tag,genparts)
-          self.out.fillBranch("Tag_isGenMatched", tagMatch)
+          self.out.fillBranch("Tag_isGenMatched"    , tagMatch)
+          self.out.fillBranch("Tag_jetBTagDeepCSV"  , 0 if tag.jetIdx < 0 else jet[tag.jetIdx].btagDeepB)
+          self.out.fillBranch("Tag_isClean"         , isSOSLoose(tag,self.year,self.flavor))
+          self.out.fillBranch("Tag_isTight"         , isSOSTight(tag,self.year,self.flavor))
 
           probeMatch = 1 if isdata else  self.matchesPrompt(probe, genparts)
-          self.out.fillBranch("Probe_isGenMatched", probeMatch)
+          self.out.fillBranch("Probe_isGenMatched"  , probeMatch)
+          self.out.fillBranch("Probe_jetBTagDeepCSV", 0 if probe.jetIdx < 0 else jet[probe.jetIdx].btagDeepB)
+          self.out.fillBranch("Probe_isClean"       , isSOSLoose(probe,self.year,self.flavor))
+          self.out.fillBranch("Probe_isTight"       , isSOSTight(probe,self.year,self.flavor))
 
           # TnP variables
-          self.out.fillBranch("TnP_mass",     mass);
-          self.out.fillBranch("TnP_trigger",  passTrigger); 
-          self.out.fillBranch("TnP_npairs",   len(pair)); 
-          self.out.fillBranch("TnP_met",      met);
-          self.out.fillBranch("TnP_ht",       ht);
+          self.out.fillBranch("TnP_mass"    , mass);
+          self.out.fillBranch("TnP_trigger" , passTrigger); 
+          self.out.fillBranch("TnP_npairs"  , len(pair)); 
+          self.out.fillBranch("TnP_met"     , met);
+          self.out.fillBranch("TnP_ht"      , ht);
           self.out.fill()
         return False
 
