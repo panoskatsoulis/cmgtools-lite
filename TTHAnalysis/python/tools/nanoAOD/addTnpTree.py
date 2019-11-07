@@ -17,7 +17,14 @@ def isSOSLoose(lep,year,flavor):
     return clean_and_FO_selection_SOS(lep,year) and ( (flavor=="Muon" and muonSelection(lep)) or (flavor=="Electron" and electronSelection(lep)) )
 def isSOSTight(lep,year,flavor):
     return isSOSLoose(lep,year,flavor) and ((abs(lep.pdgId)==13 or tightEleID(lep, year)) and lep.pfRelIso03_all<0.5 and (lep.pfRelIso03_all*lep.pt)<5. and abs(lep.ip3d)<0.01 and lep.sip3d<2)
-
+def isDYTight(lep,year,flavor):
+    return isSOSLoose(lep,year,flavor) and ((abs(lep.pdgId)==13 or tightEleID(lep, year)) and lep.pfRelIso03_all<0.5 and ((lep.pfRelIso03_all*lep.pt)<5. or lep.pfRelIso03_all<0.1))
+def isTTTight(lep,year,flavor):
+    return isSOSLoose(lep,year,flavor) and ((abs(lep.pdgId)==13 or tightEleID(lep, year)) and lep.pfRelIso03_all<0.5 and ((lep.pfRelIso03_all*lep.pt)<5. or lep.pfRelIso03_all<0.1) and abs(lep.ip3d)<0.01 and lep.sip3d<2)
+def isVVTight(lep,year,flavor): #VV ID same as TT
+    return isTTTight(lep,year,flavor)
+def isWZTight(lep,year,flavor): #WZ ID same as TT
+    return isTTTight(lep,year,flavor)
 
 _rootLeafType2rootBranchType = { 'UChar_t':'b', 'Char_t':'B', 'UInt_t':'i', 'Int_t':'I', 'Float_t':'F', 'Double_t':'D', 'ULong64_t':'l', 'Long64_t':'L', 'Bool_t':'O' }
 
@@ -69,10 +76,18 @@ class addTnpTree(Module):
         self.out.branch("Tag_jetBTagDeepCSV"    , "F")
         self.out.branch("Tag_isClean"           , "I")
         self.out.branch("Tag_isTight"           , "I")
+        self.out.branch("Tag_isDYTight"         , "I")
+        self.out.branch("Tag_isTTTight"         , "I")
+        self.out.branch("Tag_isVVTight"         , "I")
+        self.out.branch("Tag_isWZTight"         , "I")
         self.out.branch("Probe_isGenMatched"    , "I")
         self.out.branch("Probe_jetBTagDeepCSV"  , "F")
         self.out.branch("Probe_isClean"         , "I")
         self.out.branch("Probe_isTight"         , "I")
+        self.out.branch("Probe_isDYTight"       , "I")
+        self.out.branch("Probe_isTTTight"       , "I")
+        self.out.branch("Probe_isVVTight"       , "I")
+        self.out.branch("Probe_isWZTight"       , "I")
 
         self.out.branch("TnP_mass", "F")
         self.out.branch("TnP_ht",   "F")
@@ -181,12 +196,20 @@ class addTnpTree(Module):
           self.out.fillBranch("Tag_jetBTagDeepCSV"  , 0 if tag.jetIdx < 0 else jet[tag.jetIdx].btagDeepB)
           self.out.fillBranch("Tag_isClean"         , isSOSLoose(tag,self.year,self.flavor))
           self.out.fillBranch("Tag_isTight"         , isSOSTight(tag,self.year,self.flavor))
+          self.out.fillBranch("Tag_isDYTight"       , isDYTight(tag,self.year,self.flavor))
+          self.out.fillBranch("Tag_isTTTight"       , isTTTight(tag,self.year,self.flavor))
+          self.out.fillBranch("Tag_isVVTight"       , isVVTight(tag,self.year,self.flavor))
+          self.out.fillBranch("Tag_isWZTight"       , isWZTight(tag,self.year,self.flavor))
 
           probeMatch = 1 if isdata else  self.matchesPrompt(probe, genparts)
           self.out.fillBranch("Probe_isGenMatched"  , probeMatch)
           self.out.fillBranch("Probe_jetBTagDeepCSV", 0 if probe.jetIdx < 0 else jet[probe.jetIdx].btagDeepB)
           self.out.fillBranch("Probe_isClean"       , isSOSLoose(probe,self.year,self.flavor))
           self.out.fillBranch("Probe_isTight"       , isSOSTight(probe,self.year,self.flavor))
+          self.out.fillBranch("Probe_isDYTight"     , isDYTight(probe,self.year,self.flavor))
+          self.out.fillBranch("Probe_isTTTight"     , isTTTight(probe,self.year,self.flavor))
+          self.out.fillBranch("Probe_isVVTight"     , isVVTight(probe,self.year,self.flavor))
+          self.out.fillBranch("Probe_isWZTight"     , isWZTight(probe,self.year,self.flavor))
 
           # TnP variables
           self.out.fillBranch("TnP_mass"    , mass);
