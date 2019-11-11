@@ -1,0 +1,206 @@
+#!/bin/bash
+
+function do_treeProd_help() {
+    printf "Usage: $(basename $0) --task <task-name> --type <data/mc> --year <year> -in <cfg.py> -out <dir> [...]                  (Full Production Mode)
+Usage: $(basename $0) --friends-only --task <task-name> --type <data/mc> --year <year> -in <trees-dir> -out <dir> [...] (Friends Only Mode)
+Options:
+    --task <arg>         : Task name
+    --type <arg>         : data/mc, configs the recleaner
+    --year <arg>         : 2016,2017,2018
+    --input, -in <arg>   : Input to the script as described above (file or dir)
+    --output, -out <arg> : Output directory to store products (hadd'ed)
+    --events <arg>       : Maximum events per chunk
+    --freq <arg>         : Check frequency for the watchdogs
+    --dataset <arg>      : RegEx to specify a collection of datasets to process
+    --friends-only       : Enables the Friends Only mode
+    --skip-friends       : Skips the calculation of the friend trees completely
+    --skip-jetCorrs      : Skips the calculation of the jetMetCorrections,
+                           one needs to setup correctly the 'output' argument
+                           {give an existing output dir with jetCorr-ftrees included}
+    --force-rm           : Forces to remove <out-dir> and <src/task_name> (if exist)
+    --print-cmds         : Prints the nanopy and prepareEvent commands that would run, without running them
+    --debug              : Runs 'set -x' (super verbosive)
+"
+    [ "$1" == "all" ] && {
+	printf "Local afs directories:
+SRC/TASK --+-- postprocessor_chunks
+           |-- friends_chunks
+           +-- jetmetUncertainties_chunks
+"
+	printf "Output directories Structure (Full Production):
+OUT_PATH/YEAR/TASK_NAME --+-- postprocessor_chunks
+                          |-- friends_chunks
+                          +-- jetmetUncertainties_chunks
+                          +-- trees --+-- <trees>.root
+                                      +-- friends --+-- <ftrees>.root
+                                                    +-- jetmetUncertainties --+-- <jetmet-trees>.root
+"
+	printf "Output directories Structure (Friends Only):
+OUT_PATH/YEAR/TASK_NAME --+-- postprocessor_chunks
+                          |-- friends_chunks
+                          +-- jetmetUncertainties_chunks
+
+"
+    } || {
+	echo "Run $(basename $0) -h all for information about the directories."
+    }
+    exit 0
+}
+
+
+## tool that asks the user if wants to remove the given directory
+## Usage: checkRmPath <dir> <force-bool>
+function checkRmPath() {
+    DIR2RM=$1
+    FORCE=$2
+    $FORCE && {	rm -rf $DIR2RM;	return 0; }
+    if [ -e $DIR2RM ]; then
+	ans=''
+	while ! [[ $ans =~ [yn] ]]; do printf "The working path $DIR2RM exists, want to remove it? [y/n]"; read ans; done
+	[ "$ans" == "y" ] && { rm -rf $DIR2RM; return 0; }
+	return 1
+    else
+	echo "Requested directory $DIR2RM to removed, but it doesn't exist."
+	return 1
+    fi
+    printf "[ WARNING ]\nIt's not expected the control flow to reach this point. Nothing has been removed.\n"
+    return 1
+}
+
+## tool that resubmits a task using the command given
+## Usage: task_resubmit <cluster-id> <cmd-string> <output-dir>
+function task_resubmit() {
+    CONDOR_CLUSTER=$1
+    CMD="$2"
+    DIR_OUTPUT=$3
+    ## prepare environment
+    touch resubmit.log
+    printf "New resubmit attempt:\ncluster-id = $CONDOR_CLUSTER\noutput-dir = $DIR_OUTPUT\n" >> resubmit.log
+    echo "Waiting for the old task to be included in the schedd..." >> resubmit.log
+    sleep 30s
+    condor_rm $CONDOR_CLUSTER || { echo "condor_rm $CONDOR_CLUSTER failed with $?"; return 1; }
+    echo "Waiting for the old task to stop creating files..." >> resubmit.log
+    sleep 1m
+    rm -rf $DIR_OUTPUT && echo "Removed $DIR_OUTPUT" >> resubmit.log
+    rm -f last-submit-info && echo "Removed the old 'last-submit-info' file" >> resubmit.log
+    ## run the given command and parse the new cluster-id
+    echo "Running $CMD" >> resubmit.log
+    if eval $CMD; then
+	CONDOR_CLUSTER=$(grep -o "cluster [0-9]\+" last-submit-info | sed 's/[^0-9]*//')
+	[ -z "$CLUSTER" ] && {
+	    echo "Couldn't parse new cluster-id." >> resubmit.log
+	    return 1
+	}
+	echo $CONDOR_CLUSTER ## echo it to be captured by the caller
+    else
+	echo "eval \"$CMD\" failed with return value $?" >> resubmit.log
+	return $1
+    fi
+    return 0
+}
+
+## tool to check and if root file corrupted, resubmit the related chunk (returns 0 if corrupted file found)
+## Usage: checkResubChunk <dir> <cluster>
+function checkResubChunk() {
+    _dir=$1
+    _cluster=$2
+    echo ".ls" > root_cmd
+    echo ".q" >> root_cmd
+    corrupted_found=false
+    for _f in $(ls $_dir/*.root); do
+	_chunk=$(echo $_f | grep -o "chunk[0-9]\+" | sed s/chunk//)
+	root -l -b $_f < root_cmd | grep TTree > /dev/null && { ## if TTree KEY exists in the file
+	    condor_rm $_cluster.$_chunk
+	} || { ## if TTree KEY doesn't exist in the file
+	    corrupted_found=true
+	    rm -f $_f
+	    condor_release $_cluster.$_chunk
+	}		
+    done
+    $corrupted_found && return 0
+    return 1
+}
+
+## tool that checks if the friend trees module finished
+## Usage: wait_friendsModule <output-dir> <sleep-freq> <string-cmd> <cluster-id>
+function wait_friendsModule() {
+    DIR=$1
+    FREQ=$2
+    PY_CMD="$3"
+    _CLUSTER=$4
+    times_waited=0
+    while true; do
+	jobs_logs=$(ls $DIR/logs/log.* | wc | awk '{print $1}')
+	jobs_finished=$(grep Done.*tasks.* $DIR/logs/out.* | wc | awk '{print $1}')
+	root_files=$(ls $DIR/*.root | wc | awk '{print $1}')
+	echo "jobs_logs=$jobs_logs, jobs_finished=$jobs_finished, root_files=$root_files"
+	echo "logs = finished : $(( $jobs_logs == $jobs_finished ))"
+	echo "logs = files    : $(( $jobs_logs == $root_files ))"
+	echo "logs > files    : $(( $jobs_logs > $root_files ))"
+
+	## if no logs exist yet
+	if (( $jobs_logs == 0 )); then
+	    echo "true is: (( logs == 0 ))"
+	    times_tried=$(( $times_tried + 1 ))
+	    (( $times_tried == 3 )) && {
+		echo "Tried 3 submits. Probably a CondorHT problem. Exiting..."
+		return 1
+	    }
+	    echo "Log files have not yet been created. Resubmitting..."
+	    _CLUSTER=$(task_resubmit $_CLUSTER "$PY_CMD" $DIR || return $?)
+	    sleep 1m
+
+	## if logs == finished == files, task finished
+	elif (( $jobs_logs == $jobs_finished )) && (( $jobs_logs == $root_files )); then
+	    echo "true is: (( logs == finished-jobs )) && (( logs == root-files ))"
+	    # echo "will check for corrupted chunks..."
+	    # checkResubChunk $DIR $_CLUSTER && continue ## checkResubChunk will return 0 if corrupted files will be found
+	    return 0
+
+	## if logs == finished but root files missing
+	elif (( $jobs_logs == $jobs_finished )) && (( $jobs_logs > $root_files )); then
+	    echo "true is: (( logs == finished-jobs )) && (( logs > root-files ))"
+	    echo "[ ERROR ]"
+	    echo "All jobs included in $DIR finished, but the number of the produced root files is less than the jobs run."
+	    return 1
+
+	## else some jobs are still running, sleep
+	else
+	    jobs_failed=$(grep -o "return value [1-9]\+" $DIR/logs/log.* | wc | awk '{print $1}')
+	    echo "Jobs are still running, failed jobs $jobs_failed"
+	    (( $jobs_failed > 0 )) && echo "[ WARNING ] $jobs_failed jobs have failed in directory $DIR"
+	    (( $jobs_finished + $jobs_failed == $jobs_logs )) && {
+		grep -o "return value [1-9]\+" $DIR/logs/log.* | awk -F [:/.] '{print "step:"$1", cluster.chunk="$4"."$6", process="$5}' >> failed-jobs.log
+		echo "Task has finished, but $jobs_failed jobs have failed. Failed jobs have been saved in failed-jobs.log"
+		return 1 ## this value will end the script while not allowing to run the next prepareEvents command
+	    }
+	    sleep $FREQ
+	fi
+    done
+}
+
+## tool that hadds all processes in a given path and stores them wherever specified
+## Usage: haddProcesses <in-dir> <out-dir>
+function haddProcesses() {
+    IN_DIR=$1
+    OUT_DIR=$2
+    ## loop over processes which split into more than 1 chunk
+    processes=$(ls $IN_DIR/*root | sed -r 's@^.*/([^/\.]*).*[Cc]hunk[0-9]*\.root$@\1@; /chunk/d' | sort -u)
+    for process in $processes; do
+	chunks=$(ls $IN_DIR/$process.chunk*.root | wc | awk '{print $1}')
+	(( $chunks == 0 )) && {
+	    cp -a $IN_DIR/$process.root $OUT_DIR/$process.root || echo "$IN_DIR/$process is missing" >> errors_treeProduction
+	    continue
+	}
+	hadd -ff $OUT_DIR/$process.root $IN_DIR/$process.chunk*.root || {
+	    echo "hadd failed for path $IN_DIR and process $process"
+	    return 1
+	}
+    done
+    ## copy the files from processes which split in 1 chunk
+    files=$(ls $IN_DIR/*root | sed -r 's@^.*/([^/\.]*).*[Cc]hunk[0-9]*\.root$@\1@' | grep .*root$)
+    for file in $files; do
+	cp -a $file $OUT_DIR/.
+    done
+    return 0
+}
