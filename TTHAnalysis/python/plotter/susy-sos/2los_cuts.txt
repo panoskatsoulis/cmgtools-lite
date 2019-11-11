@@ -24,6 +24,7 @@ met125		: MET_pt > 125 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, Le
 met125_trig_16	: HLT_MuMuMET16	; Disable=True
 met125_trig_17	: HLT_MuMuMET17	; Disable=True
 met125_trig_18	: HLT_MuMuMET18	; Disable=True
+met125_trig_18new	: HLT_MuMuMET18 || HLT_SingleMu18 ; Disable=True
 ### Med MET	
 met200		: MET_pt > 200 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200 && MET_pt < 250	; Disable=True
 met200_col	: MET_pt > 200 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200 && MET_pt < 300	; Disable=True
@@ -52,6 +53,8 @@ SF		: abs(LepGood1_pdgId*LepGood2_pdgId)==169 || abs(LepGood1_pdgId*LepGood2_pdg
 mm		: abs(LepGood1_pdgId)==13 && abs(LepGood2_pdgId)==13
 ### EWK OR Low MET
 pt5sublep	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 5) || (fabs(LepGood2_pdgId)==11 && LepGood2_pt > 5)
+pt3p5subMu	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 3.5) || (fabs(LepGood2_pdgId)==11 && LepGood2_pt > 5)	; Disable=True
+pt3subMu	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 4.5) || (fabs(LepGood2_pdgId)==11 && LepGood2_pt > 5)	; Disable=True
 
 
 ##### DY CR
