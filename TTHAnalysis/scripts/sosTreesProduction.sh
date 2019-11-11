@@ -18,6 +18,8 @@ while ! [ -z "$1" ]; do
     [ "$1" == "--friends-only" ] && { FRIENDS_ONLY=true; shift; continue; }
     [ "$1" == "--skip-jetCorrs" ] && { SKIP_JETCORRS=true; shift; continue; }
     [ "$1" == "--skip-friends" ] && { SKIP_FRIENDS=true; shift; continue; }
+    [ "$1" == "--skip-btagFriends" ] && { SKIP_BTAG_FRIENDS=true; shift; continue; }
+    [ "$1" == "--skip-friends-all" ] && { SKIP_ALL_FRIENDS=true; shift; continue; }
     [ "$1" == "--debug" ] && { set -x; shift; continue; }
     [ "$1" == "--force-rm" ] && { FORCE_RM_DIRS=true; shift; continue; }
     [ "$1" == "--print-cmds" ] && { JUST_PRINT_CMDS=true; shift; continue; }
@@ -34,6 +36,8 @@ done
 [ -z "$FRIENDS_ONLY" ] && FRIENDS_ONLY=false
 [ -z "$SKIP_JETCORRS" ] && SKIP_JETCORRS=false
 [ -z "$SKIP_FRIENDS" ] && SKIP_FRIENDS=false
+[ -z "$SKIP_BTAG_FRIENDS" ] && SKIP_BTAG_FRIENDS=false
+[ -z "$SKIP_ALL_FRIENDS" ] && SKIP_ALL_FRIENDS=false
 [ -z "$JUST_PRINT_CMDS" ] && JUST_PRINT_CMDS=false
 [ -z "$FORCE_RM_DIRS" ] && FORCE_RM_DIRS=false
 [ -z "$N_EVENTS" ] && N_EVENTS=500000
@@ -80,16 +84,19 @@ OUT_PATH_POSTPROC=$OUT_PATH/postprocessor_chunks ## remote directories
 OUT_PATH_TREES=$OUT_PATH/trees_hadd
 OUT_PATH_FRIENDS=$OUT_PATH/friends_hadd
 OUT_PATH_JETMET=$OUT_PATH/jetmetUncertainties_hadd
+OUT_PATH_BTAGWEIGHT=$OUT_PATH/btagWeight_hadd
 if ! $JUST_PRINT_CMDS; then
     { $FORCE_RM_DIRS && [ -d $OUT_PATH_POSTPROC ]; } && rm -rf $OUT_PATH_POSTPROC
     mkdir $OUT_PATH_TREES -p
     mkdir $OUT_PATH_FRIENDS
     mkdir $OUT_PATH_JETMET
+    mkdir $OUT_PATH_BTAGWEIGHT
     mkdir $CMSSW_DIR/$TASK_NAME ## local directories
 fi
 AFS_DIR_POSTPROC_CHUNKS=postprocessor_chunks
 AFS_DIR_JETMET_CHUNKS=jetmetUncertainties_chunks
 AFS_DIR_FRIENDS_CHUNKS=friends_chunks
+AFS_DIR_BTAGWEIGHT_CHUNKS=btagWeight_chunks
 
 
 ## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,7 +180,7 @@ fi ## if not friends-only
 
 ## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## run the friend tree modules
-if ! $SKIP_FRIENDS; then
+if ! $SKIP_ALL_FRIENDS; then
     ## go to the initial directory
     cd $CMSSW_DIR/$TASK_NAME && echo $PWD
     ln -s ../CMGTools/TTHAnalysis/macros/lxbatch_runner.sh lxbatch_runner.sh
@@ -181,10 +188,12 @@ if ! $SKIP_FRIENDS; then
     ## prepare the friend tree commands
     DATA_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_data,isTightLepDY,isTightLepTT,isTightLepVV,isTightLepWZ -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME | tee last-submit-info"
     JETMET_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_JETMET_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules jetmetUncertainties$TASK_YEAR -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-jetcorrs | tee last-submit-info"
-    MC_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_mc,isTightLepDY,isTightLepTT,isTightLepVV,isTightLepWZ,mcMatchId,mcPromptGamma -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME | tee last-submit-info"
+    MC_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_mc,isTightLepDY,isTightLepTT,isTightLepVV,isTightLepWZ,mcMatchId,mcPromptGamma -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-recl | tee last-submit-info"
+    BTAGWEIGHT_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_BTAGWEIGHT_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -F $OUT_PATH_FRIENDS/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules eventBTagWeight_$(echo $TASK_YEAR | sed s/20//) -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-btag | tee last-submit-info"
+
     echo "Friend Tree Production, will run the command:"
     [ $TASK_TYPE == "data" ] && echo $DATA_CMD
-    [ $TASK_TYPE == "mc" ] && { echo $JETMET_CMD; echo $MC_CMD; }
+    [ $TASK_TYPE == "mc" ] && { echo $JETMET_CMD; echo $MC_CMD; echo $BTAGWEIGHT_CMD; }
 
     if ! $JUST_PRINT_CMDS; then
 	## be sure that the input file is a directory
@@ -201,6 +210,7 @@ if ! $SKIP_FRIENDS; then
 		haddProcesses $AFS_DIR_FRIENDS_CHUNKS $OUT_PATH_FRIENDS || \
 		exit 1
 	elif [ $TASK_TYPE == "mc" ]; then
+	    ## run the friends' producer for calculating the jet met corrections
 	    ! $SKIP_JETCORRS && {
 		eval $JETMET_CMD
 		CLUSTER=$(grep -o "cluster [0-9]\+" last-submit-info | sed 's/[^0-9]*//')
@@ -211,11 +221,25 @@ if ! $SKIP_FRIENDS; then
 	    echo "Files ($(ls $OUT_PATH_JETMET | wc | awk '{print $1}')) in the directory $OUT_PATH_JETMET:"
 	    ls $OUT_PATH_JETMET
 	    ## now run the step1 and mc step 2
-	    eval $MC_CMD
-	    CLUSTER=$(grep -o "cluster [0-9]\+" last-submit-info | sed 's/[^0-9]*//')
-	    wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ "$MC_CMD" $CLUSTER && \
-		haddProcesses $AFS_DIR_FRIENDS_CHUNKS $OUT_PATH_FRIENDS || \
-		exit 1
+	    ! $SKIP_FRIENDS && {
+		eval $MC_CMD
+		CLUSTER=$(grep -o "cluster [0-9]\+" last-submit-info | sed 's/[^0-9]*//')
+		wait_friendsModule $AFS_DIR_FRIENDS_CHUNKS $FREQ "$MC_CMD" $CLUSTER && \
+		    haddProcesses $AFS_DIR_FRIENDS_CHUNKS $OUT_PATH_FRIENDS || \
+		    exit 1
+	    }
+	    echo "Files ($(ls $OUT_PATH_FRIENDS | wc | awk '{print $1}')) in the directory $OUT_PATH_FRIENDS:"
+	    ls $OUT_PATH_FRIENDS
+	    ## now run the producer for the btag weights
+	    ! $SKIP_BTAG_FRIENDS && {
+		eval $BTAGWEIGHT_CMD
+		CLUSTER=$(grep -o "cluster [0-9]\+" last-submit-info | sed 's/[^0-9]*//')
+		wait_friendsModule $AFS_DIR_BTAGWEIGHT_CHUNKS $FREQ "$MC_CMD" $CLUSTER && \
+		    haddProcesses $AFS_DIR_BTAGWEIGHT_CHUNKS $OUT_PATH_BTAGWEIGHT || \
+		    exit 1
+	    }
+	    echo "Files ($(ls $OUT_PATH_BTAGWEIGHT | wc | awk '{print $1}')) in the directory $OUT_PATH_BTAGWEIGHT:"
+	    ls $OUT_PATH_BTAGWEIGHT
 	else
 	    echo "TASK_TYPE is neither 'data' nor 'mc'"
 	    exit 1

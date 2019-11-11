@@ -13,10 +13,13 @@ Options:
     --freq <arg>         : Check frequency for the watchdogs
     --dataset <arg>      : RegEx to specify a collection of datasets to process
     --friends-only       : Enables the Friends Only mode
-    --skip-friends       : Skips the calculation of the friend trees completely
+    --skip-friends-all   : Skips all the friends' production
     --skip-jetCorrs      : Skips the calculation of the jetMetCorrections,
                            one needs to setup correctly the 'output' argument
                            {give an existing output dir with jetCorr-ftrees included}
+    --skip-friends       : Skips the calculation of the friend trees completely
+                           {give an existing output dir with the recleaner ftrees included}
+    --skip-btagFriends   : Skips the calculation of the btag weight ftrees
     --force-rm           : Forces to remove <out-dir> and <src/task_name> (if exist)
     --print-cmds         : Prints the nanopy and prepareEvent commands that would run, without running them
     --debug              : Runs 'set -x' (super verbosive)
