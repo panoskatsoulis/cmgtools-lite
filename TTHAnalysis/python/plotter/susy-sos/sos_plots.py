@@ -24,6 +24,7 @@ parser.add_argument("--exPlots", default=None, help="Exclude plots, separated by
 parser.add_argument("--signalMasses", default=None, help="Select only these signal samples (e.g 'signal_TChiWZ_100_70+'), comma separated. Use only when doing 'cards'")
 parser.add_argument("--doWhat", default="plots", help="Do 'plots' or 'cards'. Default = '%(default)s'")
 parser.add_argument("--recursive-cuts", dest="recur_cuts", action="store_true", default=False, help="Make plots for each cut separately.")
+parser.add_argument("--n-minus-one", dest="nMinus1", action="store_true", default=False, help="Make general n-1 plots for each cut separately.")
 parser.add_argument("--dont-run", dest="dontrun", action="store_true", default=False, help="Do not run the command, just print it")
 parser.add_argument("--run", dest="run_cmd", action="store_true", default=False, help="Run the command, do not just print it")
 parser.add_argument("--study-mod", dest="studyScenarioPrint", action="store", metavar=("STUDYNAME","SCENARIO"), default=[],
@@ -62,7 +63,13 @@ TREESALL = " --Fs {P}/recleaner -P "+P0+"%s "%(YEAR,)
 
 def base(selection):
     CORE=TREESALL
-    CORE+=" -f -j %d --split-factor=-1 --year %s --s2v -L susy-sos/functionsSOS.cc -L susy-sos/functionsSF.cc --tree NanoAOD --mcc susy-sos/mcc_sos.txt --mcc susy-sos/mcc_triggerdefs.txt "%(nCores,YEAR) # --neg"
+    CORE+=" -j %d --split-factor=-1 --year %s --s2v -L susy-sos/functionsSOS.cc -L susy-sos/functionsSF.cc --tree NanoAOD --mcc susy-sos/mcc_sos.txt --mcc susy-sos/mcc_triggerdefs.txt "%(nCores,YEAR) # --neg"
+    if args.nMinus1:
+        CORE=' --n-minus-one'+CORE
+    elif args.recur_cuts:
+        pass
+    else:
+        CORE=' -f'+CORE
     if YEAR == "2017": CORE += " --mcc susy-sos/mcc_METFixEE2017.txt "
     RATIO= " --maxRatioRange 0.0  1.99 --ratioYNDiv 505 "
     RATIO2=" --showRatio --attachRatioPanel --fixRatioRange "
@@ -194,20 +201,22 @@ def modifyAnalysis(plotCmd, study_mods):
         ## general for both scenarios
         regexs.append(" -\P [^ ]* "); targets.append(" -P /eos/user/k/kpanos/sostrees/2018/trees ")
         regexs.append(" \--\Fs [^ ]* "); targets.append(" --Fs {P}/friends ")
-        regexs.append(" susy\-sos/([^ ]*plots[^ ]*txt) "); targets.append(" susy-sos/Studies/"+study_mods[0]+"/\\1 ")
-        regexs.append(" susy\-sos/([^ ]*mca[^ ]*txt) "); targets.append(" susy-sos/Studies/"+study_mods[0]+"/\\1 ")
+        regexs.append(" *$"); targets.append(" --sP=yields,SR_2l_ewk,lep1pt,lep2pt,mu1pt,mu2pt,met,Jet25") ## other plots htJet25,metovht,PtLep1vsPtLep2,PtMu1vsPtMu2
+        regexs.append(" *$"); targets.append(" --xp Fakes_t,Fakes_vv,Convs,Rares") ## include fakes tt and Wj
+        # regexs.append(" *$"); targets.append(" --xp Fakes_.*,Convs,Rares")
         ## scenario specific
         if study_mods[1] in ['sos','original','1']:
-            regexs.append(" *$"); targets.append(" --xp Fakes,Convs,Rares")
+            pass
+        if study_mods[1] in ['sos_muPt2gt3']:
+            regexs.append(" *$"); targets.append(" -X ^sublepPt$ -X ^pt5sublep$ -E ^pt3subMu$")
         if study_mods[1] in ['alt','alternative','2','alt_muPt2gt3p5','alt_muPt2gt3']:
             ## mca needs to be here because includes the SingleMuon dataset
-            regexs.append(" susy\-sos/([^ ]*cuts[^ ]*txt) "); targets.append(" susy-sos/Studies/"+study_mods[0]+"/\\1 ")
-            regexs.append(" \-\-mcc [^ ]*triggerdefs.txt "); targets.append(" --mcc susy-sos/Studies/SingleMuonTrigger/mcc_triggerdefs.txt ")
-            regexs.append(" *$"); targets.append(" --xp Fakes,Convs,Rares")
+            regexs.append(" (susy\-sos/[^ ]*mca[^ ]*)\.txt "); targets.append(" \\1_withSingleMu.txt ")
+            regexs.append("met125_trig_18"); targets.append("met125_trig_18new") ## change the low met trigger
             if study_mods[1] == 'alt_muPt2gt3':
-                regexs.append(" *$"); targets.append(" -X ^sublepPt$ -X ^pt5sublep$ -E ^pt3sublep$")
+                regexs.append(" *$"); targets.append(" -X ^sublepPt$ -X ^pt5sublep$ -E ^pt3subMu$")
             elif study_mods[1] == 'alt_muPt2gt3p5':
-                regexs.append(" *$"); targets.append(" -X ^sublepPt$ -X ^pt5sublep$ -E ^pt3p5sublep$")
+                regexs.append(" *$"); targets.append(" -X ^sublepPt$ -X ^pt5sublep$ -E ^pt3p5subMu$")
 
     ## study dedicated code <<<-------------------------------------------------------------------------------------------------------------------------
 
