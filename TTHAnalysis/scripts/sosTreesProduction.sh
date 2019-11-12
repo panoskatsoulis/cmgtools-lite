@@ -143,7 +143,7 @@ if ! $FRIENDS_ONLY; then
 		    FINISHED=true ## fix the FINISHED BOOL; else
 		else
 		    echo "Will resubmit failed chunks.."
-		    eval `cat corruptedChunks | grep -v ^#` ## run the resub cmds
+		    cat corruptedChunks | while read line; do eval $line; done ## run the resub cmds
 		    RUNNING_TASKS=($(cat corruptedChunks | grep -v ^# | sed -r "s@.*/([^/]*)\$@\1@")) ## update the running processes
 		    rm corruptedChunks ## delete the file
 		fi
