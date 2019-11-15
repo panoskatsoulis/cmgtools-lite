@@ -58,6 +58,8 @@ unordered_map<int, TH2F*> h_trigEff_mumuMET_metleg_MC = {
 	{ 2017, (TH2F*) f_trigSF_2l->Get("dimu3met50_metleg_2017_MC") },
 	{ 2016, (TH2F*) f_trigSF_2l->Get("dimu3met50_metleg_2016_MC") }
 };
+TH2F* h_trigEff_mumuMET_dca16_Data = (TH2F*) f_trigSF_2l->Get("dimu3met50_dca_2016_Data");
+TH2F* h_trigEff_mumuMET_dca16_MC = (TH2F*) f_trigSF_2l->Get("dimu3met50_dcaleg_2016_MC");
 
 // Numerical maps
 float mass_Data = 1.00, mass_MC = 1.00;
@@ -104,10 +106,46 @@ unordered_map<int, float> sigma_MC = {
 
 
 // TFormula bug => Functions cannot have more than 9 arguments => Factorize SF computation by using functions
-float muleg_SF(int year, float pt1, float _eta1, float pt2, float _eta2, float pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
+float dcaDzleg_Data(int year, float _eta1, float _eta2){
+	
+	// Definitions and Protection
+	float d_Data;
+	float etaMax = max(_eta1,_eta2);
+	float etaMin = min(_eta1,_eta2);
+	float maxBin = h_trigEff_mumuMET_dca16_Data->GetXaxis()->FindBin(etaMax);
+	float minBin = h_trigEff_mumuMET_dca16_Data->GetYaxis()->FindBin(etaMin);
+
+	if(year==2016 &&  (maxBin - minBin) < 5){
+		d_Data = h_trigEff_mumuMET_dca16_Data->GetBinContent(maxBin, minBin);
+	}
+	else d_Data = dcaDz_Data[year];
+
+	return d_Data;
+}
+float dcaDzleg_MC(int year, float _eta1, float _eta2){
+	
+	// Definitions and Protection
+	float d_MC;
+	float etaMax = max(_eta1,_eta2);
+	float etaMin = min(_eta1,_eta2);
+	float maxBin = h_trigEff_mumuMET_dca16_MC->GetXaxis()->FindBin(etaMax);
+	float minBin = h_trigEff_mumuMET_dca16_MC->GetYaxis()->FindBin(etaMin);
+
+	if(year==2016 &&  (maxBin - minBin) < 5){
+		d_MC = h_trigEff_mumuMET_dca16_MC->GetBinContent(maxBin, minBin);
+	}
+	else d_MC = dcaDz_MC[year];
+
+	return d_MC;
+}
+
+
+// d factors also include the mass efficiency. Since this efficiency is 1.0, it is omitted.
+float muDleg_SF(int year, float pt1, float _eta1, float pt2, float _eta2, float pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
 	
 	// Definitions and Protection
 	float mu1_Data, mu1_MC, mu2_Data, mu2_MC, mu3_Data, mu3_MC;
+	float d12_Data, d12_MC, d13_Data, d13_MC, d23_Data, d23_MC;
 	float SF;
 	float eta1	= min(float(2.399), abs(_eta1)); // eta -> Absolute eta
 	float eta2	= min(float(2.399), abs(_eta2)); // eta -> Absolute eta
@@ -124,7 +162,9 @@ float muleg_SF(int year, float pt1, float _eta1, float pt2, float _eta2, float p
 	}
 
 	if(choose_leptons==12){
-		SF = (mu1_MC*mu2_MC == 0.0) ? 0.0 : (mu1_Data*mu2_Data) / (mu1_MC*mu2_MC);
+		d12_Data = dcaDzleg_Data(year, _eta1, _eta2);
+		d12_MC = dcaDzleg_MC(year, _eta1, _eta2);
+		SF = (mu1_MC*mu2_MC*d12_MC == 0.0) ? 0.0 : (mu1_Data*mu2_Data*d12_Data) / (mu1_MC*mu2_MC*d12_MC);
 	}
 	else{
 		// Third muon efficiency
@@ -135,11 +175,22 @@ float muleg_SF(int year, float pt1, float _eta1, float pt2, float _eta2, float p
 			mu3_MC /= dcaDz_MC[year];
 		}
 
-		if(choose_leptons==13)		SF = (mu1_MC*mu3_MC == 0.0) ? 0.0 : (mu1_Data*mu3_Data) / (mu1_MC*mu3_MC);
-		else if(choose_leptons==23)	SF = (mu2_MC*mu3_MC == 0.0) ? 0.0 : (mu2_Data*mu3_Data) / (mu2_MC*mu3_MC);
+		if(choose_leptons==13){
+			d13_Data = dcaDzleg_Data(year, _eta1, _eta3);
+			d13_MC = dcaDzleg_MC(year, _eta1, _eta3);
+			SF = (mu1_MC*mu3_MC*d13_MC == 0.0) ? 0.0 : (mu1_Data*mu3_Data*d13_Data) / (mu1_MC*mu3_MC*d13_MC);
+		}
+		else if(choose_leptons==23){
+			d23_Data = dcaDzleg_Data(year, _eta2, _eta3);
+			d23_MC = dcaDzleg_MC(year, _eta2, _eta3);
+			SF = (mu2_MC*mu3_MC*d23_MC == 0.0) ? 0.0 : (mu2_Data*mu3_Data*d23_Data) / (mu2_MC*mu3_MC*d23_MC);
+		}
 		else if(choose_leptons==123){
-			float ProbAnyPairFired_Data = 1 - (1-mu1_Data*mu2_Data)*(1-mu1_Data*mu3_Data)*(1-mu2_Data*mu3_Data);
-			float ProbAnyPairFired_MC = 1 - (1-mu1_MC*mu2_MC)*(1-mu1_MC*mu3_MC)*(1-mu2_MC*mu3_MC);
+			d12_Data = dcaDzleg_Data(year, _eta1, _eta2);	d13_Data = dcaDzleg_Data(year, _eta1, _eta3);	d23_Data = dcaDzleg_Data(year, _eta2, _eta3);
+			d12_MC = dcaDzleg_MC(year, _eta1, _eta2);		d13_MC = dcaDzleg_MC(year, _eta1, _eta3);		d23_MC = dcaDzleg_MC(year, _eta2, _eta3);
+
+			float ProbAnyPairFired_Data = mu1_Data*mu2_Data*d12_Data + mu1_Data*mu3_Data*d13_Data + mu2_Data*mu3_Data*d23_Data - mu1_Data*mu2_Data*mu3_Data * (d12_Data*d13_Data + d12_Data*d23_Data + d13_Data*d23_Data - d12_Data*d13_Data*d23_Data);
+			float ProbAnyPairFired_MC = mu1_MC*mu2_MC*d12_MC + mu1_MC*mu3_MC*d13_MC + mu2_MC*mu3_MC*d23_MC - mu1_MC*mu2_MC*mu3_MC * (d12_MC*d13_MC + d12_MC*d23_MC + d13_MC*d23_MC - d12_MC*d13_MC*d23_MC);
 
 			SF = (ProbAnyPairFired_MC == 0.0) ? 0.0 : ProbAnyPairFired_Data / ProbAnyPairFired_MC;
 		}
@@ -151,10 +202,11 @@ float muleg_SF(int year, float pt1, float _eta1, float pt2, float _eta2, float p
 	return SF;
 }
 
-float muleg_MCEff(int year, float pt1, float _eta1, float pt2, float _eta2, float pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
+float muDleg_MCEff(int year, float pt1, float _eta1, float pt2, float _eta2, float pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
 	
 	// Definitions and Protection
 	float mu1_MC, mu2_MC, mu3_MC;
+	float d12_MC, d13_MC, d23_MC;
 	float MCEff;
 	float eta1	= min(float(2.399), abs(_eta1)); // eta -> Absolute eta
 	float eta2	= min(float(2.399), abs(_eta2)); // eta -> Absolute eta
@@ -168,7 +220,8 @@ float muleg_MCEff(int year, float pt1, float _eta1, float pt2, float _eta2, floa
 	}
 
 	if(choose_leptons==12){
-		MCEff = (mu1_MC*mu2_MC);
+		d12_MC = dcaDzleg_MC(year, _eta1, _eta2);
+		MCEff = (mu1_MC*mu2_MC*d12_MC);
 	}
 	else{
 		// Third muon efficiency
@@ -177,10 +230,17 @@ float muleg_MCEff(int year, float pt1, float _eta1, float pt2, float _eta2, floa
 			mu3_MC /= dcaDz_MC[year];
 		}
 
-		if(choose_leptons==13)		MCEff = (mu1_MC*mu3_MC);
-		else if(choose_leptons==23)	MCEff = (mu2_MC*mu3_MC);
+		if(choose_leptons==13){
+			d13_MC = dcaDzleg_MC(year, _eta1, _eta3);
+			MCEff = (mu1_MC*mu3_MC*d13_MC);
+		}
+		else if(choose_leptons==23){
+			d23_MC = dcaDzleg_MC(year, _eta2, _eta3);
+			MCEff = (mu2_MC*mu3_MC*d23_MC);
+		}
 		else if(choose_leptons==123){
-			float ProbAnyPairFired_MC = 1 - (1-mu1_MC*mu2_MC)*(1-mu1_MC*mu3_MC)*(1-mu2_MC*mu3_MC);
+			d12_MC = dcaDzleg_MC(year, _eta1, _eta2);	d13_MC = dcaDzleg_MC(year, _eta1, _eta3);	d23_MC = dcaDzleg_MC(year, _eta2, _eta3);
+			float ProbAnyPairFired_MC = mu1_MC*mu2_MC*d12_MC + mu1_MC*mu3_MC*d13_MC + mu2_MC*mu3_MC*d23_MC - mu1_MC*mu2_MC*mu3_MC * (d12_MC*d13_MC + d12_MC*d23_MC + d13_MC*d23_MC - d12_MC*d13_MC*d23_MC);
 
 			MCEff = ProbAnyPairFired_MC;
 		}
@@ -194,7 +254,7 @@ float muleg_MCEff(int year, float pt1, float _eta1, float pt2, float _eta2, floa
 
 
 // Fullsim
-float triggerSF(float muleg_SF, float _met, float _met_corr, int year, float var=0){
+float triggerSF(float muDleg_SF, float _met, float _met_corr, int year, float var=0){
 
 	// Definitions and Protection
 	float eff_Data, eff_MC, SF;
@@ -209,15 +269,15 @@ float triggerSF(float muleg_SF, float _met, float _met_corr, int year, float var
 	}
 	// Low MET triggers
 	else{
-		// Mu leg computed in muleg_SF function
+		// Mu + Dca/Dz legs computed in muDleg_SF function
 		// Met leg
 		float met_Data	= h_trigEff_mumuMET_metleg_Data[year]->GetBinContent(h_trigEff_mumuMET_metleg_Data[year]->GetXaxis() ->FindBin(met), h_trigEff_mumuMET_metleg_Data[year]->GetYaxis()->FindBin(met_corr));
 		float met_MC	= h_trigEff_mumuMET_metleg_MC[year]->GetBinContent(h_trigEff_mumuMET_metleg_MC[year]->GetXaxis() ->FindBin(met), h_trigEff_mumuMET_metleg_MC[year]->GetYaxis()->FindBin(met_corr));
 
 		// Putting everything together
-		eff_Data	= dcaDz_Data[year] * mass_Data * met_Data;
-		eff_MC		= dcaDz_MC[year] * mass_MC * met_MC;
-		SF = (eff_MC == 0.0) ? 0.0 : muleg_SF * eff_Data / eff_MC;
+		eff_Data	= mass_Data * met_Data;
+		eff_MC		= mass_MC * met_MC;
+		SF = (eff_MC == 0.0) ? 0.0 : muDleg_SF * eff_Data / eff_MC;
 	}
 
 	// Variations: conservative 5% also for the SF 
@@ -228,13 +288,13 @@ float triggerSF(float muleg_SF, float _met, float _met_corr, int year, float var
 	return SF; 
 }
 
-float triggerWZSF(float muleg_SF, float _met, float _met_corr, int year, float var=0){
+float triggerWZSF(float muDleg_SF, float _met, float _met_corr, int year, float var=0){
 	return 1.0;
 }
 
 
 // Fastsim: MCEff to multiply fastsim samples so that SF * MCEff = DataEff
-float triggerMCEff(float muleg_MCEff, float _met, float _met_corr, int year, float var=0){
+float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year, float var=0){
 
 	// Definitions and Protection
 	float MCEff;
@@ -245,12 +305,12 @@ float triggerMCEff(float muleg_MCEff, float _met, float _met_corr, int year, flo
 	if(met_corr>=200.0) MCEff	= 0.5 * epsilonInf_MC[year] * ( TMath::Erf( (met_corr - mean_MC[year]) / sigma_MC[year] ) + 1 );
 	// Low MET triggers
 	else{
-		// Mu leg computed in muleg_MCEff function
+		// Mu + Dca/Dz legs computed in muDleg_MCEff function
 		// Met leg
 		float met_MC	= h_trigEff_mumuMET_metleg_MC[year]->GetBinContent(h_trigEff_mumuMET_metleg_MC[year]->GetXaxis() ->FindBin(met), h_trigEff_mumuMET_metleg_MC[year]->GetYaxis()->FindBin(met_corr));
 
 		// Putting everything together
-		MCEff	= dcaDz_MC[year] * mass_MC * met_MC;
+		MCEff	= muDleg_MCEff * mass_MC * met_MC;
 	}
 
 	// Variations: conservative 5% also for the MCEff 
@@ -261,7 +321,7 @@ float triggerMCEff(float muleg_MCEff, float _met, float _met_corr, int year, flo
 	return MCEff; 
 }
 
-float triggerWZMCEff(float muleg_MCEff, float _met, float _met_corr, int year, float var=0){
+float triggerWZMCEff(float muDleg_MCEff, float _met, float _met_corr, int year, float var=0){
 	return 1.0;
 }
 
