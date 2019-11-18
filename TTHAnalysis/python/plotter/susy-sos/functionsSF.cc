@@ -254,7 +254,7 @@ float muDleg_MCEff(int year, float pt1, float _eta1, float pt2, float _eta2, flo
 
 
 // Fullsim
-float triggerSF(float muDleg_SF, float _met, float _met_corr, int year, float var=0){
+float triggerSF(float muDleg_SF, float _met, float _met_corr, int year){
 
 	// Definitions and Protection
 	float eff_Data, eff_MC, SF;
@@ -280,21 +280,17 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year, float va
 		SF = (eff_MC == 0.0) ? 0.0 : muDleg_SF * eff_Data / eff_MC;
 	}
 
-	// Variations: conservative 5% also for the SF 
-	if(var>0) return SF*(1+0.05);
-	if(var<0) return SF*(1-0.05);
-
 	assert (SF>0 && "*** Warning we have a negative (or zero) Trigger SF ***");
 	return SF; 
 }
 
-float triggerWZSF(float muDleg_SF, float _met, float _met_corr, int year, float var=0){
+float triggerWZSF(float muDleg_SF, float _met, float _met_corr, int year){
 	return 1.0;
 }
 
 
 // Fastsim: MCEff to multiply fastsim samples so that SF * MCEff = DataEff
-float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year, float var=0){
+float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
 
 	// Definitions and Protection
 	float MCEff;
@@ -313,15 +309,11 @@ float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year, fl
 		MCEff	= muDleg_MCEff * mass_MC * met_MC;
 	}
 
-	// Variations: conservative 5% also for the MCEff 
-	if(var>0) return MCEff*(1+0.05);
-	if(var<0) return MCEff*(1-0.05);
-
 	assert (MCEff>0 && "*** Warning we have a negative (or zero) Trigger MCEff ***");
 	return MCEff; 
 }
 
-float triggerWZMCEff(float muDleg_MCEff, float _met, float _met_corr, int year, float var=0){
+float triggerWZMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
 	return 1.0;
 }
 
