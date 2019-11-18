@@ -265,7 +265,7 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year){
 	if(met_corr>=200.0){
 		eff_Data	= 0.5 * epsilonInf_Data[year] * ( TMath::Erf( (met_corr - mean_Data[year]) / sigma_Data[year] ) + 1 );
 		eff_MC		= 0.5 * epsilonInf_MC[year] * ( TMath::Erf( (met_corr - mean_MC[year]) / sigma_MC[year] ) + 1 );
-		SF			= eff_Data / eff_MC;
+		SF			= (eff_MC == 0.0) ? 0.0 : eff_Data / eff_MC;
 	}
 	// Low MET triggers
 	else{
@@ -280,7 +280,14 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year){
 		SF = (eff_MC == 0.0) ? 0.0 : muDleg_SF * eff_Data / eff_MC;
 	}
 
-	assert (SF>0 && "*** Warning we have a negative (or zero) Trigger SF ***");
+	if(SF<=0.0){
+		cout << "=====================================" << endl;
+		cout << "||             SF <= 0             ||" << endl;
+		cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
+		cout << "||     Setting SF to 1 for now     ||" << endl;
+		cout << "=====================================" << endl;
+		SF = 1.0;
+	}
 	return SF; 
 }
 
@@ -309,7 +316,14 @@ float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
 		MCEff	= muDleg_MCEff * mass_MC * met_MC;
 	}
 
-	assert (MCEff>0 && "*** Warning we have a negative (or zero) Trigger MCEff ***");
+	if(MCEff<=0.0){
+		cout << "=====================================" << endl;
+		cout << "||           MC eff <= 0           ||" << endl;
+		cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
+		cout << "||   Setting MC eff to 1 for now   ||" << endl;
+		cout << "=====================================" << endl;
+		MCEff = 1.0;
+	}
 	return MCEff; 
 }
 
