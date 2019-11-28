@@ -414,10 +414,34 @@ GGHZZ4L,
 VHToNonbb, #VHToNonbb_ll,
 ]
 
+# low Mll samples
+
+ZZTo4L_M1toInf = kreator.makeMCComponent("ZZTo4L_M1toInf","/ZZTo4L_M-1toInf_TuneCP5_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM","CMS",".*root", 13.74)
+
+VVTo2L2Nu_M1toInf = kreator.makeMCComponent("VVTo2L2Nu_M1toInf","/VVTo2L2Nu_M-1toInf_TuneCP5_13TeV_amcatnloFXFX_madspin_pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM","CMS",".*root", 14.75)
+# VVTo2L2Nu_M1toInf = kreator.makeMCComponent("VVTo2L2Nu_M1toInf","/VVTo2L2Nu_M-1toInf_TuneCP5_13TeV_amcatnloFXFX_madspin_pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_pdfweight_102X_upgrade2018_realistic_v19-v1/NANOAODSIM","CMS",".*root", 14.75)
+
+DYJetsToLL_M1to4_HT70to100 = kreator.makeMCComponent("DYJetsToLL_M1to4_HT70to100","/DYJetsToLL_M-1to4_HT-70to100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM","CMS",".*root", 624.5)
+DYJetsToLL_M1to4_HT100to200 = kreator.makeMCComponent("DYJetsToLL_M1to4_HT100to200","/DYJetsToLL_M-1to4_HT-100to200_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM","CMS",".*root", 484.3)
+DYJetsToLL_M1to4_HT200to400 = kreator.makeMCComponent("DYJetsToLL_M1to4_HT200to400","/DYJetsToLL_M-1to4_HT-200to400_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM","CMS",".*root", 85.78)
+DYJetsToLL_M1to4_HT400to600 = kreator.makeMCComponent("DYJetsToLL_M1to4_HT400to600","/DYJetsToLL_M-1to4_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM","CMS",".*root", 8.203)
+DYJetsToLL_M1to4_HT600toInf = kreator.makeMCComponent("DYJetsToLL_M1to4_HT600toInf","/DYJetsToLL_M-1to4_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM","CMS",".*root", 2.465)
+
+ZZandVV_M1toInf = [ ZZTo4L_M1toInf, VVTo2L2Nu_M1toInf ]
+
+DYJetsToLL_M1to4 = [
+    DYJetsToLL_M1to4_HT70to100,
+    DYJetsToLL_M1to4_HT100to200,
+    DYJetsToLL_M1to4_HT200to400,
+    DYJetsToLL_M1to4_HT400to600,
+    DYJetsToLL_M1to4_HT600toInf
+]
+
+
 # ----------------------------- summary ----------------------------------------
 
 
-mcSamples = QCDPt + QCDHT + QCD_Mus + QCD_EMs + QCD_bcToE + Ws + DYs + VJetsQQHT + TTs + Ts + TTXs + TTXXs + DiBosons + TriBosons + Higgs
+mcSamples = QCDPt + QCDHT + QCD_Mus + QCD_EMs + QCD_bcToE + Ws + DYs + VJetsQQHT + TTs + Ts + TTXs + TTXXs + DiBosons + TriBosons + Higgs + ZZandVV_M1toInf + DYJetsToLL_M1to4
 
 
 samples = mcSamples
