@@ -46,14 +46,13 @@ if year == 2018:
         mcSamples = byCompName(mcSamples_, [
 
             ## low Mll Samples
-            # ZZTo4L_M1toInf,
-            # VVTo2L2Nu_M1toInf,
-            # DYJetsToLL_M1to4_HT70to100,
-            # DYJetsToLL_M1to4_HT100to200,
-            # DYJetsToLL_M1to4_HT200to400,
-            # DYJetsToLL_M1to4_HT400to600,
-            # DYJetsToLL_M1to4_HT600toInf,
-
+            # "ZZTo4L_M1toInf",
+            # "VVTo2L2Nu_M1toInf",
+            # "DYJetsToLL_M1to4_HT70to100",
+            # "DYJetsToLL_M1to4_HT100to200",
+            # "DYJetsToLL_M1to4_HT200to400",
+            # "DYJetsToLL_M1to4_HT400to600",
+            # "DYJetsToLL_M1to4_HT600toInf",
 
 ##            "DYJetsToLL_M10to50_LO",
             "DYJetsToLL_M50_LO", # for Tag and Probe studies
@@ -146,13 +145,13 @@ elif year == 2017:
     mcSamples = byCompName(mcSamples_, [
 
         ## low Mll Samples
-        # ZZTo4L_M1toInf,
-        # VVTo2L2Nu_M1toInf,
-        # DYJetsToLL_M1to4_HT70to100,
-        # DYJetsToLL_M1to4_HT100to200,
-        # DYJetsToLL_M1to4_HT200to400,
-        # DYJetsToLL_M1to4_HT400to600,
-        # DYJetsToLL_M1to4_HT600toInf,
+        # "ZZTo4L_M1toInf",
+        # "VVTo2L2Nu_M1toInf",
+        # "DYJetsToLL_M1to4_HT70to100",
+        # "DYJetsToLL_M1to4_HT100to200",
+        # "DYJetsToLL_M1to4_HT200to400",
+        # "DYJetsToLL_M1to4_HT400to600",
+        # "DYJetsToLL_M1to4_HT600toInf",
 
         "DYJetsToLL_M50_LO", # for Tag and Probe studies
         "DYJetsToLL_M10to50_LO_ext,"
@@ -242,13 +241,13 @@ elif year == 2016:
     mcSamples = byCompName(mcSamples_, [
 
         ## low Mll Samples
-        # ZZTo4L_M1toInf,
-        # VVTo2L2Nu_M1toInf,
-        # DYJetsToLL_M1to4_HT70to100,
-        # DYJetsToLL_M1to4_HT100to200,
-        # DYJetsToLL_M1to4_HT200to400,
-        # DYJetsToLL_M1to4_HT400to600,
-        # DYJetsToLL_M1to4_HT600toInf,
+        # "ZZTo4L_M1toInf",
+        # "VVTo2L2Nu_M1toInf",
+        # "DYJetsToLL_M1to4_HT70to100",
+        # "DYJetsToLL_M1to4_HT100to200",
+        # "DYJetsToLL_M1to4_HT200to400",
+        # "DYJetsToLL_M1to4_HT400to600",
+        # "DYJetsToLL_M1to4_HT600toInf",
 
         "DYJetsToLL_M50_LO", # for Tag and Probe studies
         "DYJetsToLL_M10to50_LO$",
