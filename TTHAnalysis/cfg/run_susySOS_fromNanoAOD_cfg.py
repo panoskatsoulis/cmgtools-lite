@@ -46,14 +46,13 @@ if year == 2018:
         mcSamples = byCompName(mcSamples_, [
 
             ## low Mll Samples
-            # ZZTo4L_M1toInf,
-            # VVTo2L2Nu_M1toInf,
-            # DYJetsToLL_M1to4_HT70to100,
-            # DYJetsToLL_M1to4_HT100to200,
-            # DYJetsToLL_M1to4_HT200to400,
-            # DYJetsToLL_M1to4_HT400to600,
-            # DYJetsToLL_M1to4_HT600toInf,
-
+            "ZZTo4L_M1toInf",
+            "VVTo2L2Nu_M1toInf",
+            "DYJetsToLL_M1to4_HT70to100",
+            "DYJetsToLL_M1to4_HT100to200",
+            "DYJetsToLL_M1to4_HT200to400",
+            "DYJetsToLL_M1to4_HT400to600",
+            "DYJetsToLL_M1to4_HT600toInf",
 
 ##            "DYJetsToLL_M10to50_LO",
             "DYJetsToLL_M50_LO", # for Tag and Probe studies
@@ -135,24 +134,22 @@ if year == 2018:
 
     if analysis == "main":
 ##        DatasetsAndTriggers.append( ("DoubleMuon", triggers["mumu_iso"] + triggers["3mu"]) )
-        DatasetsAndTriggers.append( ("DoubleMuon",  triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
-        DatasetsAndTriggers.append( ("MET",         triggers["SOS_highMET"] ) )
-        DatasetsAndTriggers.append( ("EGamma",      triggers["SOS_eleTnP"] ) )
-        DatasetsAndTriggers.append( ("SingleMuon",  triggers["SOS_muTnP"] ) )
-##        DatasetsAndTriggers.append( ("SingleMuon", triggers["1mu_iso"]) ) ##which one?? ##PD SingleMuon o MET?
+        DatasetsAndTriggers.append( ("DoubleMuon", triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
+        DatasetsAndTriggers.append( ("MET",     triggers["SOS_highMET"] ) )
+        DatasetsAndTriggers.append( ("SingleMuon", triggers["SOS_singleMu"]) )
 ##conf db e cercare stream dato il nome del trigger
 
 elif year == 2017:
     mcSamples = byCompName(mcSamples_, [
 
         ## low Mll Samples
-        # ZZTo4L_M1toInf,
-        # VVTo2L2Nu_M1toInf,
-        # DYJetsToLL_M1to4_HT70to100,
-        # DYJetsToLL_M1to4_HT100to200,
-        # DYJetsToLL_M1to4_HT200to400,
-        # DYJetsToLL_M1to4_HT400to600,
-        # DYJetsToLL_M1to4_HT600toInf,
+        "ZZTo4L_M1toInf",
+        "VVTo2L2Nu_M1toInf",
+        "DYJetsToLL_M1to4_HT70to100",
+        "DYJetsToLL_M1to4_HT100to200",
+        "DYJetsToLL_M1to4_HT200to400",
+        "DYJetsToLL_M1to4_HT400to600",
+        "DYJetsToLL_M1to4_HT600toInf",
 
         "DYJetsToLL_M50_LO", # for Tag and Probe studies
         "DYJetsToLL_M10to50_LO_ext,"
@@ -242,13 +239,13 @@ elif year == 2016:
     mcSamples = byCompName(mcSamples_, [
 
         ## low Mll Samples
-        # ZZTo4L_M1toInf,
-        # VVTo2L2Nu_M1toInf,
-        # DYJetsToLL_M1to4_HT70to100,
-        # DYJetsToLL_M1to4_HT100to200,
-        # DYJetsToLL_M1to4_HT200to400,
-        # DYJetsToLL_M1to4_HT400to600,
-        # DYJetsToLL_M1to4_HT600toInf,
+        "ZZTo4L_M1toInf",
+        "VVTo2L2Nu_M1toInf",
+        "DYJetsToLL_M1to4_HT70to100",
+        "DYJetsToLL_M1to4_HT100to200",
+        "DYJetsToLL_M1to4_HT200to400",
+        "DYJetsToLL_M1to4_HT400to600",
+        "DYJetsToLL_M1to4_HT600toInf",
 
         "DYJetsToLL_M50_LO", # for Tag and Probe studies
         "DYJetsToLL_M10to50_LO$",
@@ -402,7 +399,7 @@ if getHeppyOption("nanoPreProcessor"):
     preproc_cfg = {2016: ("mc94X2016","data94X2016"),
                    2017: ("mc94Xv2","data94Xv2"),
                    2018: ("mc102X","data102X_ABC","data102X_D")}
-    preproc_cmsswArea = "/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/nanoAOD/CMSSW_10_2_15" #MODIFY ACCORDINGLY
+    preproc_cmsswArea = "/afs/cern.ch/user/k/kpanos/work/Projects/SOS_data2018_SingleMuonTrigger/TreesProduction/CMSSW_10_2_16_UL" #MODIFY ACCORDINGLY
     preproc_mc = nanoAODPreprocessor(cfg='%s/src/PhysicsTools/NanoAOD/test/%s_NANO.py'%(preproc_cmsswArea,preproc_cfg[year][0]),cmsswArea=preproc_cmsswArea,keepOutput=True)
     if year==2018:
         preproc_data_ABC = nanoAODPreprocessor(cfg='%s/src/PhysicsTools/NanoAOD/test/%s_NANO.py'%(preproc_cmsswArea,preproc_cfg[year][1]),cmsswArea=preproc_cmsswArea,keepOutput=True, injectTriggerFilter=True, injectJSON=True)
