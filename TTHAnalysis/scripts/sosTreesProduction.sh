@@ -132,13 +132,18 @@ if ! $FRIENDS_ONLY; then
 	while ! $FINISHED; do
 	    echo "$(date) | running tasks (${RUNNING_TASKS[@]})"
 	    sleep $FREQ
+	    ## query condor and check if query succeeded
+	    condor_q &>condor_q.report
+	    grep "Failed to fetch ads" condor_q.report && continue
+	    ## if query succedded search which tasks are still running
 	    for i in ${!RUNNING_TASKS[@]}; do
-		## remove the task from the running tasks if grep can't find it in the condor_q's output
-		condor_q | grep ${RUNNING_TASKS[$i]} || unset RUNNING_TASKS[$i]
+		## remove the task from the running tasks if grep can't find it in the condor_q report
+		grep ${RUNNING_TASKS[$i]} condor_q.report || unset RUNNING_TASKS[$i]
 	    done
 	    [ "${#RUNNING_TASKS[@]}" == "0" ] && { ## if all running tasks finished
 		## check chunks' integrity
 		cmgListChunksToResub -t NanoAODurl -q "HTCondor -t 72000" ./ > corruptedChunks
+		cat corruptedChunks | grep -v ^# > corruptedChunks ## erase commented out lines from the file
 		if [ ! -s corruptedChunks ]; then ## if corruptedChunks file is empty
 		    FINISHED=true ## fix the FINISHED BOOL; else
 		else
