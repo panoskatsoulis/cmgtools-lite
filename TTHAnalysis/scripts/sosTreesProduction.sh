@@ -190,11 +190,11 @@ if ! $SKIP_ALL_FRIENDS; then
     cd $CMSSW_DIR/$TASK_NAME && echo $PWD
     ln -s ../CMGTools/TTHAnalysis/macros/lxbatch_runner.sh lxbatch_runner.sh
 
-    ## prepare the friend tree commands
-    DATA_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_data,isTightLepDY,isTightLepTT,isTightLepVV,isTightLepWZ -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME | tee last-submit-info"
-    JETMET_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_JETMET_CHUNKS -D $DATASET -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules jetmetUncertainties$TASK_YEAR -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-jetcorrs | tee last-submit-info"
-    MC_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_mc,isTightLepDY,isTightLepTT,isTightLepVV,isTightLepWZ,mcMatchId,mcPromptGamma -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-recl | tee last-submit-info"
-    BTAGWEIGHT_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_BTAGWEIGHT_CHUNKS -D $DATASET -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -F $OUT_PATH_FRIENDS/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules eventBTagWeight_$(echo $TASK_YEAR | sed s/20//) -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-btag | tee last-submit-info"
+    ## prepare the friend tree commands { -D $DATASET is missing }
+    DATA_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_data,isTightLepDY,isTightLepTT,isTightLepVV,isTightLepWZ -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME | tee last-submit-info"
+    JETMET_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_JETMET_CHUNKS -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules jetmetUncertainties$TASK_YEAR -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-jetcorrs | tee last-submit-info"
+    MC_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_FRIENDS_CHUNKS -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules recleaner_step1,recleaner_step2_mc,isTightLepDY,isTightLepTT,isTightLepVV,isTightLepWZ,mcMatchId,mcPromptGamma -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-recl | tee last-submit-info"
+    BTAGWEIGHT_CMD="python $PY_FTREES_CMD -t NanoAOD $IN_FILE_DIR $AFS_DIR_BTAGWEIGHT_CHUNKS -F $OUT_PATH_JETMET/{cname}_Friend.root Friends -F $OUT_PATH_FRIENDS/{cname}_Friend.root Friends -I CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules eventBTagWeight_$(echo $TASK_YEAR | sed s/20//) -N $N_EVENTS -q condor --maxruntime 240 --batch-name $TASK_NAME-btag | tee last-submit-info"
 
     echo "Friend Tree Production, will run the command:"
     [ $TASK_TYPE == "data" ] && echo $DATA_CMD
