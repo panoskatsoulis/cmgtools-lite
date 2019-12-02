@@ -71,7 +71,7 @@ def base(selection):
     if selection=='2los':
          GO="%s susy-sos/mca/mca-2los-%s.txt susy-sos/2los_cuts.txt "%(CORE, YEAR)
          if args.doWhat in ["plots","ntuple"]: GO+=" susy-sos/2los_plots.txt "
-         if args.doWhat in ["cards"]: GO+="  m2l [4,10,20,30,50] "
+         if args.doWhat in ["cards"]: GO+="  minMllSFOS [4,10,20,30,50] "
          
 
          if YEAR == "2016":
