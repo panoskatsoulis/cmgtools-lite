@@ -6,8 +6,8 @@ eventFilters	: $DATA{EventFilters} $MC{1}	; Disable=True
 dilep		: nLepGood == 2
 sublepPt	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 3.5) || (fabs(LepGood2_pdgId)==11 && LepGood2_pt > 5)
 
-mll		: m2l > 4 && m2l < 50
-upsilonVeto	: m2l < 9 || m2l > 10.5
+mll		: minMllSFOS > 4 && minMllSFOS < 50
+upsilonVeto	: minMllSFOS < 9 || minMllSFOS > 10.5
 dilepPt		: pt_2(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi) > 3 
 
 ISRjet		: JetSel1_Recl_jetId >= 4
