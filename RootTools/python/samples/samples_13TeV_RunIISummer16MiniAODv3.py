@@ -713,9 +713,33 @@ SignalSUSY = [
 SMS_TChiWZ
 ]
 
+# low Mll samples
+
+ZZTo4L_M1toInf = kreator.makeMCComponent("ZZTo4L_M1toInf","/ZZTo4L_M-1toInf_13TeV_powheg_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM","CMS",".*root", 13.92)
+
+VVTo2L2Nu_M1toInf = kreator.makeMCComponent("VVTo2L2Nu_M1toInf","/VVTo2L2Nu_M-1toInf_TuneCUETP8M1_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM","CMS",".*root", 12.33)
+#VVTo2L2Nu_M1toInf = kreator.makeMCComponent("VVTo2L2Nu_M1toInf","/VVTo2L2Nu_M-1toInf_TuneCUETP8M1_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16MiniAODv3-PUMoriond17_pdfweight_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM","CMS",".*root", 12.33)
+
+# DYJetsToLL_M1to5_HT70to100 = kreator.makeMCComponent("DYJetsToLL_M1to5_HT70to100","/DYJetsToLL_M-1to5_HT-70to100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM","CMS",".*root", 1.0)
+# DYJetsToLL_M1to5_HT100to200 = kreator.makeMCComponent("DYJetsToLL_M1to5_HT100to200","/DYJetsToLL_M-1to5_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM","CMS",".*root", 1.0)
+DYJetsToLL_M1to5_HT200to400 = kreator.makeMCComponent("DYJetsToLL_M1to5_HT200to400","/DYJetsToLL_M-1to5_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM","CMS",".*root", 119.1)
+DYJetsToLL_M1to5_HT400to600 = kreator.makeMCComponent("DYJetsToLL_M1to5_HT400to600","/DYJetsToLL_M-1to5_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM","CMS",".*root", 11.57)
+DYJetsToLL_M1to5_HT600toInf = kreator.makeMCComponent("DYJetsToLL_M1to5_HT600toInf","/DYJetsToLL_M-1to5_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM","CMS",".*root", 3.458)
+
+ZZandVV_M1toInf = [ ZZTo4L_M1toInf, VVTo2L2Nu_M1toInf ]
+
+DYJetsToLL_M1to5 = [
+    # DYJetsToLL_M1to5_HT70to100, - MISSING
+    # DYJetsToLL_M1to5_HT100to200, - MISSING
+    DYJetsToLL_M1to5_HT200to400,
+    DYJetsToLL_M1to5_HT400to600,
+    DYJetsToLL_M1to5_HT600toInf
+]
+
+
 ### ----------------------------- summary ----------------------------------------
 
-mcSamples = TTs + SingleTop + VJets + DYJetsM50HT + DYJetsM5to50HT + DYNJets + WJetsToLNuHT + WJetsToLNuPT + WNJets + GJetsHT + ZJetsToNuNuHT + QCDHT + QCDPtbcToE + QCDPt + QCDPtEMEnriched + [QCD_Mu15] + QCD_Mu5 +  DiBosons + TriBosons + TTV + Higgs + Rares + EWKV2Jets + SignalSUSY
+mcSamples = TTs + SingleTop + VJets + DYJetsM50HT + DYJetsM5to50HT + DYNJets + WJetsToLNuHT + WJetsToLNuPT + WNJets + GJetsHT + ZJetsToNuNuHT + QCDHT + QCDPtbcToE + QCDPt + QCDPtEMEnriched + [QCD_Mu15] + QCD_Mu5 +  DiBosons + TriBosons + TTV + Higgs + Rares + EWKV2Jets + SignalSUSY + ZZandVV_M1toInf + DYJetsToLL_M1to5
 
 samples = mcSamples
 
