@@ -96,7 +96,8 @@ else:
 
 for scanpoint in scanpoints: 
     pointname = '_'.join( [ '%s_%s'%(x,y) for x,y in zip(options.params.split(','),scanpoint)])
-    listSignals = [] 
+    pointname = pointname.replace('p1','kt')
+    pointname = pointname.replace('p2','kv')
     for psig in mca.listSignals(): 
         match = pattern.search(psig)
         if scanpoint != [match.group(p) for p in options.params.split(',')]: continue
@@ -199,9 +200,9 @@ for scanpoint in scanpoints:
                         systs[name] = ("lnN", effyield, {})
         # make a new list with only the ones that have an effect
         nuisances = sorted(systs.keys())
-        datacard = open(outdir+pointname+binname+".card.txt", "w"); 
+        datacard = open(outdir+binname+'_'+pointname+".card.txt", "w"); 
         datacard.write("## Datacard for cut file %s and scan point %s\n"%(args[1],pointname))
-        datacard.write("shapes *        * %s.input.root x_$PROCESS x_$PROCESS_$SYSTEMATIC\n" % (pointname + binname))
+        datacard.write("shapes *        * %s.input.root x_$PROCESS x_$PROCESS_$SYSTEMATIC\n" % (binname + pointname))
         datacard.write('##----------------------------------\n')
         datacard.write('bin         %s\n' % binname)
         datacard.write('observation %s\n' % allyields['data_obs'])
@@ -237,37 +238,11 @@ for scanpoint in scanpoints:
                     systs[name] = ("lnN", effyield, {})
       # make a new list with only the ones that have an effect
       nuisances = sorted(systs.keys())
+        workspace = ROOT.TFile.Open(outdir+binname+'_'+pointname+".input.root", "RECREATE")
+        for h in towrite:
+            workspace.WriteTObject(h,h.GetName())
+        workspace.Close()
     
-      datacard = open(outdir+pointname+binname+".card.txt", "w"); 
-      datacard.write("## Datacard for cut file %s and scan point %s\n"%(args[1],pointname))
-      datacard.write("shapes *        * %s.input.root x_$PROCESS x_$PROCESS_$SYSTEMATIC\n" % pointname + binname)
-      datacard.write('##----------------------------------\n')
-      datacard.write('bin         %s\n' % binname)
-      datacard.write('observation %s\n' % allyields['data_obs'])
-      datacard.write('##----------------------------------\n')
-      klen = max([7, len(binname)]+[len(p) for p in procs])
-      kpatt = " %%%ds "  % klen
-      fpatt = " %%%d.%df " % (klen,3)
-      npatt = "%%-%ds " % max([len('process')]+map(len,nuisances))
-      datacard.write('##----------------------------------\n')
-      datacard.write((npatt % 'bin    ')+(" "*6)+(" ".join([kpatt % binname  for p in procs]))+"\n")
-      datacard.write((npatt % 'process')+(" "*6)+(" ".join([kpatt % p        for p in procs]))+"\n")
-      datacard.write((npatt % 'process')+(" "*6)+(" ".join([kpatt % iproc[p] for p in procs]))+"\n")
-      datacard.write((npatt % 'rate   ')+(" "*6)+(" ".join([fpatt % allyields[p] for p in procs]))+"\n")
-      datacard.write('##----------------------------------\n')
-      towrite = [ report[p].raw() for p in procs ] + [ report["data_obs"].raw() ]
-      for name in nuisances:
-        (kind,effmap,effshape) = systs[name]
-        datacard.write(('%s %5s' % (npatt % name,kind)) + " ".join([kpatt % effmap[p]  for p in procs]) +"\n")
-        for p,(hup,hdn) in effshape.iteritems():
-            towrite.append(hup.Clone("x_%s_%sUp"   % (p,name)))
-            towrite.append(hdn.Clone("x_%s_%sDown" % (p,name)))
-      if options.autoMCStats: 
-        datacard.write('* autoMCStats %d\n' % options.autoMCStatsValue)
-    
-      workspace = ROOT.TFile.Open(outdir+pointname+binname+".input.root", "RECREATE")
-      for h in towrite:
-          workspace.WriteTObject(h,h.GetName())
-      workspace.Close()
+        print "Wrote to {0}.card.txt and {0}.input.root ".format(outdir+binname+'_'+pointname)
     
       print "Wrote to {0}.card.txt and {0}.input.root ".format(outdir+pointname+binname)    
