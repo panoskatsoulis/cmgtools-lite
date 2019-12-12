@@ -22,6 +22,11 @@ parser.add_argument("--inPlots", default=None, help="Select plots, separated by 
 parser.add_argument("--exPlots", default=None, help="Exclude plots, separated by commas, no spaces")
 parser.add_argument("--signalMasses", default=None, help="Select only these signal samples (e.g 'signal_TChiWZ_100_70+'), comma separated. Use only when doing 'cards'")
 parser.add_argument("--doWhat", default="plots", help="Do 'plots' or 'cards'. Default = '%(default)s'")
+parser.add_argument("--htcondor", action="store_true", default=False, help="Submit jobs on HTCondor. Currently only for 'cards' mode")
+parser.add_argument("--queue", default="longlunch", help="HTCondor queue for job submission")
+parser.add_argument("--allCards", action="store_true", default=False, help="run cards for all years, cats and bins")
+parser.add_argument("--runCombine", action="store_true", default=False, help="combine cards and run limit")
+parser.add_argument("--optPoint", default=None, help="choose a point of the opt")
 args = parser.parse_args()
 
 ODIR=args.outDir
@@ -51,6 +56,16 @@ submit = '{command}'
 P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_230819_v5/"
 nCores = 8
 TREESALL = " --Fs {P}/recleaner --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR,)
+
+optPointsMed  = [170,185,200,215,230]
+optPointsHigh = [220,235,250,265,280]
+
+optPoints=[]
+for pm in optPointsMed:
+    for ph in optPointsHigh:
+        if ph>pm:
+            optPoints.append([pm,ph])
+
 
 def base(selection):
     CORE=TREESALL
@@ -94,6 +109,7 @@ def base(selection):
     elif selection=='3l':
         GO="%s susy-sos/mca/mca-3l-%s.txt susy-sos/3l_cuts.txt "%(CORE,YEAR)
         if args.doWhat in ["plots","ntuple"]: GO+=" susy-sos/3l_plots.txt "
+        if args.doWhat in ["cards"]: GO+="  m2l [4,10,20,30,50] "
         
         if YEAR == "2016":
             wBG = " 'puWeight*eventBTagSF' " #" 'getLepSF_16(LepGood1_pt, LepGood1_eta, LepGood1_pdgId)*getLepSF_16(LepGood2_pt, LepGood2_eta, LepGood2_pdgId)*getLepSF_16(LepGood3_pt, LepGood3_eta, LepGood3_pdgId)*triggerSFfullsim3L(LepGood1_pt, LepGood1_eta, LepGood2_pt, LepGood2_eta, LepGood3_pt, LepGood3_eta, MET_pt, metmmm_pt(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi, LepGood3_pt, LepGood3_phi, MET_pt, MET_phi, lepton_Id_selection(LepGood1_pdgId, LepGood2_pdgId, LepGood3_pdgId)), lepton_permut(LepGood1_pdgId, LepGood2_pdgId, LepGood3_pdgId))' "
@@ -126,15 +142,128 @@ def procs(GO,mylist):
 def sigprocs(GO,mylist):
     return procs(GO,mylist)+' --showIndivSigs --noStackSig'
 
+def createPath(filename):
+    if not os.path.exists(os.path.dirname(filename)):
+        try:
+            os.makedirs(os.path.dirname(filename))
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+def prepareSubmitter(name, cmd):
+    template = [l.strip("\n") for l in open("scripts/htcondor_submitter.sh").readlines()]
+    filename="/%s/src//submitJob_%s.sh"%(ODIR,name.replace("_%s"%YEAR,''))
+    if args.allCards:
+        filename=filename.replace("%s"%args.lep,'').replace("_%s"%args.reg,'').replace("_%s"%args.bin,'').replace('__','_')
+    if os.path.isfile(filename): return
+    createPath(filename)
+    f = open(filename, "w")
+    if args.allCards:
+        name=name.replace("_%s"%YEAR,'').replace("%s"%args.lep,'').replace("_%s"%args.reg,'').replace("_%s"%args.bin,'')
+        name=name.replace('__','_')
+        if name.startswith('_'): name=name.replace('_','',1)
+    jobid = 'job_%s'%name
+    for line in template:
+#        line = line.replace("[SCRIPT]"        , "%s/jobs/runJob_%s.sh"%(ODIR,name))
+        line = line.replace("[SCRIPT]"        , "/%s/src//wrapRunners_%s.sh"%(ODIR,name.replace("_%s"%YEAR,'')))
+        line = line.replace("[NAME]"       , name                      )
+        line = line.replace("[DIR]"     , "%s/jobs/"%(ODIR)                       )
+        line = line.replace("[QUEUE]"      , args.queue                                   )
+        f.write(line+"\n")
+    f.close()
+
+def prepareRunner(name, cmd):
+    template = [l.strip("\n") for l in open("scripts/htcondor_runner.sh").readlines()]
+    filename = "%s/jobs/runJob_%s.sh"%(ODIR,name)
+    createPath(filename)
+    f = open(filename, "w")
+    jobid = 'job_%s'%name
+    cmssw  = os.popen("echo $CMSSW_BASE").read().strip('\n')
+    for line in template:
+        line = line.replace("[SRC]"        , "%s/src/"%cmssw)
+        line = line.replace("[INST]"       , name                      )
+        line = line.replace("[JOBDIR]"     , "%s/src/"%ODIR                       )
+        line = line.replace("[JOBID]"      , jobid                                   )
+        line = line.replace("[CMD]"      , cmd                                   )
+        f.write(line+"\n")
+    f.close()
+
+def prepareWrapper(name):
+    if not args.allCards:
+        nameWr=name.replace("_%s"%YEAR,'')
+        filename="/%s/src//wrapRunners_%s.sh"%(ODIR,nameWr)
+        print filename
+        if os.path.isfile(filename): return
+        createPath(filename)
+        f = open(filename, "w")
+        f.write("#!/bin/bash\n")
+        for year in ["2016","2017","2018"]:
+            f.write('if test -f "%s/jobs/runJob_%s_%s.sh"; then\n'%(ODIR,nameWr,year))
+            f.write('    echo "running %s"\n'%YEAR)
+            f.write('    source "%s/jobs/runJob_%s_%s.sh"\n'%(ODIR,nameWr,year))
+            f.write('fi\n')
+    else:
+        nameWr=name.replace("_%s"%YEAR,'').replace("%s"%args.lep,'').replace("_%s"%args.reg,'').replace("_%s"%args.bin,'')
+        print nameWr
+        optPoint = "_"+args.optPoint if args.optPoint is not None else ''
+        print 'argP, ',args.optPoint
+        print 'optPoint, ',optPoint
+        filename="/%s/src//wrapRunners_%s.sh"%(ODIR,nameWr)
+        print filename
+        filename=filename.replace('__','_')
+        print filename
+        if os.path.isfile(filename): return
+        createPath(filename)
+        f = open(filename, "w")
+        f.write("#!/bin/bash\n")
+        nameSplit = name.split('_')
+        for year in ["2016","2017","2018"]:
+            for nlep in ["2los","3l"]:
+                for ireg in ["sr","cr_ss"]:
+                    for ibin in ["low","med","high"]:
+                        if ibin == "high" and nlep != "2los" and ireg!="sr": continue
+                        if ireg == "cr_ss" and nlep != "2los" and ibin != "med": continue
+                        newName = '_'.join([nlep,ireg,ibin,nameSplit[3],nameSplit[4],year])
+                        f.write('if test -f "%s/jobs/runJob_%s.sh"; then\n'%(ODIR,newName))
+                        f.write('    echo "running %s"\n'%year)
+                        f.write('    source "%s/jobs/runJob_%s.sh"\n'%(ODIR,newName))
+                        f.write('fi\n')
+        f.write( 'CARDS=""\n' )
+        masses = '_'.join((args.signalMasses.rstrip('+').split('_'))[-2:])
+        f.write( 'for f in `find   %s/scan/SR -name "%s"`\n'%(ODIR,masses) )
+        f.write( 'do CARDS="${CARDS} `find  $f -regex .*txt`"\n'  )
+        f.write( 'done\n' )
+        f.write( 'echo ${CARDS}\n' )
+        f.write( 'cd /afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src\n' )
+        f.write( 'eval `scramv1 runtime -sh`\n' )
+        f.write( 'cd -\n' )
+        f.write( '[ -d %s/combinedCards ] || mkdir %s/combinedCards\n'%(ODIR,ODIR) )
+        f.write( 'combineCards.py -S $CARDS > %s/combinedCards/%s.txt\n' %( ODIR, masses) )
+        f.write( '[ -d %s/limits ] || mkdir %s/limits\n'%(ODIR,ODIR) )
+        f.write( 'combine -M Asymptotic %s/combinedCards/%s.txt -n %s -m %s > %s/limits/%s_limit.txt \n'%(ODIR, masses, masses+str(optPoint), masses.split('_')[0], ODIR, masses ) )
+        f.write( 'mv higgsCombine%s.Asymptotic.mH%s.root %s/limits \n'%(masses+str(optPoint), masses.split('_')[0], ODIR ) )
+    
+    f.close()
+
 def runIt(GO,name):
-    if args.data: name=name+"_data"
+    if args.data and not args.doWhat == "cards" : name=name+"_data"
     if args.norm: name=name+"_norm"
     if args.unc: name=name+"_unc"
-    print name+"\n"
-    if args.doWhat == "plots":  print submit.format(command=' '.join(['python mcPlots.py',"--pdir %s/%s/%s"%(ODIR,YEAR,name),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ])]))
+    if args.doWhat == "cards": mass = '_'.join(name.split('_')[-2:])
+#    print name.split('_')[-2]
+#    print mass
+#    print name+"\n"
+    if args.doWhat == "plots":  
+        ret = submit.format(command=' '.join(['python mcPlots.py',"--pdir %s/%s/%s"%(ODIR,YEAR,name),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ])]))
 
-    if args.doWhat == "cards":  print submit.format(command=' '.join(['python makeShapeCardsNew.py --savefile',"--outdir %s/%s/%s"%(ODIR,YEAR,name),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ]), "--xp='signal(?!.*%s).*'"%args.signalMasses.strip('signal') if args.signalMasses is not None else ''   ]))
-
+    if args.doWhat == "cards":  
+        ret = submit.format(command=' '.join(['python makeShapeCardsNew.py --savefile',"--outdir %s/scan/SR/%s/%s/%sfb/TChiWZ/%s/sig_TChiWZ_%s/"%(ODIR,YEAR,name.replace("_%s"%mass,''),LUMI.strip('-l ').replace('.', 'p'),mass,mass),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ]), "--xp='signal(?!.*%s).*'"%args.signalMasses.strip('signal') if args.signalMasses is not None else '', "--all-processes"   ]))
+        
+    print ret
+    if args.htcondor:
+        prepareSubmitter("%s_%s"%(name,YEAR),ret)
+        prepareRunner("%s_%s"%(name,YEAR),ret)
+        prepareWrapper("%s_%s"%(name,YEAR))    
 
     # What is supposed to be included in sys.argv[4] and after?
     #elif args.doWhat == "yields": print 'echo %s; python mcAnalysis.py'%name,GO,' '.join(sys.argv[4:])
@@ -150,20 +279,37 @@ def setwide(x):
     return x2
 
 def binChoice(x,torun):
-    metBin = ''
+    metBinTrig = ''
+    metBinInf = ''
+    metBinSup = ''
     x2 = add(x,'-E ^eventFilters$ ')
     if '_min' in torun:
-        metBin = 'met75'
+        metBinTrig = 'met75'
+        metBinInf = 'met75'
     elif '_low' in torun:
-        metBin = 'met125'
+        metBinTrig = 'met125'
+        metBinInf = 'met125'
+        metBinSup = 'met200'
+        if args.optPoint is not None:
+            metBinSup = 'met'+str(optPoints[int(args.optPoint)][0])
     elif '_med' in torun:
-        metBin = 'met200'
+        metBinTrig = 'met200'
+        metBinInf = 'met200'
+        metBinSup = 'met250' if '2los_' in torun else ''
+        if args.optPoint is not None:
+            metBinInf = 'met'+str(optPoints[int(args.optPoint)][0])
+            metBinSup = 'met'+str(optPoints[int(args.optPoint)][1]) if '2los_' in torun else ''
         x2 = add(x2,'-X ^mm$ ')
     elif '_high' in torun:
-        metBin = 'met250'
+        metBinTrig = 'met250'
+        metBinInf = 'met250'
+        if args.optPoint is not None:
+            metBinInf = 'met'+str(optPoints[int(args.optPoint)][1])
         x2 = add(x2,'-X ^mm$ ')
-    if metBin != '': x2 = add(x2,'-E ^'+metBin+'$ -E ^'+metBin+'_trig$ ')
-    else: print "\n--- NO TRIGGER APPLIED! ---\n"
+    if metBinInf != '': x2 = add(x2,'-E ^'+metBinInf+'$ -E ^'+metBinTrig+'_trig$ ')
+    if metBinSup != '': x2 = add(x2,'-E ^'+metBinSup+'$ -I ^'+metBinSup+'$ ')
+
+    if metBinTrig=='': print "\n--- NO TRIGGER APPLIED! ---\n"
     return x2
 
 allow_unblinding = False
