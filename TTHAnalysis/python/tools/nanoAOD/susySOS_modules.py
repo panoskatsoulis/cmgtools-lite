@@ -15,7 +15,7 @@ conf = dict(
 #    muonId = "softMvaId" ###looseId
 )
 susySOS_skim_cut =  ("nMuon + nElectron >= 2 &&" + ##if heppy option fast
-###        "MET_pt > {minMet}  &&"+
+       "MET_pt > {minMet}  &&"+
        "Sum$(Muon_pt > {muPt}) +"
        "Sum$(Electron_pt > {elePt}) >= 2").format(**conf) ## && Muon_miniPFRelIso_all < {miniRelIso} && Electron_miniPFRelIso_all < {miniRelIso}  #mettere qui MET_pt>50 #cp dal cfg la selezione
 #cut  = ttH_skim_cut
