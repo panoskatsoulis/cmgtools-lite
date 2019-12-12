@@ -391,7 +391,6 @@ Error      = {logdir}/err.$(cluster).$(Dataset).$({chunk})
 Output     = {logdir}/out.$(cluster).$(Dataset).$({chunk})
 Log        = {logdir}/log.$(cluster).$(Dataset).$({chunk})
 
-use_x509userproxy = $ENV(X509_USER_PROXY)
 getenv = True
 request_memory = 2000
 +MaxRuntime = {maxruntime}
