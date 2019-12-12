@@ -133,10 +133,12 @@ if year == 2018:
         ])
 
     if analysis == "main":
-##        DatasetsAndTriggers.append( ("DoubleMuon", triggers["mumu_iso"] + triggers["3mu"]) )
-        DatasetsAndTriggers.append( ("DoubleMuon", triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
-        DatasetsAndTriggers.append( ("MET",     triggers["SOS_highMET"] ) )
-        DatasetsAndTriggers.append( ("SingleMuon", triggers["SOS_singleMu"]) )
+        DatasetsAndTriggers.append( ("DoubleMuon",  triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
+        DatasetsAndTriggers.append( ("MET",         triggers["SOS_highMET"] ) )
+        DatasetsAndTriggers.append( ("EGamma",      triggers["SOS_eleTnP"] ) )
+##        DatasetsAndTriggers.append( ("SingleMuon",  triggers["SOS_muTnP"] ) ) ## Manos' study
+##        DatasetsAndTriggers.append( ("SingleMuon", triggers["1mu_iso"]) ) ##which one?? ##PD SingleMuon o MET?
+        DatasetsAndTriggers.append( ("SingleMuon",  triggers["SOS_singleMu"]) )
 ##conf db e cercare stream dato il nome del trigger
 
 elif year == 2017:
