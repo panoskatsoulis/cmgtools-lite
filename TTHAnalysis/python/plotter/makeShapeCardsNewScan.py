@@ -98,7 +98,7 @@ if options.categ:
 else:
     allreports = {binname:report}
 
-for i,scanpoint in enumerate(scanpoints): 
+for scanpoint in scanpoints: 
     
     listSignals = [] 
     pointname = '_'.join( [ '%s_%s'%(x,y) for x,y in zip(options.params.split(','),scanpoint)])
