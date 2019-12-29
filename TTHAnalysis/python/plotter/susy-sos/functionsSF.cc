@@ -141,12 +141,15 @@ float dcaDzleg_MC(int year, float _eta1, float _eta2){
 
 
 // d factors also include the mass efficiency. Since this efficiency is 1.0, it is omitted.
-float muDleg_SF(int year, float pt1, float _eta1, float pt2, float _eta2, float pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
+float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, float _pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
 	
 	// Definitions and Protection
 	float mu1_Data, mu1_MC, mu2_Data, mu2_MC, mu3_Data, mu3_MC;
 	float d12_Data, d12_MC, d13_Data, d13_MC, d23_Data, d23_MC;
 	float SF;
+	float pt1 = max(float(3.501), min(float(499.999), _pt1));
+	float pt2 = max(float(3.501), min(float(499.999), _pt2));
+	float pt3 = max(float(3.501), min(float(499.999), _pt3));
 	float eta1	= min(float(2.399), abs(_eta1)); // eta -> Absolute eta
 	float eta2	= min(float(2.399), abs(_eta2)); // eta -> Absolute eta
 	float eta3	= min(float(2.399), abs(_eta3)); // eta -> Absolute eta
@@ -204,12 +207,15 @@ float muDleg_SF(int year, float pt1, float _eta1, float pt2, float _eta2, float 
 	return SF;
 }
 
-float muDleg_MCEff(int year, float pt1, float _eta1, float pt2, float _eta2, float pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
+float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, float _pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
 	
 	// Definitions and Protection
 	float mu1_MC, mu2_MC, mu3_MC;
 	float d12_MC, d13_MC, d23_MC;
 	float MCEff;
+	float pt1 = max(float(3.501), min(float(499.999), _pt1));
+	float pt2 = max(float(3.501), min(float(499.999), _pt2));
+	float pt3 = max(float(3.501), min(float(499.999), _pt3));
 	float eta1	= min(float(2.399), abs(_eta1)); // eta -> Absolute eta
 	float eta2	= min(float(2.399), abs(_eta2)); // eta -> Absolute eta
 	float eta3	= min(float(2.399), abs(_eta3)); // eta -> Absolute eta
@@ -262,8 +268,8 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year){
 
 	// Definitions and Protection
 	float eff_Data, eff_MC, SF;
-	float met      = max(float(50.1) , _met      );
-	float met_corr = max(float(50.1) , _met_corr );
+	float met      = max(float(50.1) , min(float(499.999), _met));
+	float met_corr = max(float(50.1) , min(float(499.999), _met_corr));
 
 	// High MET triggers
 	if(met_corr>=200.0){
@@ -306,8 +312,8 @@ float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
 
 	// Definitions and Protection
 	float MCEff;
-	float met      = max(float(50.1) , _met      );
-	float met_corr = max(float(50.1) , _met_corr );
+	float met      = max(float(50.1) , min(float(499.999), _met));
+	float met_corr = max(float(50.1) , min(float(499.999), _met_corr));
 
 	// High MET triggers
 	if(met_corr>=200.0) MCEff	= 0.5 * epsilonInf_MC[year] * ( TMath::Erf( (met_corr - mean_MC[year]) / sigma_MC[year] ) + 1 );
