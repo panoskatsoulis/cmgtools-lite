@@ -156,6 +156,7 @@ float muDleg_SF(int year, float pt1, float _eta1, float pt2, float _eta2, float 
 	mu1_MC		= h_trigEff_mumuMET_muleg_MC[year]->GetBinContent(h_trigEff_mumuMET_muleg_MC[year]->GetXaxis()->FindBin(pt1), h_trigEff_mumuMET_muleg_MC[year]->GetYaxis()->FindBin(eta1));
 	mu2_Data	= h_trigEff_mumuMET_muleg_Data[year]->GetBinContent(h_trigEff_mumuMET_muleg_Data[year]->GetXaxis()->FindBin(pt2), h_trigEff_mumuMET_muleg_Data[year]->GetYaxis()->FindBin(eta2));
 	mu2_MC		= h_trigEff_mumuMET_muleg_MC[year]->GetBinContent(h_trigEff_mumuMET_muleg_MC[year]->GetXaxis()->FindBin(pt2), h_trigEff_mumuMET_muleg_MC[year]->GetYaxis()->FindBin(eta2));
+	if(mu1_Data==0) {mu1_Data=1.0;}; if(mu1_MC==0) {mu1_MC=1.0;}; if(mu2_Data==0) {mu2_Data=1.0;}; if(mu2_MC==0) {mu2_MC=1.0;}; //Fix empty bins in histos
 	if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 		mu1_Data /= dcaDz_Data[year]; mu2_Data /= dcaDz_Data[year];
 		mu1_MC /= dcaDz_MC[year]; mu2_MC /= dcaDz_MC[year];
@@ -170,6 +171,7 @@ float muDleg_SF(int year, float pt1, float _eta1, float pt2, float _eta2, float 
 		// Third muon efficiency
 		mu3_Data = h_trigEff_mumuMET_muleg_Data[year]->GetBinContent(h_trigEff_mumuMET_muleg_Data[year]->GetXaxis()->FindBin(pt3), h_trigEff_mumuMET_muleg_Data[year]->GetYaxis()->FindBin(eta3));
 		mu3_MC = h_trigEff_mumuMET_muleg_MC[year]->GetBinContent(h_trigEff_mumuMET_muleg_MC[year]->GetXaxis()->FindBin(pt3), h_trigEff_mumuMET_muleg_MC[year]->GetYaxis()->FindBin(eta3));
+		if(mu3_Data==0) {mu3_Data=1.0;}; if(mu3_MC==0) {mu3_MC=1.0;}; //Fix empty bins in histos
 		if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 			mu3_Data /= dcaDz_Data[year];
 			mu3_MC /= dcaDz_MC[year];
@@ -215,6 +217,7 @@ float muDleg_MCEff(int year, float pt1, float _eta1, float pt2, float _eta2, flo
 	// First 2 muon efficiency
 	mu1_MC	= h_trigEff_mumuMET_muleg_MC[year]->GetBinContent(h_trigEff_mumuMET_muleg_MC[year]->GetXaxis()->FindBin(pt1), h_trigEff_mumuMET_muleg_MC[year]->GetYaxis()->FindBin(eta1));
 	mu2_MC	= h_trigEff_mumuMET_muleg_MC[year]->GetBinContent(h_trigEff_mumuMET_muleg_MC[year]->GetXaxis()->FindBin(pt2), h_trigEff_mumuMET_muleg_MC[year]->GetYaxis()->FindBin(eta2));
+	if(mu1_MC==0) {mu1_MC=1.0;}; if(mu2_MC==0) {mu2_MC=1.0;}; //Fix empty bins in histos
 	if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 		mu1_MC /= dcaDz_MC[year]; mu2_MC /= dcaDz_MC[year];
 	}
@@ -226,6 +229,7 @@ float muDleg_MCEff(int year, float pt1, float _eta1, float pt2, float _eta2, flo
 	else{
 		// Third muon efficiency
 		mu3_MC = h_trigEff_mumuMET_muleg_MC[year]->GetBinContent(h_trigEff_mumuMET_muleg_MC[year]->GetXaxis()->FindBin(pt3), h_trigEff_mumuMET_muleg_MC[year]->GetYaxis()->FindBin(eta3));
+		if(mu3_MC==0) {mu3_MC=1.0;}; //Fix empty bins in histos
 		if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 			mu3_MC /= dcaDz_MC[year];
 		}
@@ -273,6 +277,7 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year){
 		// Met leg
 		float met_Data	= h_trigEff_mumuMET_metleg_Data[year]->GetBinContent(h_trigEff_mumuMET_metleg_Data[year]->GetXaxis() ->FindBin(met), h_trigEff_mumuMET_metleg_Data[year]->GetYaxis()->FindBin(met_corr));
 		float met_MC	= h_trigEff_mumuMET_metleg_MC[year]->GetBinContent(h_trigEff_mumuMET_metleg_MC[year]->GetXaxis() ->FindBin(met), h_trigEff_mumuMET_metleg_MC[year]->GetYaxis()->FindBin(met_corr));
+		if(met_Data==0) {met_Data=1.0;}; if(met_MC==0) {met_MC=1.0;} //Fix empty bins in histos
 
 		// Putting everything together
 		eff_Data	= mass_Data * met_Data;
@@ -311,6 +316,7 @@ float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
 		// Mu + Dca/Dz legs computed in muDleg_MCEff function
 		// Met leg
 		float met_MC	= h_trigEff_mumuMET_metleg_MC[year]->GetBinContent(h_trigEff_mumuMET_metleg_MC[year]->GetXaxis() ->FindBin(met), h_trigEff_mumuMET_metleg_MC[year]->GetYaxis()->FindBin(met_corr));
+		if(met_MC==0) {met_MC=1.0;} //Fix empty bins in histos
 
 		// Putting everything together
 		MCEff	= muDleg_MCEff * mass_MC * met_MC;
