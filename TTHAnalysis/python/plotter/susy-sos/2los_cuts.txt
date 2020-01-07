@@ -10,7 +10,7 @@ mll		: m2l > 4 && m2l < 50
 upsilonVeto	: m2l < 9 || m2l > 10.5
 dilepPt		: pt_2(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi) > 3 
 
-ISRjet		: Jet1_jetId >= 4
+ISRjet		: JetSel1_Recl_jetId >= 4
 METoverHT	: (MET_pt/(htJet25j-LepGood1_pt-LepGood2_pt))>(2/3) && (MET_pt/(htJet25j-LepGood1_pt-LepGood2_pt)) < 1.4
 minHT		: (htJet25j-LepGood1_pt-LepGood2_pt) > 100
 
@@ -62,7 +62,8 @@ met280		: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, Le
 OS		: LepGood1_pdgId*LepGood2_pdgId<0
 ledlepPt	: 5.0 < LepGood1_pt && LepGood1_pt < 30.0
 twoTight	: LepGood1_isLepTight && LepGood2_isLepTight
-bveto		: nBJetLoose25 == 0
+bveto		: nBJetLoose25_Recl == 0
+#bveto		: Sum$(JetSel_Recl_btagDeepB > 0.4 ) == 0
 mtautau		: 0.0 > mass_tautau(MET_pt,MET_phi,LepGood1_pt,LepGood1_eta,LepGood1_phi,LepGood2_pt,LepGood2_eta,LepGood2_phi) || mass_tautau(MET_pt,MET_phi,LepGood1_pt,LepGood1_eta,LepGood1_phi,LepGood2_pt,LepGood2_eta,LepGood2_phi) > 160.0
 ### EWK
 mT		: mt_2(LepGood1_pt, LepGood1_phi, MET_pt, MET_phi) < 70. && mt_2(LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) < 70.0

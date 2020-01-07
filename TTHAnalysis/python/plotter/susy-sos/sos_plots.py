@@ -27,6 +27,7 @@ parser.add_argument("--queue", default="longlunch", help="HTCondor queue for job
 parser.add_argument("--allCards", action="store_true", default=False, help="run cards for all years, cats and bins")
 parser.add_argument("--runCombine", action="store_true", default=False, help="combine cards and run limit")
 parser.add_argument("--optPoint", default=None, help="choose a point of the opt")
+parser.add_argument("--asimov", dest="asimov", default=None, help="Use an Asimov dataset of the specified kind: including signal ('signal','s','sig','s+b') or background-only ('background','bkg','b','b-only')")
 args = parser.parse_args()
 
 ODIR=args.outDir
@@ -257,7 +258,7 @@ def runIt(GO,name):
         ret = submit.format(command=' '.join(['python mcPlots.py',"--pdir %s/%s/%s"%(ODIR,YEAR,name),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ])]))
 
     if args.doWhat == "cards":  
-        ret = submit.format(command=' '.join(['python makeShapeCardsNew.py --savefile',"--outdir %s/scan/SR/%s/%s/%sfb/TChiWZ/%s/sig_TChiWZ_%s/"%(ODIR,YEAR,name.replace("_%s"%mass,''),LUMI.strip('-l ').replace('.', 'p'),mass,mass),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ]), "--xp='signal(?!.*%s).*'"%args.signalMasses.strip('signal') if args.signalMasses is not None else '', "--all-processes"   ]))
+        ret = submit.format(command=' '.join(['python makeShapeCardsNew.py --savefile',"--outdir %s/scan/SR/%s/%s/%sfb/TChiWZ/%s/sig_TChiWZ_%s/"%(ODIR,YEAR,name.replace("_%s"%mass,''),LUMI.strip('-l ').replace('.', 'p'),mass,mass),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ]), "--xp='signal(?!.*%s).*'"%args.signalMasses.strip('signal') if args.signalMasses is not None else '', "--all-processes", "--asimov=%s"%(args.asimov) if args.asimov is not None else ''   ]))
         
     print ret
     if args.htcondor:

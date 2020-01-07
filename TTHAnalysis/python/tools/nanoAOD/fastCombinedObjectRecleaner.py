@@ -42,17 +42,18 @@ class fastCombinedObjectRecleaner(Module):
         self.vars_jets = ["btagDeepB","qgl",'btagDeepFlavB'] #"btagCSVV2",,"btagDeepC"]#"btagCSV","btagDeepCSV",,"btagDeepCSVCvsL","btagDeepCSVCvsB","ptd","axis1"] # FIXME recover
         if self.isMC: self.vars_jets += ['pt_jesTotalUp','pt_jesTotalDown']
         self.vars_jets_int = (["hadronFlavour"] if self.isMC else [])
+        self.vars_jets_int.extend(['jetId'])
         self.vars_jets_nooutput = []
 
         self.systsJEC = {0:"", 1:"_jecUp", -1:"_jecDown"} 
 
         self.outmasses=['mZ1','minMllAFAS','minMllAFOS','minMllAFSS','minMllSFOS']
-        self._outjetvars = [x%self.jc for x in ['ht%s%%dj','mht%s%%d','nB%sLoose%%d','nB%sMedium%%d','n%s%%d','jetId%s%%d','btagDeepFlavB%s%%d']]
+        self._outjetvars = [x%self.jc for x in ['ht%s%%dj','mht%s%%d','nB%sLoose%%d','nB%sMedium%%d','n%s%%d']]
         self.outjetvars=[]
         for jetPt in self.jetPts: self.outjetvars.extend([(x%jetPt+y,'I' if ('nB%s'%self.jc in x or 'n%s'%self.jc in x) else 'F') for x in self._outjetvars for y in self.systsJEC.values()])
         self.outjetvars.extend([('nFwdJet'+self.systsJEC[y],'I') for y in self.systsJEC ])
         self.outjetvars.extend([(x+self.systsJEC[y],'F') for y in self.systsJEC for x in ['FwdJet1_pt','FwdJet1_eta'] ])
-
+        
         self.branches = [var+self.label for var in self.outmasses]
         self.branches.extend([(var+self.label,_type) for var,_type in self.outjetvars])
         self.branches += [("LepGood_conePt","F",100,"nLepGood")]
@@ -60,7 +61,7 @@ class fastCombinedObjectRecleaner(Module):
         self._helper_lepsF = CollectionSkimmer("LepFO"+self.label, "LepGood", floats=[], maxSize=10, saveTagForAll=True, saveSelectedIndices=True,padSelectedIndicesWith=0)
         self._helper_lepsT = CollectionSkimmer("LepTight"+self.label, "LepGood", floats=[], maxSize=10, saveTagForAll=True)
         self._helper_taus = CollectionSkimmer("TauSel"+self.label, self.tauc, floats=self.vars+self.vars_taus, ints=self.vars_taus_int, uchars=self.vars_taus_uchar, maxSize=10)
-        self._helper_jets = CollectionSkimmer("%sSel"%self.jc+self.label, self.jc, floats=self.vars+self.vars_jets, ints=self.vars_jets_int, maxSize=20)
+        self._helper_jets = CollectionSkimmer("%sSel"%self.jc+self.label, self.jc, floats=self.vars+self.vars_jets, ints=self.vars_jets_int, maxSize=20, saveSelectedIndices=True,padSelectedIndicesWith=0)
         self._helpers = [self._helper_lepsF,self._helper_lepsT,self._helper_taus,self._helper_jets]
 
 ##        if "/fastCombinedObjectRecleanerHelper_cxx.so" not in ROOT.gSystem.GetLibraries():
@@ -140,6 +141,8 @@ class fastCombinedObjectRecleaner(Module):
         for delta,varname in self.systsJEC.iteritems():
             for x in self._worker.GetJetSums(delta):
                 for var in self._outjetvars: 
+                    print var%x.thr+varname+self.label
+                    print var.replace('%d','').replace(self.jc,'Jet')
                     self.wrappedOutputTree.fillBranch(var%x.thr+varname+self.label, getattr(x,var.replace('%d','').replace(self.jc,'Jet')))
                 self.wrappedOutputTree.fillBranch('nFwdJet'+varname+self.label,getattr(x,'nFwdJet'))
                 self.wrappedOutputTree.fillBranch('FwdJet1_pt'+varname+self.label,getattr(x,'fwd1_pt'))

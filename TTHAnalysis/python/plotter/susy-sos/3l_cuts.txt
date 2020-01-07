@@ -44,7 +44,8 @@ minMll		: minMllSFOS > 4 && minMllSFOS < 50
 ZvetoTrigger	: maxMllSFOS < 60 
 ledlepPt	: 5.0 < LepGood1_pt && LepGood1_pt < 30.0
 threeTight	: LepGood1_isLepTight && LepGood2_isLepTight && LepGood3_isLepTight
-bveto		: nBJetLoose25 == 0
+bveto		: nBJetLoose25_Recl == 0
+#bveto		: Sum$(JetSel_Recl_btagDeepB > 0.4 ) == 0
 pt5sublep	: LepGood2_pt > 5 && LepGood3_pt > 5
 ### Low MET
 mm		: ( abs(LepGood1_pdgId)==13 && abs(LepGood2_pdgId)==13 ) || ( abs(LepGood1_pdgId)==13 && abs(LepGood3_pdgId)==13 ) || ( abs(LepGood2_pdgId)==13 && abs(LepGood3_pdgId)==13 )  
