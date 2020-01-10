@@ -7,24 +7,20 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 
-from CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules import calculateRawMVA, SOSTightID2018, susyEleIdParametrization, VLooseFOEleID, tightEleID, clean_and_FO_selection_SOS
-conf = dict(muPt = 3.0, elePt = 5.0, sip3d = 2.5, dxy =  0.05, dz = 0.1, minMet = 50.0, ip3d = 0.0175, iperbolic_iso_0 = 20.0, iperbolic_iso_1 = 300.0)
-
-muonSelection = lambda l : abs(l.eta) < 2.4 and l.pt > conf["muPt"]  and l.sip3d < conf["sip3d"] and abs(l.dxy) < conf["dxy"] and abs(l.dz) < conf["dz"]  and l.pfRelIso03_all*l.pt < ( conf["iperbolic_iso_0"]+conf["iperbolic_iso_1"]/l.pt) and abs(l.ip3d) < conf["ip3d"]
-electronSelection = lambda l : abs(l.eta) < 2.5 and l.pt > conf["elePt"]  and l.sip3d < conf["sip3d"] and abs(l.dxy) < conf["dxy"] and abs(l.dz) < conf["dz"] and l.pfRelIso03_all*l.pt < ( conf["iperbolic_iso_0"]+conf["iperbolic_iso_1"]/l.pt) and abs(l.ip3d) < conf["ip3d"]
+from CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules import conf, muonSelection, electronSelection, calculateRawMVA, SOSTightID2018, susyEleIdParametrization, VLooseFOEleID, tightEleID, clean_and_FO_selection_SOS, fullCleaningLeptonSel, fullTightLeptonSel, tightLepDY, tightLepTT, tightLepVV, tightLepWZ
 
 def isVLFOEle(lep,year,flavor):
     return VLooseFOEleID(lep, year) if flavor=="Electron" else 0
 def isTightEle(lep,year,flavor):
     return tightEleID(lep, year) if flavor=="Electron" else 0
 def isSOSLoose(lep,year,flavor):
-    return clean_and_FO_selection_SOS(lep,year) and ( (flavor=="Muon" and muonSelection(lep)) or (flavor=="Electron" and electronSelection(lep)) )
+    return fullCleaningLeptonSel(lep,year) and ( (flavor=="Muon" and muonSelection(lep)) or (flavor=="Electron" and electronSelection(lep)) )
 def isSOSTight(lep,year,flavor):
-    return isSOSLoose(lep,year,flavor) and ((abs(lep.pdgId)==13 or tightEleID(lep, year)) and lep.pfRelIso03_all<0.5 and (lep.pfRelIso03_all*lep.pt)<5. and abs(lep.ip3d)<0.01 and lep.sip3d<2)
+    return isSOSLoose(lep,year,flavor) and fullTightLeptonSel(lep,year)
 def isDYTight(lep,year,flavor):
-    return isSOSLoose(lep,year,flavor) and ((abs(lep.pdgId)==13 or tightEleID(lep, year)) and lep.pfRelIso03_all<0.5 and ((lep.pfRelIso03_all*lep.pt)<5. or lep.pfRelIso03_all<0.1))
+    return isSOSLoose(lep,year,flavor) and tightLepDY(lep,year)
 def isTTTight(lep,year,flavor):
-    return isSOSLoose(lep,year,flavor) and ((abs(lep.pdgId)==13 or tightEleID(lep, year)) and lep.pfRelIso03_all<0.5 and ((lep.pfRelIso03_all*lep.pt)<5. or lep.pfRelIso03_all<0.1) and abs(lep.ip3d)<0.01 and lep.sip3d<2)
+    return isSOSLoose(lep,year,flavor) and tightLepTT(lep,year)
 def isVVTight(lep,year,flavor): #VV ID same as TT
     return isTTTight(lep,year,flavor)
 def isWZTight(lep,year,flavor): #WZ ID same as TT
