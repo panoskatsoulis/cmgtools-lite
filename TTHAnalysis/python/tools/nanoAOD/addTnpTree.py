@@ -117,7 +117,7 @@ class addTnpTree(Module):
       return match
 
     def matchesPrompt(self, lep, genparts):
-        return (lep.genPartFlav == 1 and bool(genparts[lep.genPartIdx].statusFlags & 1)) or  (lep.genPartFlav == 15 and bool(genparts[lep.genPartIdx].statusFlags & (1 << 5)))
+        return (lep.genPartFlav == 1 and bool(genparts[lep.genPartIdx].statusFlags & 1)) or  (lep.genPartFlav == 15 and bool(genparts[lep.genPartIdx].statusFlags & (1 << 5))) # statusFlags & 1 : isPrompt, statusFlags & (1 << 5) : isDirectPromptTauDecayProduct. Ref: https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html#GenPart
 
     def analyze(self, event):
         # Get Jet and Ele collections
@@ -131,11 +131,11 @@ class addTnpTree(Module):
         for tr in trigObj:
             if self.flavor == "Electron":
                 if not abs(tr.id) == 11: continue
-                if not (tr.filterBits & 2): continue
+                if not (tr.filterBits & 2): continue # filterBits & 2 : WPTight. Ref: https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html#TrigObj
             if self.flavor == "Muon":
                 if not abs(tr.id) == 13: continue
                 if self.year == 2016:
-                    if not ((tr.filterBits & 2) or (tr.filterBits & 8)): continue
+                    if not ((tr.filterBits & 2) or (tr.filterBits & 8)): continue # filterBits & 2 : Iso, filterBits & 8 : 1mu. Ref: https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html#TrigObj
                 else:
                     if not ((tr.filterBits & 2) and (tr.filterBits & 8)): continue
             selTrigObj.append(tr)
@@ -162,7 +162,7 @@ class addTnpTree(Module):
         ht = 0; met = event.METFixEE2017_pt if self.year == 17 else event.MET_pt
         jetId = 1 if self.year == 2016 else 2 
         for j in jet: 
-            ht += j.pt if j.pt > 30 and abs(j.eta)  < 2.4 and j.jetId&(1<<jetId) else 0
+            ht += j.pt if j.pt > 30 and abs(j.eta)  < 2.4 and j.jetId&(1<<jetId) else 0 # jetId&(1<<1) : tight, jetId&(1<<2) : tightLepVeto. Ref: https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html#Jet
 
         isdata = 0 if hasattr(event, 'Electron_genPartFlav') else 1
         if not isdata: genparts = Collection(event, 'GenPart')
