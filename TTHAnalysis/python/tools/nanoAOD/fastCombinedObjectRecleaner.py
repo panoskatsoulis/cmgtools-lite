@@ -141,8 +141,6 @@ class fastCombinedObjectRecleaner(Module):
         for delta,varname in self.systsJEC.iteritems():
             for x in self._worker.GetJetSums(delta):
                 for var in self._outjetvars: 
-                    print var%x.thr+varname+self.label
-                    print var.replace('%d','').replace(self.jc,'Jet')
                     self.wrappedOutputTree.fillBranch(var%x.thr+varname+self.label, getattr(x,var.replace('%d','').replace(self.jc,'Jet')))
                 self.wrappedOutputTree.fillBranch('nFwdJet'+varname+self.label,getattr(x,'nFwdJet'))
                 self.wrappedOutputTree.fillBranch('FwdJet1_pt'+varname+self.label,getattr(x,'fwd1_pt'))
