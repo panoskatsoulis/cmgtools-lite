@@ -335,15 +335,33 @@ float triggerWZMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
 // LEPTON SCALE FACTORS
 // -------------------------------------------------------------
 
-unordered_map<int, TFile*> f_lepSF_Muon = {
-	{ 2018, (TFile*) new TFile(DATA_SF+"/LeptonSF/Muon2018_LeptonSFMap.root","read") },
-	{ 2017, (TFile*) new TFile(DATA_SF+"/LeptonSF/Muon2017_LeptonSFMap.root","read") },
-	{ 2016, (TFile*) new TFile(DATA_SF+"/LeptonSF/Muon2016_LeptonSFMap.root","read") }
+TFile* f_lepSF_Electron_2018 = new TFile(DATA_SF+"/LeptonSF/Electron2018_LeptonSFMap.root","read");
+TFile* f_lepSF_Electron_2017 = new TFile(DATA_SF+"/LeptonSF/Electron2017_LeptonSFMap.root","read");
+TFile* f_lepSF_Electron_2016 = new TFile(DATA_SF+"/LeptonSF/Electron2016_LeptonSFMap.root","read");
+TFile* f_lepSF_Muon_2018 = new TFile(DATA_SF+"/LeptonSF/Muon2018_LeptonSFMap.root","read");
+TFile* f_lepSF_Muon_2017 = new TFile(DATA_SF+"/LeptonSF/Muon2017_LeptonSFMap.root","read");
+TFile* f_lepSF_Muon_2016 = new TFile(DATA_SF+"/LeptonSF/Muon2016_LeptonSFMap.root","read");
+
+unordered_map<int, TH2F*> h_lepSF_Electron_SF = {
+	{ 2018, (TH2F*) f_lepSF_Electron_2018->Get("EGamma_SF2D") },
+	{ 2017, (TH2F*) f_lepSF_Electron_2017->Get("EGamma_SF2D") },
+	{ 2016, (TH2F*) f_lepSF_Electron_2016->Get("EGamma_SF2D") }
 };
-unordered_map<int, TFile*> f_lepSF_Electron = {
-	{ 2018, (TFile*) new TFile(DATA_SF+"/LeptonSF/Electron2018_LeptonSFMap.root","read") },
-	{ 2017, (TFile*) new TFile(DATA_SF+"/LeptonSF/Electron2017_LeptonSFMap.root","read") },
-	{ 2016, (TFile*) new TFile(DATA_SF+"/LeptonSF/Electron2016_LeptonSFMap.root","read") }
+unordered_map<int, TH2F*> h_lepSF_Muon_SF = {
+	{ 2018, (TH2F*) f_lepSF_Muon_2018->Get("EGamma_SF2D") },
+	{ 2017, (TH2F*) f_lepSF_Muon_2017->Get("EGamma_SF2D") },
+	{ 2016, (TH2F*) f_lepSF_Muon_2016->Get("EGamma_SF2D") }
+};
+
+unordered_map<int, TH2F*> h_lepSF_Electron_MCEff = {
+	{ 2018, (TH2F*) f_lepSF_Electron_2018->Get("EGamma_EffMC2D") },
+	{ 2017, (TH2F*) f_lepSF_Electron_2017->Get("EGamma_EffMC2D") },
+	{ 2016, (TH2F*) f_lepSF_Electron_2016->Get("EGamma_EffMC2D") }
+};
+unordered_map<int, TH2F*> h_lepSF_Muon_MCEff = {
+	{ 2018, (TH2F*) f_lepSF_Muon_2018->Get("EGamma_EffMC2D") },
+	{ 2017, (TH2F*) f_lepSF_Muon_2017->Get("EGamma_EffMC2D") },
+	{ 2016, (TH2F*) f_lepSF_Muon_2016->Get("EGamma_EffMC2D") }
 };
 
 // Fullsim
@@ -357,16 +375,14 @@ float lepSF_recoToTight(float _pt, float _eta, int pdgId, int year) {
 		pt = max(float(5.001), min(float(999.999), _pt));
 		eta = min(float(2.499), abs(_eta)); // eta -> Absolute eta
 
-		TH2D* Hist = (TH2D*) f_lepSF_Electron[year]->Get("EGamma_SF2D");
-		SF = Hist->GetBinContent(Hist->GetXaxis()->FindBin(eta), Hist->GetYaxis()->FindBin(pt));
+		SF = h_lepSF_Electron_SF[year]->GetBinContent(h_lepSF_Electron_SF[year]->GetXaxis()->FindBin(eta), h_lepSF_Electron_SF[year]->GetYaxis()->FindBin(pt));
 	}
 	else if(abs(pdgId)==13) { // Muons
 		// Protection
 		pt = max(float(3.501), min(float(999.999), _pt));
 		eta = min(float(2.399), abs(_eta)); // eta -> Absolute eta
 
-		TH2D* Hist = (TH2D*) f_lepSF_Muon[year]->Get("EGamma_SF2D");
-		SF = Hist->GetBinContent(Hist->GetXaxis()->FindBin(eta), Hist->GetYaxis()->FindBin(pt));
+		SF = h_lepSF_Muon_SF[year]->GetBinContent(h_lepSF_Muon_SF[year]->GetXaxis()->FindBin(eta), h_lepSF_Muon_SF[year]->GetYaxis()->FindBin(pt));
 	}
 	else { // Other => We should never end up here.
 		SF = 0.0;
@@ -383,48 +399,8 @@ float lepSF_recoToTight(float _pt, float _eta, int pdgId, int year) {
 	return SF;
 }
 
-float lepSF_reco(float _pt, float _eta, int pdgId, int year) {
-	
-	// Definitions and Protection
-	//float SF, eta;
-	//eta = min(float(2.399), abs(_eta)); // eta -> Absolute eta
-	
-	// Muon tracking
-//	if(pt>10){
-//		if     (abs(eta)>0.0  && abs(eta)<=0.20 ) return 0.9800;
-//		else if(abs(eta)>0.20 && abs(eta)<=0.40 ) return 0.9862;
-//		else if(abs(eta)>0.40 && abs(eta)<=0.60 ) return 0.9872;
-//		else if(abs(eta)>0.60 && abs(eta)<=0.80 ) return 0.9845;
-//		else if(abs(eta)>0.80 && abs(eta)<=1.00 ) return 0.9847;
-//		else if(abs(eta)>1.00 && abs(eta)<=1.20 ) return 0.9801;
-//		else if(abs(eta)>1.20 && abs(eta)<=1.40 ) return 0.9825;
-//		else if(abs(eta)>1.40 && abs(eta)<=1.60 ) return 0.9754;
-//		else if(abs(eta)>1.60 && abs(eta)<=1.80 ) return 0.9860;
-//		else if(abs(eta)>1.80 && abs(eta)<=2.00 ) return 0.9810;
-//		else if(abs(eta)>2.00 && abs(eta)<=2.20 ) return 0.9815;
-//		else if(abs(eta)>2.20 && abs(eta)<=2.40 ) return 0.9687;
-//		else return 1.0;
-//	}
-//	else{
-//		if     (abs(eta)>0.0  && abs(eta)<=0.20 ) return 0.9968;
-//		else if(abs(eta)>0.20 && abs(eta)<=0.40 ) return 0.9975;
-//		else if(abs(eta)>0.40 && abs(eta)<=0.60 ) return 0.9979;
-//		else if(abs(eta)>0.60 && abs(eta)<=0.80 ) return 0.9978;
-//		else if(abs(eta)>0.80 && abs(eta)<=1.00 ) return 0.9980;
-//		else if(abs(eta)>1.00 && abs(eta)<=1.20 ) return 0.9971;
-//		else if(abs(eta)>1.20 && abs(eta)<=1.40 ) return 0.9961;
-//		else if(abs(eta)>1.40 && abs(eta)<=1.60 ) return 0.9954;
-//		else if(abs(eta)>1.60 && abs(eta)<=1.80 ) return 0.9955;
-//		else if(abs(eta)>1.80 && abs(eta)<=2.00 ) return 0.9941;
-//		else if(abs(eta)>2.00 && abs(eta)<=2.20 ) return 0.9925;
-//		else if(abs(eta)>2.20 && abs(eta)<=2.40 ) return 0.9866;
-//		else return 1.0;
-//	}
-	return 1.0;
-}
-
 float lepSF(float _pt, float _eta, int pdgId, int year) {
-	return lepSF_recoToTight(_pt,_eta,pdgId,year) * lepSF_reco(_pt,_eta,pdgId,year);
+	return lepSF_recoToTight(_pt,_eta,pdgId,year);
 }
 
 
@@ -439,16 +415,14 @@ float lepMCEff_recoToTight(float _pt, float _eta, int pdgId, int year) {
 		pt = max(float(5.001), min(float(999.999), _pt));
 		eta = min(float(2.499), abs(_eta)); // eta -> Absolute eta
 
-		TH2D* Hist = (TH2D*) f_lepSF_Electron[year]->Get("EGamma_EffMC2D");
-		MCEff = Hist->GetBinContent(Hist->GetXaxis()->FindBin(eta), Hist->GetYaxis()->FindBin(pt));
+		MCEff = h_lepSF_Electron_MCEff[year]->GetBinContent(h_lepSF_Electron_MCEff[year]->GetXaxis()->FindBin(eta), h_lepSF_Electron_MCEff[year]->GetYaxis()->FindBin(pt));
 	}
 	else if(abs(pdgId)==13) { // Muons
 		// Protection
 		pt = max(float(3.501), min(float(999.999), _pt));
 		eta = min(float(2.399), abs(_eta)); // eta -> Absolute eta
 
-		TH2D* Hist = (TH2D*) f_lepSF_Muon[year]->Get("EGamma_EffMC2D");
-		MCEff = Hist->GetBinContent(Hist->GetXaxis()->FindBin(eta), Hist->GetYaxis()->FindBin(pt));
+		MCEff = h_lepSF_Muon_MCEff[year]->GetBinContent(h_lepSF_Muon_MCEff[year]->GetXaxis()->FindBin(eta), h_lepSF_Muon_MCEff[year]->GetYaxis()->FindBin(pt));
 	}
 	else { // Other => We should never end up here.
 		MCEff = 0.0;
