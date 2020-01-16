@@ -26,7 +26,6 @@ parser.add_argument("--htcondor", action="store_true", default=False, help="Subm
 parser.add_argument("--queue", default="longlunch", help="HTCondor queue for job submission")
 parser.add_argument("--allCards", action="store_true", default=False, help="run cards for all years, cats and bins")
 parser.add_argument("--runCombine", action="store_true", default=False, help="combine cards and run limit")
-parser.add_argument("--optPoint", default=None, help="choose a point of the opt")
 parser.add_argument("--asimov", dest="asimov", default=None, help="Use an Asimov dataset of the specified kind: including signal ('signal','s','sig','s+b') or background-only ('background','bkg','b','b-only')")
 args = parser.parse_args()
 
@@ -57,16 +56,7 @@ submit = '{command}'
 P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_230819_v5/"
 nCores = 8
 TREESALL = " --Fs {P}/recleaner --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR,)
-
-optPointsMed  = [170,185,200,215,230]
-optPointsHigh = [220,235,250,265,280]
-
-optPoints=[]
-for pm in optPointsMed:
-    for ph in optPointsHigh:
-        if ph>pm:
-            optPoints.append([pm,ph])
-
+HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src"
 
 def base(selection):
     CORE=TREESALL
@@ -194,9 +184,6 @@ def prepareWrapper(name):
     else:
         nameWr=name.replace("_%s"%YEAR,'').replace("%s"%args.lep,'').replace("_%s"%args.reg,'').replace("_%s"%args.bin,'')
         print nameWr
-        optPoint = "_"+args.optPoint if args.optPoint is not None else ''
-        print 'argP, ',args.optPoint
-        print 'optPoint, ',optPoint
         filename="/%s/src//wrapRunners_%s.sh"%(ODIR,nameWr)
         print filename
         filename=filename.replace('__','_')
@@ -223,14 +210,14 @@ def prepareWrapper(name):
         f.write( 'do CARDS="${CARDS} `find  $f -regex .*txt`"\n'  )
         f.write( 'done\n' )
         f.write( 'echo ${CARDS}\n' )
-        f.write( 'cd /afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src\n' )
+        f.write( 'cd %s\n'%(HIGGSCOMBINEDIR) )
         f.write( 'eval `scramv1 runtime -sh`\n' )
         f.write( 'cd -\n' )
         f.write( '[ -d %s/combinedCards ] || mkdir %s/combinedCards\n'%(ODIR,ODIR) )
         f.write( 'combineCards.py -S $CARDS > %s/combinedCards/%s.txt\n' %( ODIR, masses) )
         f.write( '[ -d %s/limits ] || mkdir %s/limits\n'%(ODIR,ODIR) )
-        f.write( 'combine -M Asymptotic %s/combinedCards/%s.txt -n %s -m %s > %s/limits/%s_limit.txt \n'%(ODIR, masses, masses+str(optPoint), masses.split('_')[0], ODIR, masses ) )
-        f.write( 'mv higgsCombine%s.Asymptotic.mH%s.root %s/limits \n'%(masses+str(optPoint), masses.split('_')[0], ODIR ) )
+        f.write( 'combine -M Asymptotic %s/combinedCards/%s.txt -n %s -m %s > %s/limits/%s_limit.txt \n'%(ODIR, masses, masses, masses.split('_')[0], ODIR, masses ) )
+        f.write( 'mv higgsCombine%s.Asymptotic.mH%s.root %s/limits \n'%(masses, masses.split('_')[0], ODIR ) )
     
     f.close()
 
@@ -279,21 +266,14 @@ def binChoice(x,torun):
         metBinTrig = 'met125'
         metBinInf = 'met125'
         metBinSup = 'met200'
-        if args.optPoint is not None:
-            metBinSup = 'met'+str(optPoints[int(args.optPoint)][0])
     elif '_med' in torun:
         metBinTrig = 'met200'
         metBinInf = 'met200'
         metBinSup = 'met250' if '2los_' in torun else ''
-        if args.optPoint is not None:
-            metBinInf = 'met'+str(optPoints[int(args.optPoint)][0])
-            metBinSup = 'met'+str(optPoints[int(args.optPoint)][1]) if '2los_' in torun else ''
         x2 = add(x2,'-X ^mm$ ')
     elif '_high' in torun:
         metBinTrig = 'met250'
         metBinInf = 'met250'
-        if args.optPoint is not None:
-            metBinInf = 'met'+str(optPoints[int(args.optPoint)][1])
         x2 = add(x2,'-X ^mm$ ')
     if metBinInf != '': x2 = add(x2,'-E ^'+metBinInf+'$ -E ^'+metBinTrig+'_trig$ ')
     if metBinSup != '': x2 = add(x2,'-E ^'+metBinSup+'$ -I ^'+metBinSup+'$ ')
