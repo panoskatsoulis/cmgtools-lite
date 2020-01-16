@@ -347,6 +347,8 @@ isTightLepTT = lambda : ObjTagger('isTightLepTT', "LepGood", [ lambda lep,year: 
 isTightLepVV = lambda : ObjTagger('isTightLepVV', "LepGood", [ lambda lep,year: tightLepVV(lep,year) ]) # relax iso cut
 isTightLepWZ = lambda : ObjTagger('isTightLepWZ', "LepGood", [ lambda lep,year: tightLepWZ(lep,year) ]) # relax iso cut
 
+isFOLep = lambda : ObjTagger('isFOLep', "LepGood", [ lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ]) 
+
 eleSel_seq = [isVLFOEle, isTightEle]
 tightLepCR_seq = [isTightLepDY,isTightLepTT,isTightLepVV,isTightLepWZ]
 
