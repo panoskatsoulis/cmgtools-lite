@@ -187,7 +187,7 @@ float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, floa
 
 			SF = (ProbAnyPairFired_MC == 0.0) ? 0.0 : ProbAnyPairFired_Data / ProbAnyPairFired_MC;
 		}
-		else{ // Only electrons in the low MET bin => We should never go here.
+		else{ // Only electrons in the low MET bin
 			SF = 0.0;
 		}
 	}
@@ -242,7 +242,7 @@ float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, f
 
 			MCEff = ProbAnyPairFired_MC;
 		}
-		else{ // Only electrons in the low MET bin => We should never go here.
+		else{ // Only electrons in the low MET bin
 			MCEff = 0.0;
 		}
 	}
@@ -280,11 +280,11 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year){
 	}
 
 	if(SF<=0.0){
-		cout << "=====================================" << endl;
-		cout << "||             SF <= 0             ||" << endl;
-		cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
-		cout << "||     Setting SF to 1 for now     ||" << endl;
-		cout << "=====================================" << endl;
+		//cout << "=====================================" << endl;
+		//cout << "||             SF <= 0             ||" << endl;
+		//cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
+		//cout << "||     Setting SF to 1 for now     ||" << endl;
+		//cout << "=====================================" << endl;
 		SF = 1.0;
 	}
 	return SF; 
@@ -317,11 +317,11 @@ float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
 	}
 
 	if(MCEff<=0.0){
-		cout << "=====================================" << endl;
-		cout << "||           MC eff <= 0           ||" << endl;
-		cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
-		cout << "||   Setting MC eff to 1 for now   ||" << endl;
-		cout << "=====================================" << endl;
+		//cout << "=====================================" << endl;
+		//cout << "||           MC eff <= 0           ||" << endl;
+		//cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
+		//cout << "||   Setting MC eff to 1 for now   ||" << endl;
+		//cout << "=====================================" << endl;
 		MCEff = 1.0;
 	}
 	return MCEff; 
@@ -389,11 +389,11 @@ float lepSF_recoToTight(float _pt, float _eta, int pdgId, int year) {
 	}
 	
 	if(SF<=0.0){
-        cout << "=====================================" << endl;
-        cout << "||             SF <= 0             ||" << endl;
-        cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
-        cout << "||     Setting SF to 1 for now     ||" << endl;
-        cout << "=====================================" << endl;
+        //cout << "=====================================" << endl;
+        //cout << "||             SF <= 0             ||" << endl;
+        //cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
+        //cout << "||     Setting SF to 1 for now     ||" << endl;
+        //cout << "=====================================" << endl;
         SF = 1.0;
     }
 	return SF;
@@ -429,11 +429,11 @@ float lepMCEff_recoToTight(float _pt, float _eta, int pdgId, int year) {
 	}
 	
 	if(MCEff<=0.0){
-		cout << "=====================================" << endl;
-		cout << "||           MC eff <= 0           ||" << endl;
-		cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
-		cout << "||   Setting MC eff to 1 for now   ||" << endl;
-		cout << "=====================================" << endl;
+		//cout << "=====================================" << endl;
+		//cout << "||           MC eff <= 0           ||" << endl;
+		//cout << "||    THIS SHOULD NEVER HAPPEN!    ||" << endl;
+		//cout << "||   Setting MC eff to 1 for now   ||" << endl;
+		//cout << "=====================================" << endl;
 		MCEff = 1.0;
 	}
 	return MCEff; 
