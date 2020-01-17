@@ -21,21 +21,13 @@ met125		: MET_pt > 125 && metmmm_pt(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepG
 met125_trig		: (year==2016 && HLT_MuMuMET16) || ( (year==2017 || year==2018) && HLT_MuMuMET )	; Disable=True
 met125_trig_CR	: (year==2016 && HLT_MuMu16) || ( (year==2017 || year==2018) && HLT_MuMu )	; Disable=True
 
-####### Med MET
-####met200		: metmmm_pt(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi,LepGood3_pt,LepGood3_phi, MET_pt, MET_phi, lepton_Id_selection(LepGood1_pdgId, LepGood2_pdgId, LepGood3_pdgId)) > 200	; Disable=True
-####met200_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
-
 ### Med MET
-met200		: MET_pt > 200	; Disable=True
+met200		: metmmm_pt(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi,LepGood3_pt,LepGood3_phi, MET_pt, MET_phi, lepton_Id_selection(LepGood1_pdgId, LepGood2_pdgId, LepGood3_pdgId)) > 200	; Disable=True
 met200_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
 
-
-
-###for binning optimization
-met185		: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 185 	; Disable=True
-met170		: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 170 	; Disable=True
-met215		: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 215 	; Disable=True
-met230		: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 230 	; Disable=True
+###### Med MET
+###met200		: MET_pt > 200	; Disable=True
+###met200_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
 
 
 ##### SR (enabled by default but likely to be inverted cuts)

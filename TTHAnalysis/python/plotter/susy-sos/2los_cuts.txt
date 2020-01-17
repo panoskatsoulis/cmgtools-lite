@@ -22,27 +22,27 @@ met125_trig		: (year==2016 && HLT_MuMuMET16) || ( (year==2017 || year==2018) && 
 
 
 ####### Med MET	
-####met200		: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200 	; Disable=True
-####met200_col	: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) < 300	; Disable=True
-####met200_CR	: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200	; Disable=True
-####met200_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
-####### High MET
-####met250		: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 250	; Disable=True
-####met300_col	: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 300	; Disable=True
-####met250_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
-
-
-
-
-### Med MET	
-met200		: MET_pt > 200 	; Disable=True
-met200_col	: MET_pt > 200 && MET_pt < 300	; Disable=True
-met200_CR	: MET_pt > 200	; Disable=True
+met200		: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200 	; Disable=True
+met200_col	: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) < 300	; Disable=True
+met200_CR	: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200	; Disable=True
 met200_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
 ### High MET
-met250		: MET_pt > 250	; Disable=True
-met300_col	: MET_pt > 300	; Disable=True
+met250		: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 250	; Disable=True
+met300_col	: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 300	; Disable=True
 met250_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
+
+
+
+
+###### Med MET	
+###met200		: MET_pt > 200 	; Disable=True
+###met200_col	: MET_pt > 200 && MET_pt < 300	; Disable=True
+###met200_CR	: MET_pt > 200	; Disable=True
+###met200_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
+###### High MET
+###met250		: MET_pt > 250	; Disable=True
+###met300_col	: MET_pt > 300	; Disable=True
+###met250_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
 
 
 
