@@ -137,8 +137,7 @@ def VLooseFOEleID(lep,year):# from https://twiki.cern.ch/twiki/pub/CMS/SUSLepton
         else:
             return mvaValue >  cuts["EE"][3]
 
-
-
+          
 def new_FOEleID(lep,year):# from https://indico.cern.ch/event/878236/contributions/3699845/attachments/1968758/3274470/FRFlavPerYear_Muons_Electrons_NewFODef.pdf, slide 22
     if year == 2016:
         cuts = dict(EB = [0.97, 0.97, 0.85], 
@@ -170,7 +169,6 @@ def new_FOEleID(lep,year):# from https://indico.cern.ch/event/878236/contributio
             return mvaValue > cuts["EE"][1]
         else:
             return mvaValue >  cuts["EE"][2]
-
 
 
 
@@ -279,17 +277,15 @@ def tightLepWZ(lep,year):
 	return ( clean_and_FO_selection_SOS(lep,year) and ( abs(lep.pdgId)==13 or tightEleID(lep, year) )
 										and lep.pfRelIso03_all<0.5 and ((lep.pfRelIso03_all*lep.pt)<5. or lep.pfRelIso03_all<0.1) and abs(lep.ip3d)<0.01 and lep.sip3d<2 ) #r elax iso cut
 
-
 foTauSel = lambda tau: False
 tightTauSel = lambda tau: False
-
 
 from CMGTools.TTHAnalysis.tools.combinedObjectTaggerForCleaning import CombinedObjectTaggerForCleaning
 from CMGTools.TTHAnalysis.tools.nanoAOD.fastCombinedObjectRecleaner import fastCombinedObjectRecleaner
 recleaner_step1 = lambda : CombinedObjectTaggerForCleaning("InternalRecl",
 	looseLeptonSel = lambda lep,year: ((abs(lep.pdgId)==11 and (VLooseFOEleID(lep,year) and lep.lostHits<=1))) or (abs(lep.pdgId)==13 and lep.looseId),
 	cleaningLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ,
-        FOLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ,
+  FOLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ,
 	tightLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year), #tight wp
 	FOTauSel = foTauSel,
 	tightTauSel = tightTauSel,
@@ -303,7 +299,7 @@ recleaner_step2_mc = lambda : fastCombinedObjectRecleaner(label="Recl", inlabel=
 	jetPtsFwd=[25,40],
 	btagL_thr=lambda year: 0.4 if year==2016 else 0.1522 if year==2017 else 0.1241,
 	btagM_thr=lambda year: 0.6324 if year==2016 else 0.4941 if year==2017 else 0.4184,
-        jetBTag='btagDeepB',
+  jetBTag='btagDeepB',
 	isMC = True)
 recleaner_step2_data = lambda : fastCombinedObjectRecleaner(label="Recl", inlabel="_InternalRecl",
 	cleanTausWithLooseLeptons=True,
@@ -313,7 +309,7 @@ recleaner_step2_data = lambda : fastCombinedObjectRecleaner(label="Recl", inlabe
 	jetPtsFwd=[25,40],
 	btagL_thr=lambda year: 0.4 if year==2016 else 0.1522 if year==2017 else 0.1241,
 	btagM_thr=lambda year: 0.6324 if year==2016 else 0.4941 if year==2017 else 0.4184,
-        jetBTag='btagDeepB',
+  jetBTag='btagDeepB',
 	isMC = False)
 
 from CMGTools.TTHAnalysis.tools.eventVars_2lss import EventVars2LSS
