@@ -337,8 +337,8 @@ if __name__ == '__main__':
             if '_med' in torun:
                 x = x.replace('-E ^met200$','-E ^met200_CR$')
                 x = add(x,'-X ^pt5sublep$ ')
-            x = add(x,"-X ^ledlepPt$ -X ^twoTight$ -X ^mT$ ")
-            x = add(x,"-E ^CRVVlepId$ -E ^CRVVleplepPt$ -E ^CRVVmT$ ")
+            x = add(x,"-X ^ledlepPt$ -X ^twoTight$ -X ^bveto$ -X ^mT$ ")
+            x = add(x,"-E ^CRVVlepId$ -E ^CRVVleplepPt$ -E ^CRVVbveto$ -E ^CRVVmT$ ")
 
         if 'cr_ss' in torun:
             if '_med' in torun:
