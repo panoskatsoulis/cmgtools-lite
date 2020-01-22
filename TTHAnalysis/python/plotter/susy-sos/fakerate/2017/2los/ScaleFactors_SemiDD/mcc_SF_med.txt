@@ -1,0 +1,4 @@
+#ScaleFactor1F: 1.32;AlsoData
+#ScaleFactor2F: 1.55;AlsoData
+ScaleFactor1F: 1.43;AlsoData
+ScaleFactor2F: 2.34;AlsoData

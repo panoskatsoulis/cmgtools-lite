@@ -1,0 +1,3 @@
+ScaleFactor1F: 1.15 ; AlsoData
+ScaleFactor2F: 1.14 ; AlsoData
+ScaleFactor3F: 1.00 ; AlsoData

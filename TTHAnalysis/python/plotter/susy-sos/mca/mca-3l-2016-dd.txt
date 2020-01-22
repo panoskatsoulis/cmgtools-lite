@@ -1,0 +1,28 @@
+## TChiWZ Signal Points
+---------------------------------------
+incl_signal	: + ; IncludeMca="susy-sos/mca-includes/2016/mca-3l-signal.txt"
+
+## Prompt bkg
+---------------------------------------
+incl_prompt	: + ; IncludeMca="susy-sos/mca-includes/2016/mca-3l-prompt.txt"
+
+## Non prompt bkg
+---------------------------------------
+#incl_mcfakes	: + ; IncludeMca="susy-sos/mca-includes/2016/mca-3l-mcfakes.txt"
+#incl_step1_matched1F : + ; IncludeMca="susy-sos/mca-includes/2016/3l_semiddbkg/step2/mca-3l-mcatched1fakesSF1F.txt"
+#incl_step1_matched2F : + ; IncludeMca="susy-sos/mca-includes/2016/3l_semiddbkg/step2/mca-3l-mcatched2fakesSF2F.txt"
+#incl_step1_matched3F : + ; IncludeMca="susy-sos/mca-includes/2016/3l_semiddbkg/step2/mca-3l-mcatched3fakesSF3F.txt"
+#incl_step1_matchedAL1LNT : + ; IncludeMca="susy-sos/mca-includes/2016/3l_semiddbkg/step2/mca-3l-mcatchedfakesSF1FSF2FSF3F.txt"
+inc_dataFakes : + ; IncludeMca="susy-sos/mca-includes/2016/3l_semiddbkg/mca-fakes-applData.txt"
+
+## Rares bkg
+---------------------------------------
+incl_rares	: + ; IncludeMca="susy-sos/mca-includes/2016/mca-3l-rares.txt"
+
+## Conversions bkg
+---------------------------------------
+incl_convs	: + ; IncludeMca="susy-sos/mca-includes/2016/mca-3l-convs.txt"
+
+## Data
+---------------------------------------
+incl_data	: + ; IncludeMca="susy-sos/mca-includes/2016/mca-data.txt"
