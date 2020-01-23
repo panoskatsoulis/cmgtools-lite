@@ -89,8 +89,8 @@ ptll				: pt_2(LepGood1_pt,LepGood1_phi, LepGood2_pt,LepGood2_phi) : 10,0,50  ; 
 
 nJet25		: nJet25                            : [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5] ; XTitle='N(jet\, p_{T} > 25)'
 nBJet25		: nBJetLoose25                      : [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5] ; XTitle='N(Bjet_{Loose}\, p_{T} > 25)'
-htJet25		: htJet25j-LepGood1_pt-LepGood2_pt : 8,0,400  ; XTitle="H_{T}(jet p_{T} > 25)  [GeV]"
-metovht		: (MET_pt/(htJet25j-LepGood1_pt-LepGood2_pt))               : 10,0,2   ; XTitle="p_{T}^{miss}/H_{T}(jet p_{T} > 25)"
+htJet25		: htJet25j							: 8,0,400  ; XTitle="H_{T}(jet p_{T} > 25)  [GeV]"
+metovht		: (MET_pt/htJet25j)					: 10,0,2   ; XTitle="p_{T}^{miss}/H_{T}(jet p_{T} > 25)"
 
 #lep1MetDphi	: abs(deltaPhi(LepGood1_phi, MET_phi))                     : 7,0,3.14 ; XTitle="#Delta#phi(l1\,p_{T}^{miss})", MoreY=1.5
 #lep2MetDphi	: abs(deltaPhi(LepGood2_phi, MET_phi))                     : 7,0,3.14 ; XTitle="#Delta#phi(l2\,p_{T}^{miss})", MoreY=1.5
