@@ -38,7 +38,8 @@ pattern = re.compile( options.scanregex )
 for psig in mca.listSignals(True):
     match = pattern.search( psig ) 
     if not match: 
-        raise RuntimeError("Signal %s does not match the regexp"%psig)
+	continue
+        #raise RuntimeError("Signal %s does not match the regexp"%psig)
     point = [ match.group( p ) for p in options.params.split(',') ] 
     point[1] = re.sub("_h[a-z]+", '',point[1])
     if point not in scanpoints and 'promptsub' not in point[1]: scanpoints.append(  point ) 
@@ -99,37 +100,14 @@ for scanpoint in scanpoints:
     pointname = '_'.join( [ '%s_%s'%(x,y) for x,y in zip(options.params.split(','),scanpoint)])
     for psig in mca.listSignals(): 
         match = pattern.search(psig)
-        matchpoint = [match.group(p) for p in options.params.split(',')]
-        matchpoint[1] = re.sub("_h[a-z]+", '',matchpoint[1])
+        if match: 
+        	matchpoint = [match.group(p) for p in options.params.split(',')]
+        	matchpoint[1] = re.sub("_h[a-z]+", '',matchpoint[1])
         
-        #if scanpoint != [match.group(p) for p in options.params.split(',')]: continue
-        if scanpoint != matchpoint: continue
-        listSignals.append(psig)
-    if options.asimov:
-        if options.asimov in ("s","sig","signal","s+b"):
-            asimovprocesses = listSignals + mca.listBackgrounds()
-        elif options.asimov in ("b","bkg","background", "b-only"):
-            asimovprocesses = mca.listBackgrounds()
-        else: raise RuntimeError("the --asimov option requires to specify signal/sig/s/s+b or background/bkg/b/b-only")
-        tomerge = None
-        for p in asimovprocesses:
-            if p in report: 
-                if tomerge is None: 
-                    tomerge = report[p].raw().Clone("x_data_obs"); tomerge.SetDirectory(None)
-                else: tomerge.Add(report[p].raw())
-        report['data_obs'] = HistoWithNuisances(tomerge)
-    else:
-        report['data_obs'] = report['data'].Clone("x_data_obs") 
-    
-    if options.categ:
-        allreports = dict()
-        catlabels = options.categ[2].split(",")
-        if len(catlabels) != report["data_obs"].GetNbinsY(): raise RuntimeError("Mismatch between category labels and bins")
-        for ic,lab in enumerate(catlabels):
-            allreports["%s_%s"%(binname,lab)] = dict( (k, h.projectionX("x_"+k,ic+1,ic+1)) for (k,h) in report.iteritems() )
-    else:
-        allreports = {binname:report}
-    
+        	#if scanpoint != [match.group(p) for p in options.params.split(',')]: continue
+        	if scanpoint != matchpoint: continue
+        if 'promptsub' not in psig: listSignals.append(psig)
+    #print(listSignals)
     
     for binname, report in allreports.iteritems():
       if options.bbb:
