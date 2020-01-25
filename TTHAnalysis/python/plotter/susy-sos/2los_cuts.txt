@@ -11,8 +11,8 @@ upsilonVeto	: mass_2(LepGood1_pt, LepGood1_eta, LepGood1_phi, LepGood1_mass, Lep
 dilepPt		: pt_2(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi) > 3 
 
 ISRjet		: JetSel1_Recl_jetId >= 4
-METoverHT	: (MET_pt/(htJet25j-LepGood1_pt-LepGood2_pt))>(2/3) && (MET_pt/(htJet25j-LepGood1_pt-LepGood2_pt)) < 1.4
-minHT		: (htJet25j-LepGood1_pt-LepGood2_pt) > 100
+METoverHT	: (MET_pt/htJet25j)>(2/3) && (MET_pt/htJet25j) < 1.4
+minHT		: htJet25j > 100
 
 
 ##### Triggers and Binning
@@ -79,12 +79,13 @@ btag		: nBJetLoose40 > 0	; Disable=True
 CRVVlepId	: LepGood1_isTightLepVV && LepGood2_isTightLepVV	; Disable=True
 CRVVleplepPt	: 20.0 < LepGood1_pt	; Disable=True
 CRVVmT		: mt_2(LepGood1_pt, LepGood1_phi, MET_pt, MET_phi) > 90. || mt_2(LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 90.0	; Disable=True
-
+CRVVbveto		: nBJetLoose25_Recl == 0; Disable=True
 
 ##### SS CR
 ### Disable pt5sublep, mT
 ### Invert OS
-
+1LNT : LepGood1_isLepTight+LepGood2_isLepTight==1 ; Disable=True
+2LNT : LepGood1_isLepTight+LepGood2_isLepTight==0; Disable=True
 
 #### Application Region
 ### Disable twoTight cut

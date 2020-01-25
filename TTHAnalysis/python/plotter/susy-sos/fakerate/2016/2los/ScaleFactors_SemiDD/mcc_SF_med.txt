@@ -1,4 +1,0 @@
-#ScaleFactor1F: 1.38 ; AlsoData
-#ScaleFactor2F: 1.13;AlsoData
-ScaleFactor1F: 1.49
-ScaleFactor2F: 1.79

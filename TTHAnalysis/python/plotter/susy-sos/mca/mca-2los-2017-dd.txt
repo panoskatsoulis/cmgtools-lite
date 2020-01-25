@@ -16,15 +16,6 @@ incl_prompt_vv	: + ; IncludeMca="susy-sos/mca-includes/2017/mca-2los-prompt-vv.t
 
 ## Non prompt bkg
 ---------------------------------------
-#incl_mcfakes	: + ; IncludeMca="susy-sos/mca-includes/2017/mca-2los-mcfakes.txt"
-#incl_mcfkaes_SF1F      : + ; IncludeMca="susy-sos/mca-includes/2017/2los_semiddbkg/step2/mca-2los-fakes-matchedSF1.txt"
-##fakes_matched2_.*
-#incl_mcfkaes_SF2F      : + ; IncludeMca="susy-sos/mca-includes/2017/2los_semiddbkg/step2/mca-2los-fakes-matchedSF2.txt"
-###fakes_matchedBoth_.*
-#incl_mcfkaes_SFBoth    : + ; IncludeMca="susy-sos/mca-includes/2017/2los_semiddbkg/step2/mca-2los-fakes-matchedSF1SF2.txt"
-##FRfakes_applmcBoth.*
-#incl_mcfakes_applFRSF_Both: + ; IncludeMca="susy-sos/mca-includes/2017/2los_semiddbkg/step3/mca-2los-fakes-applmcBoth.txt"
-##FRdata_fakes.*
 incl_datafakes         : + ; IncludeMca="susy-sos/mca-includes/2017/2los_semiddbkg/mca-fakes-applData.txt"
 
 

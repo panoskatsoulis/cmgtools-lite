@@ -1,2 +1,0 @@
-ScaleFactor1F: 1.45;AlsoData
-ScaleFactor2F: 1.42;AlsoData

@@ -215,15 +215,6 @@ float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, f
 	if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 		mu1_MC /= dcaDz_MC[year]; mu2_MC /= dcaDz_MC[year];
 	}
-	else{
-		// Third muon efficiency
-		mu3_Data = h_trigEff_mumuMET_muleg_Data[year]->GetBinContent(h_trigEff_mumuMET_muleg_Data[year]->GetXaxis()->FindBin(pt3), h_trigEff_mumuMET_muleg_Data[year]->GetYaxis()->FindBin(eta3));
-		mu3_MC = h_trigEff_mumuMET_muleg_MC[year]->GetBinContent(h_trigEff_mumuMET_muleg_MC[year]->GetXaxis()->FindBin(pt3), h_trigEff_mumuMET_muleg_MC[year]->GetYaxis()->FindBin(eta3));
-		if(mu3_Data==0) {mu3_Data=1.0;}; if(mu3_MC==0) {mu3_MC=1.0;}; //Fix empty bins in histos
-		if(year == 2016){ //Eliminate the DCA efficiency within the muleg
-			mu3_Data /= dcaDz_Data[year];
-			mu3_MC /= dcaDz_MC[year];
-		}
 
 	if(choose_leptons==12){
 		d12_MC = dcaDzleg_MC(year, _eta1, _eta2);
