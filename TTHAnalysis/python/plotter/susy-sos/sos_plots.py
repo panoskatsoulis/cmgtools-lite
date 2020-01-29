@@ -35,7 +35,7 @@ conf="%s_%s_%s"%(args.lep,args.reg,args.bin)
 
 if YEAR not in ("2016","2017","2018"): raise RuntimeError("Unknown year: Please choose '2016', '2017' or '2018'")
 if args.lep not in ["2los","3l"]: raise RuntimeError("Unknown choice for LEP option. Please check help" )
-if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss",'cr_ss_1F_NoSF', 'cr_ss_2F_NoSF', 'cr_ss_2F_SF2', 'cr_ss_1F_SF1', 'cr_ss_dd', 'cr_ss_semidd',"cr_wz", "appl","appl_1F_NoSF", "appl_2F_NoSF","appl_3F_NoSF",'appl_1F_SF1F', 'appl_2F_SF2F',"appl_3F_SF3F",  "appl_col",  'appl_col_1F_NoSF', 'appl_col_2F_NoSF', 'sr_semidd','sr_dd', 'sr_col_semidd', 'sr_col_dd', 'sr_3l_semidd', 'sr_closure', 'closure_norm']: raise RuntimeError("Unknown choice for REG option. Please check help." )
+if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss","cr_ss_1F_NoSF", "cr_ss_2F_NoSF", "cr_ss_2F_SF2", "cr_ss_1F_SF1", "cr_ss_dd", "cr_ss_semidd","cr_wz", "appl","appl_1F_NoSF", "appl_2F_NoSF","appl_3F_NoSF","appl_1F_SF1F", "appl_2F_SF2F","appl_3F_SF3F",  "appl_col",  "appl_col_1F_NoSF", "appl_col_2F_NoSF", "sr_semidd","sr_dd", "sr_col_semidd", "sr_col_dd", "sr_3l_semidd", "sr_closure", "closure_norm"]: raise RuntimeError("Unknown choice for REG option. Please check help." )
 if args.bin not in ["min", "low", "med", "high"]: raise RuntimeError("Unknown choice for BIN option. Please check help." )
 if args.doWhat not in ["plots", "cards"]: raise RuntimeError("Unknown choice for DOWHAT option. Please check help." ) # More options to be added
 if args.signalMasses and args.doWhat != "cards": print "Option SIGNALMASSES to be used only with the 'cards' option. Ignoring it...\n"
@@ -55,7 +55,7 @@ submit = '{command}'
 
 P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_230819_v5/"
 nCores = 8
-TREESALL = " --Fs /eos/user/v/vtavolar/SusySOS/nanoaods/%s/recleaner/ --FMCs {P}/bTagWeights -P "%(YEAR)+P0+"%s "%(YEAR)
+TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "%(YEAR)+P0+"%s "%(YEAR)
 HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src"
 
 def base(selection):
@@ -273,7 +273,7 @@ def binChoice(x,torun):
     elif '_med' in torun:
         metBinTrig = 'met200'
         metBinInf = 'met200'
-        metBinSup = 'met250' if ( ('2los_' in torun) and ('cr' not in torun) and ('_col' not in torun) ) else '' 
+        metBinSup = 'met250' if ( ('2los_' in torun) and ('_cr' not in torun) and ('_col' not in torun) ) else '' 
         x2 = add(x2,'-X ^mm$ ')
     elif '_high' in torun:
         metBinTrig = 'met250'
@@ -369,7 +369,7 @@ if __name__ == '__main__':
             if '_med' in torun:
                 x = x.replace('-E ^met200$','-E ^met200_CR$')
                 x = add(x,'-X ^pt5sublep$ ')
-            x = add(x,"-X ^mT$ -E ^twoTight$ ")
+            x = add(x,"-X ^mT$")
             x = add(x,"-I ^OS$  ")
             if '1F' in torun:
                 x = add(x, "-E ^1LNT$ -X ^twoTight$" )
