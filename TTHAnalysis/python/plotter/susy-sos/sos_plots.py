@@ -273,7 +273,7 @@ def binChoice(x,torun):
     elif '_med' in torun:
         metBinTrig = 'met200'
         metBinInf = 'met200'
-        metBinSup = 'met250' if ( ('2los_' in torun) and ('cr_' not in torun) and ('_col' not in torun) ) else '' 
+        metBinSup = 'met250' if ( ('2los_' in torun) and ('cr_' not in torun) and ('_col' not in torun) ) else ''
         x2 = add(x2,'-X ^mm$ ')
     elif '_high' in torun:
         metBinTrig = 'met250'
@@ -342,7 +342,7 @@ if __name__ == '__main__':
                 x = add(x, "-E ^2LNT$ -X ^oneNotTight$ --sP SR_2l_ewk")
 
 
-        if 'cr' in torun:
+        if 'cr_' in torun:
             x = add(x, "-X ^SF$ ")
 
         if 'cr_dy' in torun:
