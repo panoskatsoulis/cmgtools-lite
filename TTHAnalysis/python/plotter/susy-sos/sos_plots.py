@@ -74,7 +74,7 @@ def base(selection):
     RATIO= " --maxRatioRange 0.0  1.99 --ratioYNDiv 505 "
     RATIO2=" --showRatio --attachRatioPanel --fixRatioRange "
     LEGEND=" --legendColumns 2 --legendWidth 0.25 "
-    LEGEND2=" --legendFontSize 0.042 "
+    LEGEND2=" --legendFontSize 0.03 "
     SPAM=" --noCms --topSpamSize 1.1 --lspam '#scale[1.1]{#bf{CMS}} #scale[0.9]{#it{Preliminary}}' "
     if args.doWhat == "plots": 
         CORE+=LUMI+RATIO+RATIO2+LEGEND+LEGEND2+SPAM+" --showMCError "
@@ -201,7 +201,7 @@ def modifyAnalysis(plotCmd, study_mods):
         ## general for both scenarios
         regexs.append(" -\P [^ ]* "); targets.append(" -P /eos/user/k/kpanos/sostrees/2018/trees ")
         regexs.append(" \--\Fs [^ ]* "); targets.append(" --Fs {P}/friends ")
-        regexs.append(" *$"); targets.append(" --sP=yields,SR_2l_ewk,lep1pt,lep2pt,mu1pt,mu2pt,met,Jet25") ## other plots htJet25,metovht,PtLep1vsPtLep2,PtMu1vsPtMu2
+        #regexs.append(" *$"); targets.append(" --sP=yields,SR_2l_ewk,lep1pt,lep2pt,mu1pt,mu2pt,met,Jet25") ## other plots htJet25,metovht,PtLep1vsPtLep2,PtMu1vsPtMu2
         regexs.append(" *$"); targets.append(" --xp Fakes_t,Fakes_vv,Convs,Rares") ## include fakes tt and Wj
         # regexs.append(" *$"); targets.append(" --xp Fakes_.*,Convs,Rares")
         ## scenario specific

@@ -1,0 +1,43 @@
+### TT
+prompt_all       : TTJets_DiLepton               : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ;  FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+
+### VV
+#prompt_all      : WJetsToLNu_HT70to100          : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+#prompt_all       : WJetsToLNu_HT100to200         : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG" #FIX ME commented out due to corr friend tree 
+prompt_all       : WJetsToLNu_HT200to400         : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+prompt_all       : WJetsToLNu_HT400to600         : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+prompt_all       : WJetsToLNu_HT600to800         : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+#prompt_all       : WJetsToLNu_HT800to1200        : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG" #FIX ME commented out due to corr friend tree 
+prompt_all       : WJetsToLNu_HT1200to2500       : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+prompt_all       : WJetsToLNu_HT2500toInf        : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+
+#prompt_all      : WZTo2L2Q                      : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+prompt_all       : WZTo3LNu_fxfx                 : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+prompt_all       : WWTo2L2Nu             	: xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+prompt_all       : WWTo2L2Nu                     : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+prompt_all       : ZZTo2L2Nu                     : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+#prompt_all      : VHToNonbb                     : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+#prompt_all      : ZZTo2L2Q                      : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+#prompt_all       : ZZTo4L                        : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG" ## baseline SOS sample
+prompt_all       : ZZTo4L_M1toInf                : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+prompt_all       : WpWpJJ                        : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"
+
+### DY
+prompt_all       : DYJetsToLL_M1to4_HT70to100    : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M1to4_HT100to200   : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M1to4_HT200to400   : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M1to4_HT400to600   : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M1to4_HT600toInf   : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M4to50_HT70to100   : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M4to50_HT100to200  : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M4to50_HT200to400  : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M4to50_HT400to600  : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M4to50_HT600toInf  : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+#prompt_all       : DYJetsToLL_M50_HT70to100     : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M50_HT100to200     : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M50_HT200to400     : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M50_HT400to600     : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M50_HT600to800     : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M50_HT800to1200    : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M50_HT1200to2500   : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?
+prompt_all       : DYJetsToLL_M50_HT2500toInf    : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0        ; FillColor=ROOT.kYellow-3, Label="Prompt BKG"  ##ScaleFactorDY ?

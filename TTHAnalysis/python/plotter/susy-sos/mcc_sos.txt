@@ -10,6 +10,7 @@ LepGood1_(\w+)		: LepGood_\1[iLepFO_Recl[0]]; AlsoData
 LepGood2_(\w+)		: LepGood_\1[iLepFO_Recl[1]]; AlsoData
 LepGood3_(\w+)		: LepGood_\1[iLepFO_Recl[2]]; AlsoData
 LepGood4_(\w+)		: LepGood_\1[iLepFO_Recl[3]]; AlsoData
+JetSel1_(\w+)		: JetSel_\1[iJetSel_Recl[0]]; AlsoData
 nLepGood	: nLepFO_Recl; AlsoData
 nLepTight\b	: nLepTight_Recl; AlsoData
 nTauFO\b	: nTauSel_Recl; AlsoData
@@ -55,3 +56,5 @@ triggerUnc_dn\b : triggerSF_ttH(LepGood_pdgId[iLepFO_Recl[0]],LepGood_pt[iLepFO_
 #LepGood2_mcMatchId\b	: (LepGood_genPartFlav[iLepFO_Recl[1]]==1 || LepGood_genPartFlav[iLepFO_Recl[1]]==15); AlsoData
 #LepGood3_mcMatchId\b	: (LepGood_genPartFlav[iLepFO_Recl[2]]==1 || LepGood_genPartFlav[iLepFO_Recl[2]]==15); AlsoData
 #LepGood4_mcMatchId\b	: (LepGood_genPartFlav[iLepFO_Recl[3]]==1 || LepGood_genPartFlav[iLepFO_Recl[3]]==15); AlsoData
+##### kpanos
+##MLL_sos\b	: mass_2(LepGood1_pt, LepGood1_eta, LepGood1_phi, LepGood1_mass, LepGood2_pt, LepGood2_eta, LepGood2_phi, LepGood2_mass); AlsoData

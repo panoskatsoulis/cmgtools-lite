@@ -1,13 +1,13 @@
 yields         : 1 : 1,-0.5,0.5; XTitle="Total Event Yields"
 #nVert: nVert  : 40,-0.5,41.5; XTitle="N_{vtx}"
 
-SR_2l_ewk      : minMllSFOS         : [1,4,10,20,50] ; XTitle="M(ll) [GeV]", Legend='TR', IncludeOverflows=True, LegendCutoff=1e-3, YMax=500, Logy
-###### SR_2l_ewk      : minMllSFOS         : [4,10,20,30,50] ; XTitle="M(ll) [GeV]", Legend='TR', IncludeOverflows=True, LegendCutoff=1e-3, Logy, YMax=120
+SR_2l_ewk      : minMllSFOS_Recl         : [1,4,10,20,50] ; XTitle="M(ll) [GeV]", Legend='TR', IncludeOverflows=True, LegendCutoff=1e-3, YMax=500, Logy
+###### SR_2l_ewk      : minMllSFOS_Recl         : [4,10,20,30,50] ; XTitle="M(ll) [GeV]", Legend='TR', IncludeOverflows=True, LegendCutoff=1e-3, Logy, YMax=120
 # SR_2l_col     : LepGood1_pt : [5,12,20,30]    ; XTitle="Leading lepton p_{T} [GeV]", Legend='TR', LegendCutoff=1e-3, MoreY=2.8
 
-SR_2l_ewk_fine  : minMllSFOS         : 20,0,10         ; XTitle="M(ll) [GeV]", Legend='TR', IncludeOverflows=True, LegendCutoff=0, LegendCutoff=1e-3, Logy
-SR_2l_ewk_fine1 : minMllSFOS         : 10,0,50         ; XTitle="M(ll) [GeV]", IncludeOverflows=True, YMin=0.1, YMax=500, Logy
-# SR_2l_ewk_fine2 : minMllSFOS         : 10,0,50         ; XTitle="M(ll) [GeV]", Legend='TR', IncludeOverflows=True, LegendCutoff=0, LegendCutoff=1e-3, YMin=0, YMax=25
+SR_2l_ewk_fine  : minMllSFOS_Recl         : 20,0,10         ; XTitle="M(ll) [GeV]", Legend='TR', IncludeOverflows=True, LegendCutoff=0, LegendCutoff=1e-3, Logy
+SR_2l_ewk_fine1 : minMllSFOS_Recl         : 10,0,50         ; XTitle="M(ll) [GeV]", IncludeOverflows=True, YMin=0.1, YMax=500, Logy
+# SR_2l_ewk_fine2 : minMllSFOS_Recl         : 10,0,50         ; XTitle="M(ll) [GeV]", Legend='TR', IncludeOverflows=True, LegendCutoff=0, LegendCutoff=1e-3, YMin=0, YMax=25
 # SR_2l_col_fine: LepGood1_pt : 20,0,40         ; XTitle="Leading lepton p_{T} [GeV]", Legend='TR', LegendCutoff=1e-2
 
 ###### ## Lepton variables
@@ -80,8 +80,8 @@ SR_2l_ewk_fine1 : minMllSFOS         : 10,0,50         ; XTitle="M(ll) [GeV]", I
 ###### #lep2_mcMatchID : LepGood2_mcMatchId      : 30, 0, 30 ; XTitle="mcMatchID lep2"
 ###### #lep1_genPartFlav : LepGood1_genPartFlav : 30, 0,30; XTitle="Gen Part Flavor lep1"
 ###### #lep2_genPartFlav : LepGood2_genPartFlav : 30, 0,30; XTitle="Gen Part Flavor lep2"
-###### mll          : minMllSFOS         : 12,0,120 ; XTitle="M(ll) [GeV]", Legend='TL', LegendCutoff=0
-###### #fine_mll_50  : minMllSFOS: 23,4,50; XTitle="M(ll) [GeV]",LegendCutoff=1e-10
+###### mll          : minMllSFOS_Recl         : 12,0,120 ; XTitle="M(ll) [GeV]", Legend='TL', LegendCutoff=0
+###### #fine_mll_50  : minMllSFOS_Recl: 23,4,50; XTitle="M(ll) [GeV]",LegendCutoff=1e-10
 ###### met           : MET_pt  : 18,0,450;  XTitle="p_{T}^{miss}  [GeV]", LegendCutoff=1e-3,Legend='TR' 
 ###### metmm         : metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi): 14,100,450;  XTitle="p_{T}^{miss\,corr}  [GeV]"
 ###### mtautau       : mass_tautau(MET_pt,MET_phi,LepGood1_pt,LepGood1_eta,LepGood1_phi,LepGood2_pt,LepGood2_eta,LepGood2_phi): 26,-10,250; XTitle="m(#tau#tau) [GeV]", Logy

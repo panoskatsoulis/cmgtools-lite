@@ -8,11 +8,11 @@ eventFilters_18	: $DATA{EventFilters18} $MC{1}	; Disable=True
 dilep		: nLepGood == 2
 sublepPt	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 3.5) || (fabs(LepGood2_pdgId)==11 && LepGood2_pt > 5)
 
-mll		: minMllSFOS > 4 && minMllSFOS < 50
-## mll		: minMllSFOS > 4 && minMllSFOS < 50
-## mll		: minMllSFOS > 4 && minMllSFOS < 20
-jpsiVeto	: minMllSFOS < 2.5 || minMllSFOS > 3.5
-upsilonVeto	: minMllSFOS < 9 || minMllSFOS > 10.5
+mll		: minMllSFOS_Recl > 1 && minMllSFOS_Recl < 50
+## mll		: minMllSFOS_Recl > 4 && minMllSFOS_Recl < 50
+## mll		: minMllSFOS_Recl > 4 && minMllSFOS_Recl < 20
+jpsiVeto	: minMllSFOS_Recl < 2.5 || minMllSFOS_Recl > 3.5
+upsilonVeto	: minMllSFOS_Recl < 9 || minMllSFOS_Recl > 10.5
 dilepPt		: pt_2(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi) > 3 
 
 ISRjet		: Jet1_jetId >= 4
