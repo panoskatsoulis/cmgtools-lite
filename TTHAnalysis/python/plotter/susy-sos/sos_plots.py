@@ -532,7 +532,7 @@ if __name__ == '__main__':
     ans = ''
     if args.run_cmd: ans = 'y'
     while not (ans in ['y','n']):
-        print("Want to execute it? [y/n]", end=''); ans = raw_input();
+        print "Want to execute it? [y/n]"; ans = raw_input();
     exit_code = 0
     if ans == 'y':
         exit_code = os.system(plottingCmd) ## in case the code will be needed in the future
