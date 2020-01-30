@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import print_function
 import sys
 import re
 import os
@@ -48,7 +47,7 @@ if args.lep not in ["2los","3l"]: raise RuntimeError("Unknown choice for LEP opt
 if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss","cr_ss_1F_NoSF", "cr_ss_2F_NoSF", "cr_ss_2F_SF2", "cr_ss_1F_SF1", "cr_ss_dd", "cr_ss_semidd","cr_wz", "appl","appl_1F_NoSF", "appl_2F_NoSF","appl_3F_NoSF","appl_1F_SF1F", "appl_2F_SF2F","appl_3F_SF3F",  "appl_col",  "appl_col_1F_NoSF", "appl_col_2F_NoSF", "sr_semidd","sr_dd", "sr_col_semidd", "sr_col_dd", "sr_3l_semidd", "sr_closure", "closure_norm"]: raise RuntimeError("Unknown choice for REG option. Please check help." )
 if args.bin not in ["min", "low", "med", "high"]: raise RuntimeError("Unknown choice for BIN option. Please check help." )
 if args.doWhat not in ["plots", "cards"]: raise RuntimeError("Unknown choice for DOWHAT option. Please check help." ) # More options to be added
-if args.signalMasses and args.doWhat != "cards": print("Option SIGNALMASSES to be used only with the 'cards' option. Ignoring it...\n")
+if args.signalMasses and args.doWhat != "cards": print "Option SIGNALMASSES to be used only with the 'cards' option. Ignoring it...\n"
 
 lumis = {
 '2016': '35.9', # '33.2' for low MET
@@ -261,7 +260,7 @@ def runIt(GO,name):
         prepareRunner("%s_%s"%(name,YEAR),ret)
         prepareWrapper("%s_%s"%(name,YEAR))    
 
-    print(name+"\n")
+    print name+"\n"
     if args.doWhat == "plots":
         return submit.format(command=' '.join(['python mcPlots.py',"--pdir %s/%s/%s"%(ODIR,YEAR,name),GO,' '.join(['--sP %s'%p for p in (args.inPlots.split(",") if args.inPlots is not None else []) ]),' '.join(['--xP %s'%p for p in (args.exPlots.split(",") if args.exPlots is not None else []) ])]))
     if args.doWhat == "cards":
@@ -347,13 +346,13 @@ def modifyAnalysis(plotCmd, study_mods):
 
     ## printing section
     if study_mods[2]:
-        print("--"*80)
-        print(moddedCmd)
-        print("Changes to be applied:")
+        print "--"*80
+        print moddedCmd
+        print "Changes to be applied:"
         for regex,target in zip(regexs, targets):
             match = re.search(regex, moddedCmd)
-            print(match.group(0), "----------->", match.expand(target))
-        print("--"*80)
+            print match.group(0), "----------->", match.expand(target)
+        print "--"*80
 
     ## apply the changes
     for regex,target in zip(regexs, targets):
@@ -519,14 +518,14 @@ if __name__ == '__main__':
 
     ## Check if modifications have been requested and apply them
     if len(args.studyScenarioPrint) > 0:
-        print("A study has been selected:", args.studyScenarioPrint[0])
+        print "A study has been selected:", args.studyScenarioPrint[0]
         if len(args.studyScenarioPrint) < 2: # if scenario has not been given, use 'sos'
             args.studyScenarioPrint.append('sos')
         plottingCmd = modifyAnalysis(unmodSosCmd, args.studyScenarioPrint)
     else:
-        print("Unmodified SOS analysis has been requested.")
+        print "Unmodified SOS analysis has been requested."
         plottingCmd = unmodSosCmd
-    print(plottingCmd)
+    print plottingCmd
 
     ## Run the command if the user accept it
     if args.dontrun: quit(0)
