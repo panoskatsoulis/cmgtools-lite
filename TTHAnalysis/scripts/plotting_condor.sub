@@ -1,0 +1,31 @@
+##### BEGIN condor submit file
+Executable = $ENV(CMSSW_BASE)/src/CMGTools/TTHAnalysis/scripts/makePlots_condor.sh
+Universe   = vanilla
+Error      = plotting_logs/plotting_$(reg)_$(bin)_$(scenario).err
+Output     = plotting_logs/plotting_$(reg)_$(bin)_$(scenario).out
+Log        = plotting_logs/plotting_$(reg)_$(bin)_$(scenario).log
+
+use_x509userproxy = $ENV(X509_USER_PROXY)
+getenv = True
+request_memory = 2000
+on_exit_remove = (ExitBySignal == False) && (ExitCode == 0)
++MaxRuntime = 14400
+
+Arguments = $(reg) $(bin) $(data) /eos/user/k/kpanos/www/SOS/tests/test_plots2018/plotting/presentation/$(dir) $(scenario)
+
+Queue reg, bin, data, dir, scenario from (
+## Original Scenario
+sr, low, off, Original, sos
+sr, med, off, Original, sos
+cr_dy, low, --data, Original, sos
+cr_dy, med, --data, Original, sos
+cr_tt, low, --data, Original, sos
+cr_tt, med, --data, Original, sos
+## Alternative Scenario
+sr, low, off, Alternative, alt
+sr, med, off, Alternative, alt
+cr_dy, low, --data, Alternative, alt
+cr_dy, med, --data, Alternative, alt
+cr_tt, low, --data, Alternative, alt
+cr_tt, med, --data, Alternative, alt
+)

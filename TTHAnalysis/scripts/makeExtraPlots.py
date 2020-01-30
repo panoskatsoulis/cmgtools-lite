@@ -5,7 +5,8 @@ from collections import OrderedDict
 from array import array
 
 ##------> Plots
-knownFuncs = ['SigVsMassPoints','OptimizeMu2PtCut']
+knownFuncs = ['SigVsMassPoints','OptimizeMu2PtCut','diffSig_vs_PtMu2','diffSig_vs_MLL']
+newPlots = ['diffSig_vs_PtMu2','diffSig_vs_MLL']
 
 ##------> Parser
 parser = argparse.ArgumentParser(description='Make Analysis Plots. Known Functions: '+', '.join(knownFuncs))
@@ -274,6 +275,8 @@ def OptimizeMu2PtCut(dirs):
 
     return
 
+from CMGTools.TTHAnalysis.kpanosModules.diffSig_vs_PtMu2 import diffSig_vs_PtMu2
+from CMGTools.TTHAnalysis.kpanosModules.diffSig_vs_MLL import diffSig_vs_MLL
 
 ##------> Main functionality
 if __name__ == "__main__":
@@ -307,9 +310,22 @@ if __name__ == "__main__":
         try:
             if not plot in knownFuncs:
                 raise RuntimeError("Unknown code has been asked to run.")
-            exec(plot+'(files)')
+            if plot in newPlots:
+                exec(plot+'(files,args)')
+            else:
+                exec(plot+'(files)')
         except Exception as err:
             print("Plotting failure has been caught. Plot:", plot)
             print("Exception caught:", err)
+
+    ## print the command ran into a file
+    if args.outDir:
+        command = ""
+        for arg in sys.argv:
+            command += ' '+arg
+        cmd_file = open("/eos/home-k/kpanos/www/{}/command.txt".format(args.outDir),"w+")
+        cmd_file.write("Command:\n")
+        cmd_file.write(command)
+        cmd_file.close()
 
     quit(0)

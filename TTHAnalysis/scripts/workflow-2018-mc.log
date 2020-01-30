@@ -1,0 +1,101 @@
+The flag --force-rm has been issued.
+Removing /eos/user/k/kpanos/sostrees/2018/cr-DYandTT-issue/friends/2018/mcFTreesReprod2018-21Oct2019 ...Done
+Removing /afs/cern.ch/work/k/kpanos/Projects/SOS_data2018_SingleMuonTrigger/CMSSW_10_4_0/src/mcFTreesReprod2018 ...Done
+/afs/cern.ch/work/k/kpanos/Projects/SOS_data2018_SingleMuonTrigger/CMSSW_10_4_0/src/mcFTreesReprod2018
+Submitting job(s)...........
+11 job(s) submitted to cluster 2655045.
+Will use the nanoAOD postprocessor
+   TTJets_DiLepton.root   MC  11 chunks (5188636 events)
+
+
+I have 11 task(s) to process
+Saved condor submit file to condor.sub
+Running: condor_submit condor.sub -batch-name 'mcFTreesReprod2018-jetcorrs'
+ls: cannot access jetmetUncertainties_chunks/*.root: No such file or directory
+jobs_logs=11, jobs_finished=0, root_files=0
+logs = finished : 0
+logs = files    : 0
+logs > files    : 1
+Jobs are still running, failed jobs 0
+jobs_logs=11, jobs_finished=1, root_files=11
+logs = finished : 0
+logs = files    : 1
+logs > files    : 0
+Jobs are still running, failed jobs 0
+jobs_logs=11, jobs_finished=3, root_files=11
+logs = finished : 0
+logs = files    : 1
+logs > files    : 0
+Jobs are still running, failed jobs 0
+jobs_logs=11, jobs_finished=10, root_files=11
+logs = finished : 0
+logs = files    : 1
+logs > files    : 0
+Jobs are still running, failed jobs 0
+jobs_logs=11, jobs_finished=11, root_files=11
+logs = finished : 1
+logs = files    : 1
+logs > files    : 0
+true is: (( logs == finished-jobs )) && (( logs == root-files ))
+hadd Target file: /eos/user/k/kpanos/sostrees/2018/cr-DYandTT-issue/friends/2018/mcFTreesReprod2018-21Oct2019/jetmetUncertainties_hadd/TTJets_DiLepton_Friend.root
+hadd compression setting for all ouput: 103
+hadd Source file 1: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk0.root
+hadd Source file 2: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk1.root
+hadd Source file 3: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk10.root
+hadd Source file 4: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk2.root
+hadd Source file 5: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk3.root
+hadd Source file 6: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk4.root
+hadd Source file 7: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk5.root
+hadd Source file 8: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk6.root
+hadd Source file 9: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk7.root
+hadd Source file 10: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk8.root
+hadd Source file 11: jetmetUncertainties_chunks/TTJets_DiLepton_Friend.chunk9.root
+hadd Target path: /eos/user/k/kpanos/sostrees/2018/cr-DYandTT-issue/friends/2018/mcFTreesReprod2018-21Oct2019/jetmetUncertainties_hadd/TTJets_DiLepton_Friend.root:/
+Files (1) in the directory /eos/user/k/kpanos/sostrees/2018/cr-DYandTT-issue/friends/2018/mcFTreesReprod2018-21Oct2019/jetmetUncertainties_hadd:
+TTJets_DiLepton_Friend.root
+Submitting job(s)...........
+11 job(s) submitted to cluster 2655301.
+Will use the nanoAOD postprocessor
+   TTJets_DiLepton.root   MC  11 chunks (5188636 events)
+
+
+I have 11 task(s) to process
+Saved condor submit file to condor.sub
+Running: condor_submit condor.sub -batch-name 'mcFTreesReprod2018'
+ls: cannot access friends_chunks/*.root: No such file or directory
+jobs_logs=11, jobs_finished=0, root_files=0
+logs = finished : 0
+logs = files    : 0
+logs > files    : 1
+Jobs are still running, failed jobs 0
+jobs_logs=11, jobs_finished=0, root_files=11
+logs = finished : 0
+logs = files    : 1
+logs > files    : 0
+Jobs are still running, failed jobs 0
+jobs_logs=11, jobs_finished=3, root_files=11
+logs = finished : 0
+logs = files    : 1
+logs > files    : 0
+Jobs are still running, failed jobs 0
+jobs_logs=11, jobs_finished=11, root_files=11
+logs = finished : 1
+logs = files    : 1
+logs > files    : 0
+true is: (( logs == finished-jobs )) && (( logs == root-files ))
+hadd Target file: /eos/user/k/kpanos/sostrees/2018/cr-DYandTT-issue/friends/2018/mcFTreesReprod2018-21Oct2019/friends_hadd/TTJets_DiLepton_Friend.root
+hadd compression setting for all ouput: 103
+hadd Source file 1: friends_chunks/TTJets_DiLepton_Friend.chunk0.root
+hadd Source file 2: friends_chunks/TTJets_DiLepton_Friend.chunk1.root
+hadd Source file 3: friends_chunks/TTJets_DiLepton_Friend.chunk10.root
+hadd Source file 4: friends_chunks/TTJets_DiLepton_Friend.chunk2.root
+hadd Source file 5: friends_chunks/TTJets_DiLepton_Friend.chunk3.root
+hadd Source file 6: friends_chunks/TTJets_DiLepton_Friend.chunk4.root
+hadd Source file 7: friends_chunks/TTJets_DiLepton_Friend.chunk5.root
+hadd Source file 8: friends_chunks/TTJets_DiLepton_Friend.chunk6.root
+hadd Source file 9: friends_chunks/TTJets_DiLepton_Friend.chunk7.root
+hadd Source file 10: friends_chunks/TTJets_DiLepton_Friend.chunk8.root
+hadd Source file 11: friends_chunks/TTJets_DiLepton_Friend.chunk9.root
+hadd Target path: /eos/user/k/kpanos/sostrees/2018/cr-DYandTT-issue/friends/2018/mcFTreesReprod2018-21Oct2019/friends_hadd/TTJets_DiLepton_Friend.root:/
+/afs/cern.ch/user/k/kpanos/work/Projects/SOS_data2018_SingleMuonTrigger/CMSSW_10_4_0/src/CMGTools/TTHAnalysis/scripts
+Done

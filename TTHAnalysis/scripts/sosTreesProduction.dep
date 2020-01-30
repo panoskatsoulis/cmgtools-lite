@@ -1,8 +1,8 @@
 #!/bin/bash
 
 function do_treeProd_help() {
-    printf "Usage: $(basename $0) --task <task-name> --type <data/mc> --year <year> -in <cfg.py> -out <dir> [...]                  (Full Production Mode)
-Usage: $(basename $0) --friends-only --task <task-name> --type <data/mc> --year <year> -in <trees-dir> -out <dir> [...] (Friends Only Mode)
+    printf "Usage: $(basename $0) --task <task-name> --type <data/mc> --year <year> -in <cfg.py> -out <dir> [...]                     (Full Production Mode)
+Usage: $(basename $0) --friends-only --task <task-name> --type <data/mc> --year <year> -in <trees-dir> -out <dir> [...]   (Friends Only Mode)
 Options:
     --task <arg>         : Task name
     --type <arg>         : data/mc, configs the recleaner
@@ -14,8 +14,8 @@ Options:
     --dataset <arg>      : RegEx to specify a collection of datasets to process
     --friends-only       : Enables the Friends Only mode
     --skip-jetCorrs      : Skips the calculation of the jetMetCorrections,
-                           one needs to setup correctly the 'input' argument
-                           {one (1) level above the jetmet directory}
+                           the friend tree with the jetCorrs must be under the directory
+                           <OUT_PATH>/jetmetUncertainties_hadd
     --force-rm           : Forces to remove <out-dir> and <src/task_name> (if exist)
     --debug              : Runs 'set -x' (super verbosive)
 "
