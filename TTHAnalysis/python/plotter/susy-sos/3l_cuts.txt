@@ -55,3 +55,6 @@ CRWZPtLep_HighMET	: ( (fabs(LepGood1_pdgId) ==13 || fabs(LepGood1_pdgId) ==11) &
 #### Application Region
 ### Disable threeTight cut
 oneNotTight	: !LepGood1_isLepTight || !LepGood2_isLepTight || !LepGood3_isLepTight	; Disable=True
+1LNT            : LepGood1_isLepTight+LepGood2_isLepTight+LepGood3_isLepTight==2  ;  Disable=True
+2LNT            : LepGood1_isLepTight+LepGood2_isLepTight+LepGood3_isLepTight==1 ; Disable=True
+3LNT            : LepGood1_isLepTight+LepGood2_isLepTight+LepGood3_isLepTight==0 ; Disable=True 

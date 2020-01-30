@@ -80,12 +80,13 @@ CRVVlepId	: LepGood1_isTightLepVV && LepGood2_isTightLepVV	; Disable=True
 CRVVleplepPt	: 20.0 < LepGood1_pt	; Disable=True
 CRVVbveto		: nBJetLoose25_Recl == 0; Disable=True
 CRVVmT		: mt_2(LepGood1_pt, LepGood1_phi, MET_pt, MET_phi) > 90. || mt_2(LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 90.0	; Disable=True
-
+CRVVbveto		: nBJetLoose25_Recl == 0; Disable=True
 
 ##### SS CR
 ### Disable pt5sublep, mT
 ### Invert OS
-
+1LNT : LepGood1_isLepTight+LepGood2_isLepTight==1 ; Disable=True
+2LNT : LepGood1_isLepTight+LepGood2_isLepTight==0; Disable=True
 
 #### Application Region
 ### Disable twoTight cut

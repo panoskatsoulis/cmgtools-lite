@@ -5,7 +5,7 @@ import os
 import argparse
 
 helpText = "LEP = '2los', '3los'\n\
-REG = 'sr', 'sr_col', 'cr_dy', 'cr_tt', 'cr_vv', 'cr_ss', 'cr_wz', 'appl', 'appl_col'\n\
+REG = 'sr', 'sr_col', 'cr_dy', 'cr_tt', 'cr_vv', 'cr_ss','cr_wz', 'appl', 'appl_col', 'cr_ss_1F_NoSF', 'cr_ss_2F_NoSF', 'cr_ss_2F_SF2', 'cr_ss_1F_SF1', 'cr_ss_dd', 'cr_ss_semidd', 'appl_1F_NoSF','appl_2F_NoSF', 'appl_1F_SF1F', 'appl_2F_SF2F','sr_semidd','sr_dd', 'appl_col_1F_NoSF', 'appl_col_2F_NoSF', 'sr_col_semidd', 'sr_col_dd', 'sr_3l_semidd', 'sr_closure', 'closure_norm'\n\
 BIN = 'min', 'low', 'med', 'high'"
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                  epilog=helpText)
@@ -35,7 +35,7 @@ conf="%s_%s_%s"%(args.lep,args.reg,args.bin)
 
 if YEAR not in ("2016","2017","2018"): raise RuntimeError("Unknown year: Please choose '2016', '2017' or '2018'")
 if args.lep not in ["2los","3l"]: raise RuntimeError("Unknown choice for LEP option. Please check help" )
-if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss", "cr_wz", "appl", "appl_col"]: raise RuntimeError("Unknown choice for REG option. Please check help." )
+if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss","cr_ss_1F_NoSF", "cr_ss_2F_NoSF", "cr_ss_2F_SF2", "cr_ss_1F_SF1", "cr_ss_dd", "cr_ss_semidd","cr_wz", "appl","appl_1F_NoSF", "appl_2F_NoSF","appl_3F_NoSF","appl_1F_SF1F", "appl_2F_SF2F","appl_3F_SF3F",  "appl_col",  "appl_col_1F_NoSF", "appl_col_2F_NoSF", "sr_semidd","sr_dd", "sr_col_semidd", "sr_col_dd", "sr_3l_semidd", "sr_closure", "closure_norm"]: raise RuntimeError("Unknown choice for REG option. Please check help." )
 if args.bin not in ["min", "low", "med", "high"]: raise RuntimeError("Unknown choice for BIN option. Please check help." )
 if args.doWhat not in ["plots", "cards"]: raise RuntimeError("Unknown choice for DOWHAT option. Please check help." ) # More options to be added
 if args.signalMasses and args.doWhat != "cards": print "Option SIGNALMASSES to be used only with the 'cards' option. Ignoring it...\n"
@@ -55,12 +55,16 @@ submit = '{command}'
 
 P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_230819_v5/"
 nCores = 8
-TREESALL = " --Fs {P}/recleaner --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR,)
+TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "%(YEAR)+P0+"%s "%(YEAR)
 HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src"
 
 def base(selection):
     CORE=TREESALL
     CORE+=" -f -j %d --split-factor=-1 --year %s --s2v -L susy-sos/functionsSOS.cc -L susy-sos/functionsSF.cc --tree NanoAOD --mcc susy-sos/mcc_sos.txt --mcc susy-sos/mcc_triggerdefs.txt "%(nCores,YEAR) # --neg"
+    if  args.reg=="cr_ss_dd"or args.reg=='cr_ss_semidd'  or args.reg=='cr_ss_1F_SF1' or args.reg=='cr_ss_2F_SF2': CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt"%(YEAR,args.lep)
+    if args.reg=="appl_1F_SF1F" or args.reg=="appl_2F_SF2F" or args.reg=="sr_semidd" or args.reg=='sr_closure' or args.reg=='closure_norm': CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt"%(YEAR,args.lep,args.bin)
+    if args.reg=="sr_col_semidd": CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_col_%s.txt"%(YEAR,args.lep,args.bin)
+    if args.reg=="sr_3l_semidd" : CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s.txt"%(YEAR,args.lep,args.bin)
     if YEAR == "2017": CORE += " --mcc susy-sos/mcc_METFixEE2017.txt "
     RATIO= " --maxRatioRange 0.0  1.99 --ratioYNDiv 505 "
     RATIO2=" --showRatio --attachRatioPanel --fixRatioRange "
@@ -83,7 +87,7 @@ def base(selection):
          wBG = " 'puWeight*eventBTagSF*triggerSF(muDleg_SF(%s,LepGood1_pt,LepGood1_eta,LepGood2_pt,LepGood2_eta), MET_pt, metmm_pt(LepGood1_pdgId,LepGood1_pt,LepGood1_phi,LepGood2_pdgId,LepGood2_pt,LepGood2_phi,MET_pt,MET_phi), %s)*lepSF(LepGood1_pt,LepGood1_eta,LepGood1_pdgId,%s)*lepSF(LepGood2_pt,LepGood2_eta,LepGood2_pdgId,%s)' "%(YEAR,YEAR,YEAR,YEAR)
          GO="%s -W %s"%(GO,wBG)
 
-         if args.doWhat == "plots": GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.52 ")
+         if args.doWhat == "plots": GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.62 ")
          if args.doWhat == "plots": GO=GO.replace(RATIO,  " --maxRatioRange 0.6  1.99 --ratioYNDiv 210 ")
          if args.doWhat == "cards":         
              GO += " --binname %s "%args.bin
@@ -304,6 +308,16 @@ if __name__ == '__main__':
                 if '_high' in torun: 
                      x = add(x,"-X ^pt5sublep$ ")
                      x = x.replace('-E ^met250$','-E ^met300_col$')
+            if '_semidd' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-semidd.txt'%(YEAR))
+            if '_dd' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-dd.txt'%(YEAR))
+            if '_closure' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-closure.txt'%(YEAR))
+                x = add(x, "--plotmode=%s"%("nostack"))
+            if '_closure_norm' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-closure.txt'%(YEAR))
+                x = add(x, "--plotmode=%s"%("norm"))
 
         if 'appl' in torun:
             if '_col' in torun:
@@ -316,6 +330,17 @@ if __name__ == '__main__':
                     x = x.replace('-E ^met250$','-E ^met300_col$')
             x = add(x,"-X ^twoTight$ ")
             x = add(x,"-E ^oneNotTight$ ")
+            if '1F_NoSF' in torun:
+                x = add(x, "-E ^1LNT$ -X ^oneNotTight$")
+            elif '2F_NoSF' in torun:
+                x = add(x, "-E ^2LNT$ -X ^oneNotTight$")
+            elif '1F_SF1F' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-1F.txt'%(YEAR))
+                x = add(x, " -E ^1LNT$ -X ^oneNotTight$ --sP SR_2l_ewk")
+            elif '2F_SF2F' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-2F.txt'%(YEAR))
+                x = add(x, "-E ^2LNT$ -X ^oneNotTight$ --sP SR_2l_ewk")
+
 
         if 'cr_' in torun:
             x = add(x, "-X ^SF$ ")
@@ -344,16 +369,50 @@ if __name__ == '__main__':
             if '_med' in torun:
                 x = x.replace('-E ^met200$','-E ^met200_CR$')
                 x = add(x,'-X ^pt5sublep$ ')
-            x = add(x,"-X ^mT$ ")
-            x = add(x,"-I ^OS$ ")
+            x = add(x,"-X ^mT$")
+            x = add(x,"-I ^OS$  ")
+            if '1F' in torun:
+                x = add(x, "-E ^1LNT$ -X ^twoTight$" )
+            elif '2F' in torun:
+                x = add(x, "-E ^2LNT$ -X ^twoTight$" )    
+            elif '_1F_SF1' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-1F.txt'%(YEAR))
+                x = add(x, "-E ^1LNT$ -X ^twoTight$" )
+            elif '_2F_SF2' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-2F.txt'%(YEAR))
+                x = add(x, "-E ^2LNT$ -X ^twoTight$")
+            elif '_dd' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-dd.txt'%(YEAR))
+                x = add(x, "--sP SR_2l_ewk --sP lep1pt")
+            elif '_semidd' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-semidd.txt'%(YEAR))
+                x = add(x, "--sP SR_2l_ewk --sP lep1pt")
 
     elif '3l_' in torun:
         x = base('3l')
         x = binChoice(x,torun)
-    
+        if '_dd' in torun:
+                x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-dd.txt'%(YEAR))    
+        if '_semidd' in torun:
+                x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-semidd.txt'%(YEAR))    
+
         if 'appl' in torun:
             x = add(x,"-X ^threeTight$ ")
             x = add(x,"-E ^oneNotTight$ ")
+            if '1F_NoSF' in torun:
+                x = add(x, "-E ^1LNT$ -X ^oneNotTight$ --sP yields")
+            elif '2F_NoSF' in torun:
+                x = add(x, "-E ^2LNT$ -X ^oneNotTight$ --sP yields")
+            elif '3F_NoSF' in torun:
+                x = add(x, "-E ^3LNT$ -X ^oneNotTight$ --sP yields")
+            if '1F_SF1F' in torun:
+                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-1F.txt'%(YEAR))
+                x = add(x, "-E ^1LNT$ -X ^oneNotTight$ --sP SR_3l")
+            elif '2F_SF2F' in torun:
+                 x= add(x, " --xp fakes_matched1.* --xp fakes_matched3.* --xp Fakes.* --xp fakes_matchedAll.* -E ^2LNT$ -X ^oneNotTight$ --sP SR_3l")
+            elif '3F_SF3F' in torun:
+                 x= add(x, " --xp fakes_matched1.* --xp fakes_matched2.* --xp Fakes.* --xp fakes_matchedAll.* -E ^3LNT$ -X ^oneNotTight$ --sP SR_3l")
+
 
         if 'cr_wz' in torun:
             x = add(x,"-X ^minMll$ -X ^ZvetoTrigger$ -X ^ledlepPt$ -X ^threeTight$ -X ^pt5sublep$ ")
