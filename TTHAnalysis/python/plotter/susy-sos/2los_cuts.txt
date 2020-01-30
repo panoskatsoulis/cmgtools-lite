@@ -71,7 +71,7 @@ CRDYledlepPt	: 20.0 < LepGood1_pt	; Disable=True
 ### Disable ledlepPt, twoTight, bveto, mT
 CRTTlepId	: LepGood1_isTightLepTT && LepGood2_isTightLepTT	; Disable=True
 CRTTledlepPt	: 5.0 < LepGood1_pt	; Disable=True
-btag		: nBJetLoose40 > 0	; Disable=True
+btag		: nBJetMedium40 > 0	; Disable=True
 
 
 ##### VV CR
