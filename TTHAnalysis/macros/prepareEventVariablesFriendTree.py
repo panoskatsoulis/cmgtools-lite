@@ -391,7 +391,6 @@ Error      = {logdir}/err.$(cluster).$(Dataset).$({chunk})
 Output     = {logdir}/out.$(cluster).$(Dataset).$({chunk})
 Log        = {logdir}/log.$(cluster).$(Dataset).$({chunk})
 
-use_x509userproxy = $ENV(X509_USER_PROXY)
 getenv = True
 request_memory = 2000
 on_exit_remove = (ExitBySignal == False) && (ExitCode == 0)
@@ -399,6 +398,8 @@ on_exit_remove = (ExitBySignal == False) && (ExitCode == 0)
 {accounting_group}
 """.format(runner = options.runner, logdir = logdir, maxruntime = options.maxruntime * 60, chunk = chunk,
            accounting_group = '+AccountingGroup = "%s"'%options.accounting_group if options.accounting_group else ''))
+#use_x509userproxy = $ENV(X509_USER_PROXY)
+
 if options.queue:
     runner = ""
     super = ""

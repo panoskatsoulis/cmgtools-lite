@@ -45,8 +45,17 @@ if year == 2018:
     if analysis == "main":
         mcSamples = byCompName(mcSamples_, [
 
+            ## low Mll Samples
+            # "ZZTo4L_M1toInf",
+            # "VVTo2L2Nu_M1toInf",
+            # "DYJetsToLL_M1to4_HT70to100",
+            # "DYJetsToLL_M1to4_HT100to200",
+            # "DYJetsToLL_M1to4_HT200to400",
+            # "DYJetsToLL_M1to4_HT400to600",
+            # "DYJetsToLL_M1to4_HT600toInf",
+
 ##            "DYJetsToLL_M10to50_LO",
-##            "DYJetsToLL_M50_LO",
+            "DYJetsToLL_M50_LO", # for Tag and Probe studies
 ##            "DYJetsToLL_M50_LO_ext",
 
 
@@ -124,15 +133,28 @@ if year == 2018:
         ])
 
     if analysis == "main":
-        print "ciao"
-######        DatasetsAndTriggers.append( ("DoubleMuon", triggers["mumu_iso"] + triggers["3mu"]) )
-        DatasetsAndTriggers.append( ("DoubleMuon", triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
-        DatasetsAndTriggers.append( ("MET",     triggers["SOS_highMET"] ) )
-        DatasetsAndTriggers.append( ("SingleMuon", triggers["SOS_singleMu"]) )
+##        DatasetsAndTriggers.append( ("DoubleMuon", triggers["mumu_iso"] + triggers["3mu"]) )
+        DatasetsAndTriggers.append( ("DoubleMuon",  triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
+        DatasetsAndTriggers.append( ("MET",         triggers["SOS_highMET"] ) )
+        DatasetsAndTriggers.append( ("EGamma",      triggers["SOS_eleTnP"] ) )
+        DatasetsAndTriggers.append( ("SingleMuon",  triggers["SOS_muTnP"] ) )
+##        DatasetsAndTriggers.append( ("SingleMuon", triggers["1mu_iso"]) ) ##which one?? ##PD SingleMuon o MET?
+##conf db e cercare stream dato il nome del trigger
 
 elif year == 2017:
     mcSamples = byCompName(mcSamples_, [
-        "DYJetsToLL_M10to50_LO_ext"
+
+        ## low Mll Samples
+        # "ZZTo4L_M1toInf",
+        # "VVTo2L2Nu_M1toInf",
+        # "DYJetsToLL_M1to4_HT70to100",
+        # "DYJetsToLL_M1to4_HT100to200",
+        # "DYJetsToLL_M1to4_HT200to400",
+        # "DYJetsToLL_M1to4_HT400to600",
+        # "DYJetsToLL_M1to4_HT600toInf",
+
+        "DYJetsToLL_M50_LO", # for Tag and Probe studies
+        "DYJetsToLL_M10to50_LO_ext,"
 ##        "DYJetsToLL_M50$", "TT(Lep|Semi)_pow", "TTHnobb_pow",
 
         ##main bkgs
@@ -212,10 +234,23 @@ elif year == 2017:
 
     DatasetsAndTriggers.append( ("DoubleMuon", triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
     DatasetsAndTriggers.append( ("MET",     triggers["SOS_highMET"] ) )
+    DatasetsAndTriggers.append( ("SingleElectron",  triggers["SOS_eleTnP"] ) )
+    DatasetsAndTriggers.append( ("SingleMuon",      triggers["SOS_muTnP"] ) )
 
 elif year == 2016:
     mcSamples = byCompName(mcSamples_, [
-        "DYJetsToLL_M10to50_LO$"
+
+        ## low Mll Samples
+        # "ZZTo4L_M1toInf",
+        # "VVTo2L2Nu_M1toInf",
+        # "DYJetsToLL_M1to4_HT70to100",
+        # "DYJetsToLL_M1to4_HT100to200",
+        # "DYJetsToLL_M1to4_HT200to400",
+        # "DYJetsToLL_M1to4_HT400to600",
+        # "DYJetsToLL_M1to4_HT600toInf",
+
+        "DYJetsToLL_M50_LO", # for Tag and Probe studies
+        "DYJetsToLL_M10to50_LO$",
 
         ##main bkgs
         "T_tWch_noFullyHad", #extensions are to be included?
@@ -331,8 +366,10 @@ elif year == 2016:
 
 ###        "DYJetsToLL_M50$", "TT(Lep|Semi)_pow" 
     ])
-    DatasetsAndTriggers.append( ("DoubleMuon", triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
-    DatasetsAndTriggers.append( ("MET",     triggers["SOS_highMET"] ) )
+    DatasetsAndTriggers.append( ("DoubleMuon",      triggers["SOS_doublemulowMET"] + triggers["mumu_iso"] + triggers["3mu"]) )
+    DatasetsAndTriggers.append( ("MET",             triggers["SOS_highMET"] ) )
+    DatasetsAndTriggers.append( ("SingleElectron",  triggers["SOS_eleTnP"] ) )
+    DatasetsAndTriggers.append( ("SingleMuon",      triggers["SOS_muTnP"] ) )
 # make MC
 
 print "mcSamples ",mcSamples
@@ -350,12 +387,12 @@ for pd, triggers in DatasetsAndTriggers:
         dataSamples.append(comp)
     vetoTriggers += triggers[:]
 
-selectedComponents = mcSamples ##+ dataSamples
+selectedComponents = mcSamples + dataSamples
 if getHeppyOption('selectComponents'):
     selectedComponents = byCompName(selectedComponents, getHeppyOption('selectComponents').split(","))
 autoAAA(selectedComponents, quiet=False)##not(getHeppyOption("verboseAAA",False)))
 configureSplittingFromTime(mcSamples,250 if preprocessor else 10,10)
-#configureSplittingFromTime(dataSamples,80 if preprocessor else 10,10)
+configureSplittingFromTime(dataSamples,80 if preprocessor else 10,10)
 selectedComponents, _ = mergeExtensions(selectedComponents)
 
 # create and set preprocessor if requested
@@ -425,7 +462,16 @@ from CMGTools.TTHAnalysis.tools.nanoAOD.susySOS_modules import *
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 
 modules = susySOS_sequence_step1
-cut = susySOS_skim_cut 
+cut = susySOS_skim_cut
+# Switch to Tag and Probe skimming/sequence
+if getHeppyOption("TnP"):
+    collection = getHeppyOption("TnPCollection", "None")
+    if collection == "None":
+        raise RuntimeError("You omitted the TnP collection to run on!")
+    if collection != "Muon" and collection != "Electron":
+        raise RuntimeError("Invalid TnP collection to run on: Should be either 'Muon' or 'Electron'!")
+    modules = susySOS_sequence_TnP(year,collection)
+    cut = susySOS_TnP_cut 
 
 branchsel_in = os.environ['CMSSW_BASE']+"/src/CMGTools/TTHAnalysis/python/tools/nanoAOD/branchsel_in.txt"
 branchsel_out = None
