@@ -151,6 +151,7 @@ float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, floa
 	if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 		mu1_Data /= dcaDz_Data[year]; mu2_Data /= dcaDz_Data[year];
 		mu1_MC /= dcaDz_MC[year]; mu2_MC /= dcaDz_MC[year];
+		if(mu1_Data>1.0) {mu1_Data=1.0;}; if(mu1_MC>1.0) {mu1_MC=1.0;}; if(mu2_Data>1.0) {mu2_Data=1.0;}; if(mu2_MC>1.0) {mu2_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 	}
 
 	if(choose_leptons==12){
@@ -166,6 +167,7 @@ float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, floa
 		if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 			mu3_Data /= dcaDz_Data[year];
 			mu3_MC /= dcaDz_MC[year];
+			if(mu3_Data>1.0) {mu3_Data=1.0;}; if(mu3_MC>1.0) {mu3_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 		}
 
 		if(choose_leptons==13){
@@ -214,6 +216,7 @@ float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, f
 	if(mu1_MC==0) {mu1_MC=1.0;}; if(mu2_MC==0) {mu2_MC=1.0;}; //Fix empty bins in histos
 	if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 		mu1_MC /= dcaDz_MC[year]; mu2_MC /= dcaDz_MC[year];
+		if(mu1_MC>1.0) {mu1_MC=1.0;}; if(mu2_MC>1.0) {mu2_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 	}
 
 	if(choose_leptons==12){
@@ -226,6 +229,7 @@ float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, f
 		if(mu3_MC==0) {mu3_MC=1.0;}; //Fix empty bins in histos
 		if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 			mu3_MC /= dcaDz_MC[year];
+			if(mu3_MC>1.0) {mu3_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 		}
 
 		if(choose_leptons==13){
