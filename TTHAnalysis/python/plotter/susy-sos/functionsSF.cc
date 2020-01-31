@@ -339,6 +339,45 @@ float triggerWZMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
 // LEPTON SCALE FACTORS
 // -------------------------------------------------------------
 
+// Electron Reconstruction SF
+TFile* f_recoSF_Electron_2018 = new TFile(DATA_SF+"/LeptonSF/Electron2018_RecoSFMap.root","read");
+TFile* f_recoSFHighPt_Electron_2017 = new TFile(DATA_SF+"/LeptonSF/Electron2017_RecoHighPtSFMap.root","read");
+TFile* f_recoSFLowPt_Electron_2017 = new TFile(DATA_SF+"/LeptonSF/Electron2017_RecoLowPtSFMap.root","read");
+TFile* f_recoSFHighPt_Electron_2016 = new TFile(DATA_SF+"/LeptonSF/Electron2016_RecoHighPtSFMap.root","read");
+TFile* f_recoSFLowPt_Electron_2016 = new TFile(DATA_SF+"/LeptonSF/Electron2016_RecoLowPtSFMap.root","read");
+
+unordered_map<string, TH2F*> h_recoSF_Electron_SF = {
+	{ "2018",		(TH2F*) f_recoSF_Electron_2018->Get("EGamma_SF2D") },
+	{ "2017High",	(TH2F*) f_recoSFHighPt_Electron_2017->Get("EGamma_SF2D") },
+	{ "2017Low",	(TH2F*) f_recoSFLowPt_Electron_2017->Get("EGamma_SF2D") },
+	{ "2016High",	(TH2F*) f_recoSFHighPt_Electron_2016->Get("EGamma_SF2D") }
+	{ "2016Low",	(TH2F*) f_recoSFLowPt_Electron_2016->Get("EGamma_SF2D") }
+};
+
+unordered_map<string, TH2F*> h_recoSF_Electron_MCEff = {
+	{ "2018",		(TH2F*) f_recoSF_Electron_2018->Get("EGamma_EffMC2D") },
+	{ "2017High",	(TH2F*) f_recoSFHighPt_Electron_2017->Get("EGamma_EffMC2D") },
+	{ "2017Low",	(TH2F*) f_recoSFLowPt_Electron_2017->Get("EGamma_EffMC2D") },
+	{ "2016High",	(TH2F*) f_recoSFHighPt_Electron_2016->Get("EGamma_EffMC2D") }
+	{ "2016Low",	(TH2F*) f_recoSFLowPt_Electron_2016->Get("EGamma_EffMC2D") }
+};
+
+// Muon Tracking SF = 1.0 (Muon POG)
+// Muon Loose ID SF
+TFile* f_looseIDSF_Muon_2018 = new TFile(DATA_SF+"/LeptonSF/Mu_2018_LooseID.root","read");
+TFile* f_looseIDSF_Muon_2017 = new TFile(DATA_SF+"/LeptonSF/Mu_2017_LooseID.root","read");
+TFile* f_looseIDSF_Muon_2016 = new TFile(DATA_SF+"/LeptonSF/Mu_2016_LooseID.root","read"); // ErasBCDEF
+
+unordered_map<int, TH2D*> h_looseIDSF_Muon_SF = {
+	{ 2018, (TH2D*) f_looseIDSF_Muon_2018->Get("NUM_LooseID_DEN_genTracks_pt_abseta") },
+	{ 2017, (TH2D*) f_looseIDSF_Muon_2017->Get("NUM_LooseID_DEN_genTracks_pt_abseta") },
+	{ 2016, (TH2D*) f_looseIDSF_Muon_2016->Get("NUM_LooseID_DEN_genTracks_pt_abseta") } // ErasBCDEF
+};
+
+// Muon Loose ID SF for 2016ErasGH missing (even from POG) --> Small correction 
+// Muon Loose ID MCEff missing (even from POG in 2016)
+
+// SOS Tight ID SF
 TFile* f_lepSF_Electron_2018 = new TFile(DATA_SF+"/LeptonSF/Electron2018_LeptonSFMap.root","read");
 TFile* f_lepSF_Electron_2017 = new TFile(DATA_SF+"/LeptonSF/Electron2017_LeptonSFMap.root","read");
 TFile* f_lepSF_Electron_2016 = new TFile(DATA_SF+"/LeptonSF/Electron2016_LeptonSFMap.root","read");
