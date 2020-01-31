@@ -457,7 +457,6 @@ float lepSF_toReco(float _pt, float _eta, int pdgId, int year) {
 		if(pt > 20.0) ptString = "High";
 		else ptString = "Low";
 		if(year!=2018) yearString = yearString+ptString;
-		cout << yearString << endl;
 
 		SF = h_recoSF_Electron_SF[yearString]->GetBinContent(h_recoSF_Electron_SF[yearString]->GetXaxis()->FindBin(eta), h_recoSF_Electron_SF[yearString]->GetYaxis()->FindBin(pt)); // reco
 	}
@@ -539,7 +538,6 @@ float lepMCEff_toReco(float _pt, float _eta, int pdgId, int year) {
 		if(pt > 20.0) ptString = "High";
 		else ptString = "Low";
 		if(year!=2018) yearString = yearString+ptString;
-		cout << yearString << endl;
 
 		MCEff = h_recoSF_Electron_MCEff[yearString]->GetBinContent(h_recoSF_Electron_MCEff[yearString]->GetXaxis()->FindBin(eta), h_recoSF_Electron_MCEff[yearString]->GetYaxis()->FindBin(pt)); // reco
 	}
