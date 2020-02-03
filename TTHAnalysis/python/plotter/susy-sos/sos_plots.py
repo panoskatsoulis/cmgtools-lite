@@ -55,7 +55,7 @@ submit = '{command}'
 
 P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_230819_v5/"
 nCores = 8
-TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "%(YEAR)+P0+"%s "%(YEAR)
+TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR)
 HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src"
 
 def base(selection):
