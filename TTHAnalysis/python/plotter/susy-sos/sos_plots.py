@@ -5,38 +5,46 @@ import os
 import argparse
 
 helpText = "LEP = '2los', '3los'\n\
-REG = 'sr', 'sr_col', 'cr_dy', 'cr_tt', 'cr_vv', 'cr_ss','cr_wz', 'appl', 'appl_col', 'cr_ss_1F_NoSF', 'cr_ss_2F_NoSF', 'cr_ss_2F_SF2', 'cr_ss_1F_SF1', 'cr_ss_dd', 'cr_ss_semidd', 'appl_1F_NoSF','appl_2F_NoSF', 'appl_1F_SF1F', 'appl_2F_SF2F','sr_semidd','sr_dd', 'appl_col_1F_NoSF', 'appl_col_2F_NoSF', 'sr_col_semidd', 'sr_col_dd', 'sr_3l_semidd', 'sr_closure', 'closure_norm'\n\
+REG = 'sr', 'sr_col', 'cr_dy', 'cr_tt', 'cr_vv', 'cr_ss','cr_wz', 'appl', 'appl_col',\n\
+\t'cr_ss_1F_NoSF', 'cr_ss_2F_NoSF', 'cr_ss_1F_SF1', 'cr_ss_2F_SF2',\n\
+\t'appl_1F_NoSF', 'appl_2F_NoSF', 'appl_1F_SF1F', 'appl_2F_SF2F',\n\
+\t'appl_col_1F_NoSF', 'appl_col_2F_NoSF',\n\
+\t'sr_closure', 'sr_closure_norm'\n\
 BIN = 'min', 'low', 'med', 'high'"
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                  epilog=helpText)
 parser.add_argument("outDir", help="Choose the output directory.\nOutput will be saved to 'outDir/year/LEP_REG_BIN'")
 parser.add_argument("year", help="Choose the year: '2016', '2017' or '2018'")
+
 parser.add_argument("--lep", default=None, required=True, help="Choose number of leptons to use (REQUIRED)")
 parser.add_argument("--reg", default=None, required=True, help="Choose region to use (REQUIRED)")
 parser.add_argument("--bin", default=None, required=True, help="Choose bin to use (REQUIRED)")
+
 parser.add_argument("--signal", action="store_true", default=False, help="Include signal")
 parser.add_argument("--data", action="store_true", default=False, help="Include data")
+parser.add_argument("--dd", action="store_true", default=False, help="Use data-driven fakes (using mc fakes by default)")
+parser.add_argument("--semidd", action="store_true", default=False, help="Use semi-data-driven fakes (using mc fakes by default)")
 parser.add_argument("--norm", action="store_true", default=False, help="Normalize signal to data")
 parser.add_argument("--unc", action="store_true", default=False, help="Include uncertainties")
 parser.add_argument("--inPlots", default=None, help="Select plots, separated by commas, no spaces")
 parser.add_argument("--exPlots", default=None, help="Exclude plots, separated by commas, no spaces")
-parser.add_argument("--signalMasses", default=None, help="Select only these signal samples (e.g 'signal_TChiWZ_100_70+'), comma separated. Use only when doing 'cards'")
+
 parser.add_argument("--doWhat", default="plots", help="Do 'plots' or 'cards'. Default = '%(default)s'")
+parser.add_argument("--signalMasses", default=None, help="Select only these signal samples (e.g 'signal_TChiWZ_100_70+'), comma separated. Use only when doing 'cards'")
 parser.add_argument("--htcondor", action="store_true", default=False, help="Submit jobs on HTCondor. Currently only for 'cards' mode")
 parser.add_argument("--queue", default="workday", help="HTCondor queue for job submission")
 parser.add_argument("--allCards", action="store_true", default=False, help="run cards for all years, cats and bins")
 parser.add_argument("--runCombine", action="store_true", default=False, help="combine cards and run limit")
 parser.add_argument("--asimov", dest="asimov", default=None, help="Use an Asimov dataset of the specified kind: including signal ('signal','s','sig','s+b') or background-only ('background','bkg','b','b-only')")
-parser.add_argument("--fakes", dest="fakes", default="mc", help="Choose estimate of fakes: mc, semidd, dd")
-args = parser.parse_args()
 
+args = parser.parse_args()
 ODIR=args.outDir
 YEAR=args.year
 conf="%s_%s_%s"%(args.lep,args.reg,args.bin)
 
 if YEAR not in ("2016","2017","2018"): raise RuntimeError("Unknown year: Please choose '2016', '2017' or '2018'")
 if args.lep not in ["2los","3l"]: raise RuntimeError("Unknown choice for LEP option. Please check help" )
-if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss","cr_ss_1F_NoSF", "cr_ss_2F_NoSF", "cr_ss_2F_SF2", "cr_ss_1F_SF1", "cr_ss_dd", "cr_ss_semidd","cr_wz", "appl","appl_1F_NoSF", "appl_2F_NoSF","appl_3F_NoSF","appl_1F_SF1F", "appl_2F_SF2F","appl_3F_SF3F",  "appl_col",  "appl_col_1F_NoSF", "appl_col_2F_NoSF", "sr_semidd","sr_dd", "sr_col_semidd", "sr_col_dd", "sr_3l_semidd", "sr_closure", "closure_norm"]: raise RuntimeError("Unknown choice for REG option. Please check help." )
+if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss", "cr_wz", "appl", "appl_col", "cr_ss_1F_NoSF", "cr_ss_2F_NoSF", "cr_ss_1F_SF1", "cr_ss_2F_SF2", "appl_1F_NoSF", "appl_2F_NoSF", "appl_1F_SF1F", "appl_2F_SF2F", "appl_col_1F_NoSF", "appl_col_2F_NoSF", "sr_closure", "sr_closure_norm"]: raise RuntimeError("Unknown choice for REG option. Please check help." )
 if args.bin not in ["min", "low", "med", "high"]: raise RuntimeError("Unknown choice for BIN option. Please check help." )
 if args.doWhat not in ["plots", "cards"]: raise RuntimeError("Unknown choice for DOWHAT option. Please check help." ) # More options to be added
 if args.signalMasses and args.doWhat != "cards": print "Option SIGNALMASSES to be used only with the 'cards' option. Ignoring it...\n"
@@ -57,16 +65,12 @@ submit = '{command}'
 
 P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_230819_v5/"
 nCores = 8
-TREESALL = (" --Fs {P}/recleaner --FMCs {P}/bTagWeights -P "+P0+"%s ")%(YEAR)
-HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src"
+TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR)
+HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src" # To be changed accordingly
 
 def base(selection):
     CORE=TREESALL
     CORE+=" -f -j %d --split-factor=-1 --year %s --s2v -L susy-sos/functionsSOS.cc -L susy-sos/functionsSF.cc --tree NanoAOD --mcc susy-sos/mcc_sos.txt --mcc susy-sos/mcc_triggerdefs.txt "%(nCores,YEAR) # --neg"
-    if  ( args.reg=="cr_ss" and  (args.fakes=='dd' or args.fakes=='semidd'))  or args.reg=='cr_ss_1F_SF1' or args.reg=='cr_ss_2F_SF2': CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt"%(YEAR,args.lep)
-    if args.reg=="appl_1F_SF1F" or args.reg=="appl_2F_SF2F" or (args.reg=="sr" and args.lep=='2los' and args.fakes=="semidd") or args.reg=='sr_closure' or args.reg=='closure_norm': CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt"%(YEAR,args.lep,args.bin)
-    if args.reg=="sr_col" and args.fakes=="semidd": CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_col_%s.txt"%(YEAR,args.lep,args.bin)
-    if args.reg=="sr" and args.fakes=="semidd" and args.lep=="3l": CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s.txt"%(YEAR,args.lep,args.bin) ##looks redundant wrt two lines above
     if YEAR == "2017": CORE += " --mcc susy-sos/mcc_METFixEE2017.txt "
     RATIO= " --maxRatioRange 0.0  1.99 --ratioYNDiv 505 "
     RATIO2=" --showRatio --attachRatioPanel --fixRatioRange "
@@ -79,18 +83,17 @@ def base(selection):
         else: CORE+=" --xp signal.* "
 
     wBG = " '1.0' "
-    #wFS = " '1.0' "
     if selection=='2los':
          GO="%s susy-sos/mca/mca-2los-%s.txt susy-sos/2los_cuts.txt "%(CORE, YEAR)
-         if args.doWhat in ["plots","ntuple"]: GO+=" susy-sos/2los_plots.txt "
-         if args.doWhat in ["cards"]: GO+="  'mass_2(LepGood1_pt, LepGood1_eta, LepGood1_phi, LepGood1_mass, LepGood2_pt, LepGood2_eta, LepGood2_phi, LepGood2_mass)' [4,10,20,30,50] "
-         
+         if args.doWhat in ["plots"]: GO+=" susy-sos/2los_plots.txt "
+         if args.doWhat in ["cards"]: GO+=" 'mass_2(LepGood1_pt, LepGood1_eta, LepGood1_phi, LepGood1_mass, LepGood2_pt, LepGood2_eta, LepGood2_phi, LepGood2_mass)' [4,10,20,30,50] "
 
          wBG = " 'puWeight*eventBTagSF*triggerSF(muDleg_SF(%s,LepGood1_pt,LepGood1_eta,LepGood2_pt,LepGood2_eta), MET_pt, metmm_pt(LepGood1_pdgId,LepGood1_pt,LepGood1_phi,LepGood2_pdgId,LepGood2_pt,LepGood2_phi,MET_pt,MET_phi), %s)*lepSF(LepGood1_pt,LepGood1_eta,LepGood1_pdgId,%s)*lepSF(LepGood2_pt,LepGood2_eta,LepGood2_pdgId,%s)' "%(YEAR,YEAR,YEAR,YEAR)
          GO="%s -W %s"%(GO,wBG)
 
-         if args.doWhat == "plots": GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.62 ")
-         if args.doWhat == "plots": GO=GO.replace(RATIO,  " --maxRatioRange 0.6  1.99 --ratioYNDiv 210 ")
+         if args.doWhat == "plots":
+			 GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.62 ")
+			 GO=GO.replace(RATIO,  " --maxRatioRange 0.6  1.99 --ratioYNDiv 210 ")
          if args.doWhat == "cards":         
              GO += " --binname %s "%args.bin
          else:
@@ -99,7 +102,7 @@ def base(selection):
  
     elif selection=='3l':
         GO="%s susy-sos/mca/mca-3l-%s.txt susy-sos/3l_cuts.txt "%(CORE,YEAR)
-        if args.doWhat in ["plots","ntuple"]: GO+=" susy-sos/3l_plots.txt "
+        if args.doWhat in ["plots"]: GO+=" susy-sos/3l_plots.txt "
         if args.doWhat in ["cards"]: GO+="  minMllSFOS [4,10,20,30,50] "
         
         wBG = " 'puWeight*eventBTagSF*triggerSF(muDleg_SF(%s,LepGood1_pt,LepGood1_eta,LepGood2_pt,LepGood2_eta,LepGood3_pt,LepGood3_eta,lepton_permut(LepGood1_pdgId,LepGood2_pdgId,LepGood3_pdgId)), MET_pt, metmmm_pt(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi, LepGood3_pt, LepGood3_phi, MET_pt, MET_phi, lepton_Id_selection(LepGood1_pdgId,LepGood2_pdgId,LepGood3_pdgId)), %s)*lepSF(LepGood1_pt,LepGood1_eta,LepGood1_pdgId,%s)*lepSF(LepGood2_pt,LepGood2_eta,LepGood2_pdgId,%s)*lepSF(LepGood3_pt,LepGood3_eta,LepGood3_pdgId,%s)' "%(YEAR,YEAR,YEAR,YEAR,YEAR)
@@ -266,6 +269,8 @@ def prepareWrapper(name):
 
 def runIt(GO,name):
     if args.data and not args.doWhat == "cards" : name=name+"_data"
+    if args.dd and not args.doWhat == "cards" : name=name+"_dd"
+    if args.semidd and not args.doWhat == "cards" : name=name+"_semidd"
     if args.norm: name=name+"_norm"
     if args.unc: name=name+"_unc"
     if args.doWhat == "cards": mass = '_'.join(name.split('_')[-2:])
@@ -285,7 +290,6 @@ def runIt(GO,name):
         prepareRunner("%s_%s"%(name,YEAR),ret)
         prepareWrapper("%s_%s"%(name,YEAR))    
 
-    # What is supposed to be included in sys.argv[4] and after?
     #elif args.doWhat == "yields": print 'echo %s; python mcAnalysis.py'%name,GO,' '.join(sys.argv[4:])
     #elif args.doWhat == "dumps":  print 'echo %s; python mcDump.py'%name,GO,' '.join(sys.argv[4:])
     #elif args.doWhat == "ntuple": print 'echo %s; python mcNtuple.py'%name,GO,' '.join(sys.argv[4:])
@@ -338,7 +342,10 @@ if __name__ == '__main__':
     if '2los_' in torun:
         x = base('2los')
         x = binChoice(x,torun)
-    
+
+	if args.semidd: x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-semidd.txt'%(YEAR))
+	if args.dd: x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-dd.txt'%(YEAR))
+
         if 'sr' in torun:
             if '_col' in torun:
                 x = add(x,"-X ^mT$ -X ^SF$ ")
@@ -348,16 +355,16 @@ if __name__ == '__main__':
                 if '_high' in torun: 
                      x = add(x,"-X ^pt5sublep$ ")
                      x = x.replace('-E ^met250$','-E ^met300_col$')
-            if args.fakes=="semidd":
-                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-semidd.txt'%(YEAR))
-            if args.fakes=="dd":
-                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-dd.txt'%(YEAR))
+            if args.semidd:
+	   	if '_col' in torun: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_col_%s.txt "%(YEAR,args.lep,args.bin))
+		else: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt "%(YEAR,args.lep,args.bin))
             if '_closure' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-closure.txt'%(YEAR))
-                x = add(x, "--plotmode=%s"%("nostack"))
-            if '_closure_norm' in torun:
-                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-closure.txt'%(YEAR))
-                x = add(x, "--plotmode=%s"%("norm"))
+		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt "%(YEAR,args.lep,args.bin))
+		if '_norm' in torun:
+			x = add(x, "--plotmode=%s "%("norm"))
+		else:
+			x = add(x, "--plotmode=%s "%("nostack"))
 
         if 'appl' in torun:
             if '_col' in torun:
@@ -368,18 +375,21 @@ if __name__ == '__main__':
                 if '_high' in torun: 
                     x = add(x,"-X ^pt5sublep$ ")
                     x = x.replace('-E ^met250$','-E ^met300_col$')
-            x = add(x,"-X ^twoTight$ ")
-            x = add(x,"-E ^oneNotTight$ ")
+		    x = add(x,"-X ^twoTight$ ")
             if '1F_NoSF' in torun:
-                x = add(x, "-E ^1LNT$ -X ^oneNotTight$")
+                x = add(x, "-E ^1LNT$ ")
             elif '2F_NoSF' in torun:
-                x = add(x, "-E ^2LNT$ -X ^oneNotTight$")
+                x = add(x, "-E ^2LNT$ ")
             elif '1F_SF1F' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-1F.txt'%(YEAR))
-                x = add(x, " -E ^1LNT$ -X ^oneNotTight$ --sP SR_2l_ewk")
+		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt "%(YEAR,args.lep,args.bin))
+                x = add(x, " -E ^1LNT$ ")
             elif '2F_SF2F' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-2F.txt'%(YEAR))
-                x = add(x, "-E ^2LNT$ -X ^oneNotTight$ --sP SR_2l_ewk")
+		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt "%(YEAR,args.lep,args.bin))
+                x = add(x, "-E ^2LNT$ ")
+	    else:
+		x = add(x,"-E ^oneNotTight$ ")
 
 
         if 'cr_' in torun:
@@ -417,42 +427,32 @@ if __name__ == '__main__':
                 x = add(x, "-E ^2LNT$ -X ^twoTight$" )    
             elif '_1F_SF1' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-1F.txt'%(YEAR))
+		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
                 x = add(x, "-E ^1LNT$ -X ^twoTight$" )
             elif '_2F_SF2' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-2F.txt'%(YEAR))
+		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
                 x = add(x, "-E ^2LNT$ -X ^twoTight$")
-            elif args.fakes=="dd":
-                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-dd.txt'%(YEAR))
-                x = add(x, "--sP SR_2l_ewk --sP lep1pt")
-            elif args.fakes=="semidd":
-                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-semidd.txt'%(YEAR))
-                x = add(x, "--sP SR_2l_ewk --sP lep1pt")
+            if args.semidd: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
 
     elif '3l_' in torun:
         x = base('3l')
         x = binChoice(x,torun)
-        if args.fakes=="dd":
-                x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-dd.txt'%(YEAR))    
-        if args.fakes=="semidd":
-                x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-semidd.txt'%(YEAR))    
+        if args.semidd: x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-semidd.txt'%(YEAR))    
+        if args.dd: x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-dd.txt'%(YEAR))    
+
+        if 'sr' in torun: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s.txt "%(YEAR,args.lep,args.bin))
 
         if 'appl' in torun:
             x = add(x,"-X ^threeTight$ ")
-            x = add(x,"-E ^oneNotTight$ ")
             if '1F_NoSF' in torun:
-                x = add(x, "-E ^1LNT$ -X ^oneNotTight$ --sP yields")
+				x = add(x, "-E ^1LNT$ ")
             elif '2F_NoSF' in torun:
-                x = add(x, "-E ^2LNT$ -X ^oneNotTight$ --sP yields")
+                x = add(x, "-E ^2LNT$ ")
             elif '3F_NoSF' in torun:
-                x = add(x, "-E ^3LNT$ -X ^oneNotTight$ --sP yields")
-            if '1F_SF1F' in torun:
-                x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-1F.txt'%(YEAR))
-                x = add(x, "-E ^1LNT$ -X ^oneNotTight$ --sP SR_3l")
-            elif '2F_SF2F' in torun:
-                 x= add(x, " --xp fakes_matched1.* --xp fakes_matched3.* --xp Fakes.* --xp fakes_matchedAll.* -E ^2LNT$ -X ^oneNotTight$ --sP SR_3l")
-            elif '3F_SF3F' in torun:
-                 x= add(x, " --xp fakes_matched1.* --xp fakes_matched2.* --xp Fakes.* --xp fakes_matchedAll.* -E ^3LNT$ -X ^oneNotTight$ --sP SR_3l")
-
+                x = add(x, "-E ^3LNT$ ")
+	    else:
+		x = add(x,"-E ^oneNotTight$ ")
 
         if 'cr_wz' in torun:
             x = add(x,"-X ^minMll$ -X ^ZvetoTrigger$ -X ^ledlepPt$ -X ^threeTight$ -X ^pt5sublep$ ")
@@ -480,21 +480,3 @@ if __name__ == '__main__':
         masses='_'.join(masses[-2:])
         torun=torun+'_'+masses
     runIt(x,'%s'%torun)
-
-######################################################################################
-# Useful options for plotting, to be used when needed
-#
-#        if '_1fo' in torun:
-#            x = add(x,"-A alwaystrue 1FO 'LepGood1_isLepTight+LepGood2_isLepTight==1'")
-#        if '_2fo' in torun: x = add(x,"-A alwaystrue 2FO 'LepGood1_isLepTight+LepGood2_isLepTight==0'")
-#        if '_table' in torun:
-#            x = x.replace('mca-2lss-mc.txt','mca-2lss-mc-table.txt')
-#        if '_frdata' in torun: # Why?
-#            x = promptsub(x)
-#            if '_blinddata' in torun:
-#                x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
-#                x = add(x,'--xp data ')
-#            elif not '_data' in torun: raise RuntimeError
-#            x = x.replace('mca-2lss-mcdata.txt','mca-2lss-mcdata-frdata.txt')
-#            if '_table' in torun:
-#                x = x.replace('mca-2lss-mcdata-frdata.txt','mca-2lss-mcdata-frdata-table.txt')
