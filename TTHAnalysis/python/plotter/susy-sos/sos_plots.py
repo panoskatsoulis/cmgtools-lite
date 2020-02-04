@@ -92,8 +92,8 @@ def base(selection):
          GO="%s -W %s"%(GO,wBG)
 
          if args.doWhat == "plots":
-			 GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.62 ")
-			 GO=GO.replace(RATIO,  " --maxRatioRange 0.6  1.99 --ratioYNDiv 210 ")
+	     GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.62 ")
+	     GO=GO.replace(RATIO,  " --maxRatioRange 0.6  1.99 --ratioYNDiv 210 ")
          if args.doWhat == "cards":         
              GO += " --binname %s "%args.bin
          else:
@@ -375,7 +375,7 @@ if __name__ == '__main__':
                 if '_high' in torun: 
                     x = add(x,"-X ^pt5sublep$ ")
                     x = x.replace('-E ^met250$','-E ^met300_col$')
-		    x = add(x,"-X ^twoTight$ ")
+	    x = add(x,"-X ^twoTight$ ")
             if '1F_NoSF' in torun:
                 x = add(x, "-E ^1LNT$ ")
             elif '2F_NoSF' in torun:
@@ -446,7 +446,7 @@ if __name__ == '__main__':
         if 'appl' in torun:
             x = add(x,"-X ^threeTight$ ")
             if '1F_NoSF' in torun:
-				x = add(x, "-E ^1LNT$ ")
+		x = add(x, "-E ^1LNT$ ")
             elif '2F_NoSF' in torun:
                 x = add(x, "-E ^2LNT$ ")
             elif '3F_NoSF' in torun:
