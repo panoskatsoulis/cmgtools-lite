@@ -22,8 +22,7 @@ parser.add_argument("--bin", default=None, required=True, help="Choose bin to us
 
 parser.add_argument("--signal", action="store_true", default=False, help="Include signal")
 parser.add_argument("--data", action="store_true", default=False, help="Include data")
-parser.add_argument("--dd", action="store_true", default=False, help="Use data-driven fakes (using mc fakes by default)")
-parser.add_argument("--semidd", action="store_true", default=False, help="Use semi-data-driven fakes (using mc fakes by default)")
+parser.add_argument("--fakes", default="mc", help="Use 'mc', 'dd' or 'semidd' fakes. Default = '%(default)s'")
 parser.add_argument("--norm", action="store_true", default=False, help="Normalize signal to data")
 parser.add_argument("--unc", action="store_true", default=False, help="Include uncertainties")
 parser.add_argument("--inPlots", default=None, help="Select plots, separated by commas, no spaces")
@@ -271,8 +270,6 @@ def prepareWrapper(name):
 def runIt(GO,name):
     if not args.doWhat == "cards" : name=name+"_"+args.fakes
     if args.data and not args.doWhat == "cards" : name=name+"_data"
-    if args.dd and not args.doWhat == "cards" : name=name+"_dd"
-    if args.semidd and not args.doWhat == "cards" : name=name+"_semidd"
     if args.norm: name=name+"_norm"
     if args.unc: name=name+"_unc"
     if args.doWhat == "cards": mass = '_'.join(name.split('_')[-2:])
@@ -345,8 +342,8 @@ if __name__ == '__main__':
         x = base('2los')
         x = binChoice(x,torun)
 
-	if args.semidd: x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-semidd.txt'%(YEAR))
-	if args.dd: x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-dd.txt'%(YEAR))
+	if args.fakes == "semidd": x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-semidd.txt'%(YEAR))
+	if args.fakes == "dd": x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-dd.txt'%(YEAR))
 
         if 'sr' in torun:
             if '_col' in torun:
@@ -357,12 +354,13 @@ if __name__ == '__main__':
                 if '_high' in torun: 
                      x = add(x,"-X ^pt5sublep$ ")
                      x = x.replace('-E ^met250$','-E ^met300_col$')
-            if args.semidd:
+            if args.fakes == "semidd":
 	   	if '_col' in torun: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_col_%s.txt "%(YEAR,args.lep,args.bin))
 		else: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt "%(YEAR,args.lep,args.bin))
             if '_closure' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-closure.txt'%(YEAR))
-		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt "%(YEAR,args.lep,args.bin))
+		x = add(x,"-X ^met200$") # Run low MET bin and remove upper MET bound to get inclusive yields (not exactly correct). Needs modification to accomodate '_col' regions.
+		x = add(x,"--ratioNums=Fakes_MC --ratioDen=QCDFR_fakes ")
 		if '_norm' in torun:
 			x = add(x, "--plotmode=%s "%("norm"))
 		else:
@@ -435,15 +433,15 @@ if __name__ == '__main__':
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-2F.txt'%(YEAR))
 		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
                 x = add(x, "-E ^2LNT$ -X ^twoTight$")
-            if args.semidd: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
+            if args.fakes == "semidd": x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
 
     elif '3l_' in torun:
         x = base('3l')
 
         x = binChoice(x,torun)
 
-        if args.semidd: x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-semidd.txt'%(YEAR))    
-        if args.dd: x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-dd.txt'%(YEAR))    
+        if args.fakes == "semidd": x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-semidd.txt'%(YEAR))    
+        if args.fakes == "dd": x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-dd.txt'%(YEAR))    
 
         if 'sr' in torun: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s.txt "%(YEAR,args.lep,args.bin))
 
