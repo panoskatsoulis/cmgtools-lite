@@ -64,14 +64,14 @@ pt5sublep	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 5) || (fabs(LepGood2_pdgI
 ### Disable ledlepPt, twoTight
 ### Invert mtautau
 CRDYlepId	: LepGood1_isTightLepDY && LepGood2_isTightLepDY	; Disable=True
-CRDYledlepPt	: 20.0 < LepGood1_pt	; Disable=True
+CRDYledlepPt	: 5.0 < LepGood1_pt	; Disable=True
 
 
 ##### TT CR
 ### Disable ledlepPt, twoTight, bveto, mT
 CRTTlepId	: LepGood1_isTightLepTT && LepGood2_isTightLepTT	; Disable=True
 CRTTledlepPt	: 5.0 < LepGood1_pt	; Disable=True
-btag		: nBJetLoose40 > 0	; Disable=True
+btag		: nBJetLoose25 > 0	; Disable=True
 
 
 ##### VV CR
