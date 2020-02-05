@@ -63,7 +63,7 @@ pt5sublep	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 5) || (fabs(LepGood2_pdgI
 ##### DY CR
 ### Disable ledlepPt
 ### Invert mtautau
-#CRDYlepId	: LepGood1_isTightLepDY && LepGood2_isTightLepDY	; Disable=True
+CRDYlepId	: LepGood1_isTightLepDY && LepGood2_isTightLepDY	; Disable=True
 CRDYledlepPt	: 5.0 < LepGood1_pt	; Disable=True
 
 
