@@ -397,23 +397,23 @@ if __name__ == '__main__':
 
         if 'cr_dy' in torun:
             if '_med' in torun: x = x.replace('-E ^met200$','-E ^met200_CR$')
-            x = add(x,"-X ^ledlepPt$ -X ^twoTight$ ")
+            x = add(x,"-X ^ledlepPt$ ")
             x = add(x,"-I ^mtautau$ ")
-            x = add(x,"-E ^CRDYlepId$ -E ^CRDYledlepPt$ ")
+            x = add(x,"-E ^CRDYledlepPt$ ")
 
         if 'cr_tt' in torun:
             if '_med' in torun:
                 x = x.replace('-E ^met200$','-E ^met200_CR$')
                 x = add(x,'-X ^pt5sublep$ ')
-            x = add(x,"-X ^ledlepPt$ -X ^twoTight$ -X ^bveto$ -X ^mT$ ")
-            x = add(x,"-E ^CRTTlepId$ -E ^CRTTledlepPt$ -E ^btag$ ")
+            x = add(x,"-X ^ledlepPt$ -X ^bveto$ -X ^mT$ ")
+            x = add(x,"-E ^CRTTledlepPt$ -E ^btag$ ")
 
         if 'cr_vv' in torun:
             if '_med' in torun:
                 x = x.replace('-E ^met200$','-E ^met200_CR$')
                 x = add(x,'-X ^pt5sublep$ ')
-            x = add(x,"-X ^ledlepPt$ -X ^twoTight$ -X ^bveto$ -X ^mT$ ")
-            x = add(x,"-E ^CRVVlepId$ -E ^CRVVleplepPt$ -E ^CRVVbveto$ -E ^CRVVmT$ ")
+            x = add(x,"-X ^ledlepPt$ -X ^bveto$ -X ^mT$ ")
+            x = add(x,"-E ^CRVVledlepPt$ -E ^CRVVbveto$ -E ^CRVVmT$ ")
 
         if 'cr_ss' in torun:
             if '_med' in torun:
@@ -437,6 +437,7 @@ if __name__ == '__main__':
 
     elif '3l_' in torun:
         x = base('3l')
+
         x = binChoice(x,torun)
         if args.fakes == "semidd": x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-semidd.txt'%(YEAR))    
         if args.fakes == "dd": x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-dd.txt'%(YEAR))    
@@ -455,8 +456,8 @@ if __name__ == '__main__':
 		x = add(x,"-E ^oneNotTight$ ")
 
         if 'cr_wz' in torun:
-            x = add(x,"-X ^minMll$ -X ^ZvetoTrigger$ -X ^ledlepPt$ -X ^threeTight$ -X ^pt5sublep$ ")
-            x = add(x,"-E ^CRWZlepId$ -E ^CRWZmll$ ")
+            x = add(x,"-X ^minMll$ -X ^ZvetoTrigger$ -X ^ledlepPt$ -X ^pt5sublep$ ")
+            x = add(x,"-E ^CRWZmll$ ")
             if '_min' in torun: 
                 x = add(x,"-E ^CRWZPtLep_MuMu$ ")
             if '_low' in torun: 
