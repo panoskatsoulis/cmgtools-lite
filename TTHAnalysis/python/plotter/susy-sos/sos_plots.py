@@ -64,7 +64,8 @@ submit = '{command}'
 
 P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_230819_v5/"
 nCores = 8
-TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "%(YEAR)+P0+"%s "%(YEAR)
+# TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "%(YEAR)+P0+"%s "%(YEAR)
+TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR)
 HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src"
 
 def base(selection):
@@ -324,10 +325,12 @@ def modifyAnalysis(plotCmd, study_mods):
     if study_mods[0] == "SingleMuonTrigger":
         ## general for both scenarios
         regexs.append(" -\P [^ ]* "); targets.append(" -P /eos/user/k/kpanos/sostrees/2018/trees ")
-        regexs.append(" \--\Fs [^ ]* "); targets.append(" --Fs {P}/friends ")
-        #regexs.append(" *$"); targets.append(" --sP=yields,SR_2l_ewk,lep1pt,lep2pt,mu1pt,mu2pt,met,Jet25") ## other plots htJet25,metovht,PtLep1vsPtLep2,PtMu1vsPtMu2
+        regexs.append(" \--\Fs [^ ]* "); targets.append(" --Fs {P}/recleaner ")
+        regexs.append(" --FMCs {P}/bTagWeights "); targets.append(" ")
         regexs.append(" *$"); targets.append(" --xp Fakes_t,Fakes_vv,Convs,Rares") ## include fakes tt and Wj
-        # regexs.append(" *$"); targets.append(" --xp Fakes_.*,Convs,Rares")
+        regexs.append("\*eventBTagSF\*"); targets.append("*")
+        #regexs.append("\\-W +'.*'"); targets.append("-W 'puWeight'")
+        #regexs.append(" *$"); targets.append(" --sP=yields,SR_2l_ewk,lep1pt,lep2pt,mu1pt,mu2pt,met,Jet25") ## other plots htJet25,metovht,PtLep1vsPtLep2,PtMu1vsPtMu2
         ## scenario specific
         if study_mods[1] in ['sos','original','1']:
             pass
@@ -336,7 +339,7 @@ def modifyAnalysis(plotCmd, study_mods):
         if study_mods[1] in ['alt','alternative','2','alt_muPt2gt3p5','alt_muPt2gt3']:
             ## mca needs to be here because includes the SingleMuon dataset
             regexs.append(" (susy\-sos/[^ ]*mca[^ ]*)\.txt "); targets.append(" \\1_withSingleMu.txt ")
-            regexs.append("met125_trig_18"); targets.append("met125_trig_18new") ## change the low met trigger
+            regexs.append("met125_trig"); targets.append("met125_trig_new") ## change the low met trigger
             if study_mods[1] == 'alt_muPt2gt3':
                 regexs.append(" *$"); targets.append(" -X ^sublepPt$ -X ^pt5sublep$ -E ^pt3subMu$")
             elif study_mods[1] == 'alt_muPt2gt3p5':

@@ -285,7 +285,7 @@ from CMGTools.TTHAnalysis.tools.nanoAOD.fastCombinedObjectRecleaner import fastC
 recleaner_step1 = lambda : CombinedObjectTaggerForCleaning("InternalRecl",
 	looseLeptonSel = lambda lep,year: ((abs(lep.pdgId)==11 and (VLooseFOEleID(lep,year) and lep.lostHits<=1))) or (abs(lep.pdgId)==13 and lep.looseId),
 	cleaningLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ,
-  FOLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ,
+              FOLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ,
 	tightLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year), #tight wp
 	FOTauSel = foTauSel,
 	tightTauSel = tightTauSel,

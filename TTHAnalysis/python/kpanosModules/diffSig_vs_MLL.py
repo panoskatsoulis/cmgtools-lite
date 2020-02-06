@@ -12,13 +12,11 @@ def diffSig_vs_MLL(inputdir, args):
         print("required: --files <root-dir> --names root_dir --filestype dir --signals <signals> --out-dir <dir-under-www>")
         return
 
-    ## seperate dirs into Alternative and Original
-    print("Input directory given {}".format(inputdir.values()[0]))
-
     ## colors to be used for the histograms
-    colors = { "SOS530" : kBlue,
-               "ALT34"  : kMagenta, "ALT45" : kPink+5,
-               "ALT330" : kRed, "ALT430"    : kOrange, "ALT530" : kYellow }
+    colors = { "minMll--noCuts" : kOrange,
+               "minMll--2LepsTight"  : kMagenta,
+               "minMll--2LepsTightSFOS" : kRed,
+               "mass_2--2LepsTightSFOS" : kBlue }
 
     for i,sig in enumerate(args.signals.split(',')):
         signame = sig

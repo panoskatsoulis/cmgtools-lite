@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import argparse, sys, math, os
+import argparse, sys, math, os, re
 from collections import OrderedDict
 from array import array
 
 ##------> Plots
-knownFuncs = ['SigVsMassPoints','OptimizeMu2PtCut','diffSig_vs_PtMu2','diffSig_vs_MLL']
-newPlots = ['diffSig_vs_PtMu2','diffSig_vs_MLL']
+knownFuncs = ['SigVsMassPoints','OptimizeMu2PtCut','diffSig_vs_PtMu2','MLLplots_perSample']
+newPlots = ['diffSig_vs_PtMu2','MLLplots_perSample']
 
 ##------> Parser
 parser = argparse.ArgumentParser(description='Make Analysis Plots. Known Functions: '+', '.join(knownFuncs))
@@ -276,7 +276,7 @@ def OptimizeMu2PtCut(dirs):
     return
 
 from CMGTools.TTHAnalysis.kpanosModules.diffSig_vs_PtMu2 import diffSig_vs_PtMu2
-from CMGTools.TTHAnalysis.kpanosModules.diffSig_vs_MLL import diffSig_vs_MLL
+from CMGTools.TTHAnalysis.kpanosModules.MLLplots_perSample import MLLplots_perSample
 
 ##------> Main functionality
 if __name__ == "__main__":
@@ -311,8 +311,10 @@ if __name__ == "__main__":
             if not plot in knownFuncs:
                 raise RuntimeError("Unknown code has been asked to run.")
             if plot in newPlots:
+                print("Running... {}(files,args)".format(plot))
                 exec(plot+'(files,args)')
             else:
+                print("Running... {}(files)".format(plot))
                 exec(plot+'(files)')
         except Exception as err:
             print("Plotting failure has been caught. Plot:", plot)
@@ -320,10 +322,13 @@ if __name__ == "__main__":
 
     ## print the command ran into a file
     if args.outDir:
+        user = os.environ['USER']
         command = ""
         for arg in sys.argv:
             command += ' '+arg
-        cmd_file = open("/eos/home-k/kpanos/www/{}/command.txt".format(args.outDir),"w+")
+        if "www" in args.outDir:
+            args.outDir = re.sub(r"/eos/.*/{}/www/".format(user),"",args.outDir)
+        cmd_file = open("/eos/home-{}/{}/www/{}/command.txt".format(user[0],user,args.outDir),"w+")
         cmd_file.write("Command:\n")
         cmd_file.write(command)
         cmd_file.close()

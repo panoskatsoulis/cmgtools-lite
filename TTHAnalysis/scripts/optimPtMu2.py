@@ -11,7 +11,7 @@ args = parser.parse_args()
 
 # get files, env variables and check env
 print("User:", os.getenv("USER"))
-OUTPUT = "/eos/user/k/kpanos/www/SOS/tests/test_plots2018/plotting/Jan2020/Differential_Regions_MLL_1to4_jpsiVeto_minMllSFOS"
+OUTPUT = "/eos/user/k/kpanos/www/SOS/tests/test_plots2018/plotting/Feb2020/Differential_Regions_FebSW/minMllSFOS_allbutBtag"
 cuts_file = None
 CMSSW_BASE = os.getenv("CMSSW_BASE")
 if CMSSW_BASE:
@@ -31,9 +31,10 @@ else:
 
 
 MLLcuts = [ (1,4), (4,20), (20,50) ]
-#MLLcuts = [ (1,4) ]
+#MLLcuts = [ (4,20) ]
 Pt2cuts = [ (3,4), (4,5), (5,30) ]
 #Pt2cuts = [ (3,30), (4,30) ] + Pt2cuts
+#Pt2cuts = [ (4,5) ]
 print("Pt2cuts = {}".format(Pt2cuts))
 # variate the MLL cut, sed the change and run the plotter
 for m2lcut in MLLcuts:
@@ -49,7 +50,7 @@ for m2lcut in MLLcuts:
 
     outdir_base = "{}/Modification/MLL_{}_{}".format(OUTPUT, m2l_cut1, m2l_cut2)
     # variate the Pt2 cut, sed the change and run the plotter
-    for cut in Pt2cuts:
+    for i,cut in enumerate(Pt2cuts):
         #
         # get the pt cut
         pt_cut1 = str(round(cut[0],2))
@@ -67,6 +68,8 @@ for m2lcut in MLLcuts:
         # run the plotting command for ALT
         outdir = "{}/Alternative_muPt2_{}_{}".format(outdir_base, pt_cut1, pt_cut2); outdirs.append(outdir)
         plot_cmd = "python susy-sos/sos_plots.py --lep 2los --reg sr --bin low {} 2018 --signal --run --study-mod SingleMuonTrigger alt_muPt2gt3 True".format(outdir)
+        # if i == 0:
+        #     plot_cmd = plot_cmd.replace('--run ','')
         print("Will run:", plot_cmd, sep='\n')
         if args.run_it:
             os.system(plot_cmd)

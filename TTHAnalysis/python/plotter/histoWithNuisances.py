@@ -379,7 +379,10 @@ class HistoWithNuisances:
             iup /= i0; idown /= i0
         return sqrt(0.5*(iup**2+idown**2)) if symmetrize else (-idown,iup)
     def graphAsymmTotalErrors(self,toadd=None,relative=False):
-        if "TH1" not in self.central.ClassName(): raise RuntimeError("Unsupported for non-TH1")
+        if "TH1" not in self.central.ClassName(): 
+            #return
+            print "Unsupported for non-TH1"
+            #raise RuntimeError("Unsupported for non-TH1")
         h = self.raw()
         hup, hdn = self.sumSystUncertainties(toadd)
         xaxis = h.GetXaxis()

@@ -108,7 +108,7 @@ def diffSig_vs_PtMu2(dirs, args):
                             bkg = float(_yield); bkg_err = float(error)
                             if bkg == 0: break
                             signifSOS /= math.sqrt( bkg )
-                            if s_alt != 0:
+                            if s_sos != 0:
                                 SOS_yErr = signifSOS*math.sqrt( s_sos_err*s_sos_err/(s_sos*s_sos) + bkg_err*bkg_err/(4*bkg*bkg) )
                     print("bin: {}-{}, signif-SOS = {} +/- {}".format(x1,x2,signifSOS,SOS_yErr))
                     print() ## print newline
@@ -127,9 +127,9 @@ def diffSig_vs_PtMu2(dirs, args):
             canv = TCanvas("canv","canv",400,400); canv.cd()
             ALT.SetLineColor(2); ALT.SetLineWidth(2)
             SOS.SetLineColor(4); SOS.SetLineWidth(2)
-            ALT.Draw(); ALT.GetYaxis().SetRangeUser(0.0, 4.0)
+            ALT.Draw(); ALT.GetYaxis().SetRangeUser(0.0, 10.0)
             if histosALT["plot3"].GetBinContent(3) < 1:
-                ALT.GetYaxis().SetRangeUser(0.01, 4.0)
+                ALT.GetYaxis().SetRangeUser(0.01, 10.0)
                 canv.SetLogy()
             SOS.Draw("same")
             canv.SetGridx()
