@@ -383,15 +383,15 @@ if __name__ == '__main__':
                 x = add(x,'-X ^pt5sublep$ ')
             x = add(x,"-X ^mT$")
             x = add(x,"-I ^OS$  ")
-            if '1F' in torun:
+            if '1F_NoSF' in torun:
                 x = add(x, "-E ^1LNT$ -X ^twoTight$" )
-            elif '2F' in torun:
+            elif '2F_NoSF' in torun:
                 x = add(x, "-E ^2LNT$ -X ^twoTight$" )    
-            elif '_1F_SF1' in torun:
+            elif '1F_SF1' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-1F.txt'%(YEAR))
 		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
                 x = add(x, "-E ^1LNT$ -X ^twoTight$" )
-            elif '_2F_SF2' in torun:
+            elif '2F_SF2' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-2F.txt'%(YEAR))
 		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
                 x = add(x, "-E ^2LNT$ -X ^twoTight$")
