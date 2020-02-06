@@ -12,5 +12,6 @@ __init__.py
 *.pcm
 LSFJOB*/
 slurm-*.out
+TTHAnalysis/macros/*
 TTHAnalysis/scripts/*
 TTHAnalysis/python/kpanosModules/*
