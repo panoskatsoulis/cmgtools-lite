@@ -129,7 +129,7 @@ float dcaDzleg_MC(int year, float _eta1, float _eta2){
 
 
 // d factors also include the mass efficiency. Since this efficiency is 1.0, it is omitted.
-float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, float _pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
+float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, int var = 0, float _pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
 	
 	// Definitions and Protection
 	float mu1_Data, mu1_MC, mu2_Data, mu2_MC, mu3_Data, mu3_MC;
@@ -153,6 +153,12 @@ float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, floa
 		mu1_MC /= dcaDz_MC[year]; mu2_MC /= dcaDz_MC[year];
 		if(mu1_Data>1.0) {mu1_Data=1.0;}; if(mu1_MC>1.0) {mu1_MC=1.0;}; if(mu2_Data>1.0) {mu2_Data=1.0;}; if(mu2_MC>1.0) {mu2_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 	}
+	if(var!=0){ // 2% uncertainty per muon
+		mu1_Data = mu1_Data + var * mu1_Data * 0.02;
+		mu1_MC = mu1_MC + var * mu1_MC * 0.02;
+		mu2_Data = mu2_Data + var * mu2_Data * 0.02;
+		mu2_MC = mu2_MC + var * mu2_MC * 0.02;
+	}
 
 	if(choose_leptons==12){
 		d12_Data = dcaDzleg_Data(year, _eta1, _eta2);
@@ -168,6 +174,10 @@ float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, floa
 			mu3_Data /= dcaDz_Data[year];
 			mu3_MC /= dcaDz_MC[year];
 			if(mu3_Data>1.0) {mu3_Data=1.0;}; if(mu3_MC>1.0) {mu3_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
+			if(var!=0){ // 2% uncertainty per muon
+				mu3_Data = mu3_Data + var * mu3_Data * 0.02;
+				mu3_MC = mu3_MC + var * mu3_MC * 0.02;
+			}
 		}
 
 		if(choose_leptons==13){
@@ -197,7 +207,7 @@ float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, floa
 	return SF;
 }
 
-float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, float _pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
+float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, int var = 0, float _pt3 = -100.0, float _eta3 = -100.0, int choose_leptons = 12){ // "choose_leptons" determines 2l or 3l case
 	
 	// Definitions and Protection
 	float mu1_MC, mu2_MC, mu3_MC;
@@ -218,6 +228,10 @@ float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, f
 		mu1_MC /= dcaDz_MC[year]; mu2_MC /= dcaDz_MC[year];
 		if(mu1_MC>1.0) {mu1_MC=1.0;}; if(mu2_MC>1.0) {mu2_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 	}
+	if(var!=0){ // 2% uncertainty per muon
+		mu1_MC = mu1_MC + var * mu1_MC * 0.02;
+		mu2_MC = mu2_MC + var * mu2_MC * 0.02;
+	}
 
 	if(choose_leptons==12){
 		d12_MC = dcaDzleg_MC(year, _eta1, _eta2);
@@ -230,6 +244,9 @@ float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, f
 		if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 			mu3_MC /= dcaDz_MC[year];
 			if(mu3_MC>1.0) {mu3_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
+			if(var!=0){ // 2% uncertainty per muon
+				mu3_MC = mu3_MC + var * mu3_MC * 0.02;
+			}
 		}
 
 		if(choose_leptons==13){
@@ -256,7 +273,7 @@ float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, f
 
 
 // Fullsim
-float triggerSF(float muDleg_SF, float _met, float _met_corr, int year){
+float triggerSF(float muDleg_SF, float _met, float _met_corr, int year, int var = 0){
 
 	// Definitions and Protection
 	float eff_Data, eff_MC, SF;
@@ -267,6 +284,16 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year){
 	if(met_corr>=200.0){
 		eff_Data	= 0.5 * epsilonInf_Data[year] * ( TMath::Erf( (met_corr - mean_Data[year]) / sigma_Data[year] ) + 1 );
 		eff_MC		= 0.5 * epsilonInf_MC[year] * ( TMath::Erf( (met_corr - mean_MC[year]) / sigma_MC[year] ) + 1 );
+		if(var!=0){
+			if(met_corr>=250.0){ // 2% uncertainty at the plateau
+				eff_Data = eff_Data + var * eff_Data * 0.02;
+				eff_MC = eff_MC + var * eff_MC * 0.02;
+			}
+			else{ // 5% uncertainty at the turnon
+				eff_Data = eff_Data + var * eff_Data * 0.05;
+				eff_MC = eff_MC + var * eff_MC * 0.05;
+			}
+		}
 		SF			= (eff_MC == 0.0) ? 0.0 : eff_Data / eff_MC;
 	}
 	// Low MET triggers
@@ -276,6 +303,16 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year){
 		float met_Data	= h_trigEff_mumuMET_metleg_Data[year]->GetBinContent(h_trigEff_mumuMET_metleg_Data[year]->GetXaxis() ->FindBin(met), h_trigEff_mumuMET_metleg_Data[year]->GetYaxis()->FindBin(met_corr));
 		float met_MC	= h_trigEff_mumuMET_metleg_MC[year]->GetBinContent(h_trigEff_mumuMET_metleg_MC[year]->GetXaxis() ->FindBin(met), h_trigEff_mumuMET_metleg_MC[year]->GetYaxis()->FindBin(met_corr));
 		if(met_Data==0) {met_Data=1.0;}; if(met_MC==0) {met_MC=1.0;} //Fix empty bins in histos
+		if(var!=0){
+			if(met_corr>=150.0){ // 2% uncertainty at the plateau
+				met_Data = met_Data + var * met_Data * 0.02;
+				met_MC = met_MC + var * met_MC * 0.02;
+			}
+			else{ // 5% uncertainty at the turnon
+				met_Data = met_Data + var * met_Data * 0.05;
+				met_MC = met_MC + var * met_MC * 0.05;
+			}
+		}
 
 		// Putting everything together
 		eff_Data	= mass_Data * met_Data;
@@ -300,7 +337,7 @@ float triggerWZSF(float muDleg_SF, float _met, float _met_corr, int year){
 
 
 // Fastsim: MCEff to multiply fastsim samples so that SF * MCEff = DataEff
-float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
+float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year, int var){
 
 	// Definitions and Protection
 	float MCEff;
@@ -308,13 +345,31 @@ float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year){
 	float met_corr = max(float(50.1) , min(float(499.999), _met_corr));
 
 	// High MET triggers
-	if(met_corr>=200.0) MCEff	= 0.5 * epsilonInf_MC[year] * ( TMath::Erf( (met_corr - mean_MC[year]) / sigma_MC[year] ) + 1 );
+	if(met_corr>=200.0) {
+		MCEff	= 0.5 * epsilonInf_MC[year] * ( TMath::Erf( (met_corr - mean_MC[year]) / sigma_MC[year] ) + 1 );
+		if(var!=0){
+			if(met_corr>=250.0){ // 2% uncertainty at the plateau
+				MCEff = MCEff + var * MCEff * 0.02;
+			}
+			else{ // 5% uncertainty at the turnon
+				MCEff = MCEff + var * MCEff * 0.05;
+			}
+		}
+	}
 	// Low MET triggers
 	else{
 		// Mu + Dca/Dz legs computed in muDleg_MCEff function
 		// Met leg
 		float met_MC	= h_trigEff_mumuMET_metleg_MC[year]->GetBinContent(h_trigEff_mumuMET_metleg_MC[year]->GetXaxis() ->FindBin(met), h_trigEff_mumuMET_metleg_MC[year]->GetYaxis()->FindBin(met_corr));
 		if(met_MC==0) {met_MC=1.0;} //Fix empty bins in histos
+		if(var!=0){
+			if(met_corr>=150.0){ // 2% uncertainty at the plateau
+				met_MC = met_MC + var * met_MC * 0.02;
+			}
+			else{ // 5% uncertainty at the turnon
+				met_MC = met_MC + var * met_MC * 0.05;
+			}
+		}
 
 		// Putting everything together
 		MCEff	= muDleg_MCEff * mass_MC * met_MC;
@@ -365,18 +420,18 @@ unordered_map<string, TH2F*> h_recoSF_Electron_SF = {
 
 // Muon Tracking SF = 1.0 (Muon POG)
 // Muon Loose ID SF
-TFile* f_looseIDSF_Muon_2018 = new TFile(DATA_SF+"/LeptonSF/Muon2018_LooseIDSFMap.root","read");
-TFile* f_looseIDSF_Muon_2017 = new TFile(DATA_SF+"/LeptonSF/Muon2017_LooseIDSFMap.root","read");
-TFile* f_looseIDSF_Muon_2016 = new TFile(DATA_SF+"/LeptonSF/Muon2016_LooseIDSFMap.root","read"); // ErasBCDEF
+TFile* f_looseIDSF_Muon = new TFile(DATA_SF+"/LeptonSF/Muon_LooseIDSFMap.root","read");
 
-unordered_map<int, TH2D*> h_looseIDSF_Muon_SF = {
-	{ 2018, (TH2D*) f_looseIDSF_Muon_2018->Get("NUM_LooseID_DEN_genTracks_pt_abseta") },
-	{ 2017, (TH2D*) f_looseIDSF_Muon_2017->Get("NUM_LooseID_DEN_genTracks_pt_abseta") },
-	{ 2016, (TH2D*) f_looseIDSF_Muon_2016->Get("NUM_LooseID_DEN_genTracks_pt_abseta") } // ErasBCDEF
+unordered_map<string, TH2F*> h_looseIDSF_Muon_SF = {
+	{ "2018High",	(TH2F*) f_looseIDSF_Muon->Get("Muon2018_IDSF_HighPt")	},
+	{ "2018Low",	(TH2F*) f_looseIDSF_Muon->Get("Muon2018_IDSF_LowPt")	},
+	{ "2017High",	(TH2F*) f_looseIDSF_Muon->Get("Muon2017_IDSF_HighPt")	},
+	{ "2017Low",	(TH2F*) f_looseIDSF_Muon->Get("Muon2017_IDSF_LowPt")	},
+	{ "2016High",	(TH2F*) f_looseIDSF_Muon->Get("Muon2016_IDSF_HighPt")	},
+	{ "2016Low",	(TH2F*) f_looseIDSF_Muon->Get("Muon2016_IDSF_LowPt")	}
 };
 
 // To be revised
-// Muon Loose ID SF for 2016ErasGH missing (even from POG) --> Small correction 
 // Muon Loose ID MCEff missing (even from POG in 2016)
 
 // SOS Tight ID SF
@@ -411,26 +466,34 @@ unordered_map<int, TH2F*> h_lepSF_Muon_SF = {
 //};
 
 // Fullsim
-float lepSF_recoToTight(float _pt, float _eta, int pdgId, int year) {
+float lepSF_recoToTight(float _pt, float _eta, int pdgId, int year, int var){
 	
 	// Definitions
-	float SF, pt, eta;
+	float SF, SFUnc, pt, eta;
 
-	if(abs(pdgId)==11) { // Electrons
+	if(abs(pdgId)==11){ // Electrons
 		// Protection
 		pt = max(float(5.001), min(float(999.999), _pt));
 		eta = min(float(2.499), abs(_eta)); // eta -> Absolute eta
 
 		SF = h_lepSF_Electron_SF[year]->GetBinContent(h_lepSF_Electron_SF[year]->GetXaxis()->FindBin(eta), h_lepSF_Electron_SF[year]->GetYaxis()->FindBin(pt));
+		if(var!=0){
+			SFUnc = h_lepSF_Electron_SF[year]->GetBinError(h_lepSF_Electron_SF[year]->GetXaxis()->FindBin(eta), h_lepSF_Electron_SF[year]->GetYaxis()->FindBin(pt));
+			SF = SF + var * SFUnc;
+		}
 	}
-	else if(abs(pdgId)==13) { // Muons
+	else if(abs(pdgId)==13){ // Muons
 		// Protection
 		pt = max(float(3.501), min(float(999.999), _pt));
 		eta = min(float(2.399), abs(_eta)); // eta -> Absolute eta
 
 		SF = h_lepSF_Muon_SF[year]->GetBinContent(h_lepSF_Muon_SF[year]->GetXaxis()->FindBin(eta), h_lepSF_Muon_SF[year]->GetYaxis()->FindBin(pt));
+		if(var!=0){
+			SFUnc = h_lepSF_Muon_SF[year]->GetBinError(h_lepSF_Muon_SF[year]->GetXaxis()->FindBin(eta), h_lepSF_Muon_SF[year]->GetYaxis()->FindBin(pt));
+			SF = SF + var * SFUnc;
+		}
 	}
-	else { // Other => We should never end up here.
+	else{ // Other => We should never end up here.
 		SF = 0.0;
 	}
 	
@@ -445,13 +508,13 @@ float lepSF_recoToTight(float _pt, float _eta, int pdgId, int year) {
 	return SF;
 }
 
-float lepSF_toReco(float _pt, float _eta, int pdgId, int year) {
+float lepSF_toReco(float _pt, float _eta, int pdgId, int year, int var){
 
 	// Definitions
-	float SF, pt, eta;
+	float SF, SFUnc, pt, eta;
 	string ptString, yearString;
 
-	if(abs(pdgId)==11) { // Electrons
+	if(abs(pdgId)==11){ // Electrons
 		// Protection
 		pt = max(float(10.001), min(float(499.999), _pt));
 		eta = max(float(-2.499), min(float(2.499), _eta));
@@ -462,16 +525,31 @@ float lepSF_toReco(float _pt, float _eta, int pdgId, int year) {
 		if(year!=2018) yearString = yearString+ptString;
 
 		SF = h_recoSF_Electron_SF[yearString]->GetBinContent(h_recoSF_Electron_SF[yearString]->GetXaxis()->FindBin(eta), h_recoSF_Electron_SF[yearString]->GetYaxis()->FindBin(pt)); // reco
+		if(var!=0){
+			SFUnc = h_recoSF_Electron_SF[yearString]->GetBinError(h_recoSF_Electron_SF[yearString]->GetXaxis()->FindBin(eta), h_recoSF_Electron_SF[yearString]->GetYaxis()->FindBin(pt));
+			SF = SF + var * SFUnc;
+		}
 	}
-	else if(abs(pdgId)==13) { // Muons
+	else if(abs(pdgId)==13){ // Muons
 		// Protection
-		pt = max(float(3.501), min(float(29.999), _pt)); // Use last bin to cover SFs in higher pT as well
-		eta = min(float(2.399), abs(_eta)); // eta -> Absolute eta
+		pt = max(float(3.501), min(float(119.999), _pt));
+
+		yearString = to_string(year);
+		if(pt > 20.0) ptString = "High";
+		else ptString = "Low";
+		yearString = yearString+ptString;
+
+		if(yearString=="2016High") eta = max(float(-2.399), min(float(2.399), _eta));
+		else eta = min(float(2.399), abs(_eta)); // eta -> Absolute eta
 
 		// tracking SF = 1.0 (Muon POG Recommendations)
-		SF = h_looseIDSF_Muon_SF[year]->GetBinContent(h_looseIDSF_Muon_SF[year]->GetXaxis()->FindBin(pt), h_looseIDSF_Muon_SF[year]->GetYaxis()->FindBin(eta)); // loose ID
+		SF = h_looseIDSF_Muon_SF[yearString]->GetBinContent(h_looseIDSF_Muon_SF[yearString]->GetXaxis()->FindBin(eta), h_looseIDSF_Muon_SF[yearString]->GetYaxis()->FindBin(pt)); // looseID
+		if(var!=0){
+			SFUnc = h_looseIDSF_Muon_SF[yearString]->GetBinError(h_looseIDSF_Muon_SF[yearString]->GetXaxis()->FindBin(eta), h_looseIDSF_Muon_SF[yearString]->GetYaxis()->FindBin(pt));
+			SF = SF + var * SFUnc;
+		}
 	}
-	else { // Other => We should never end up here.
+	else{ // Other => We should never end up here.
 		SF = 0.0;
 	}
 	
@@ -486,8 +564,8 @@ float lepSF_toReco(float _pt, float _eta, int pdgId, int year) {
 	return SF;
 }
 
-float lepSF(float _pt, float _eta, int pdgId, int year) {
-	return lepSF_toReco(_pt,_eta,pdgId,year) * lepSF_recoToTight(_pt,_eta,pdgId,year);
+float lepSF(float _pt, float _eta, int pdgId, int year, int var = 0){
+	return lepSF_toReco(_pt,_eta,pdgId,year,var) * lepSF_recoToTight(_pt,_eta,pdgId,year,var);
 }
 
 
