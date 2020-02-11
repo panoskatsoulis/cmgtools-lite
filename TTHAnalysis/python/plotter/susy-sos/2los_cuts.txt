@@ -61,26 +61,25 @@ pt5sublep	: (fabs(LepGood2_pdgId)==13 && LepGood2_pt > 5) || (fabs(LepGood2_pdgI
 
 
 ##### DY CR
-### Disable ledlepPt, twoTight
+### Disable ledlepPt
 ### Invert mtautau
-CRDYlepId	: LepGood1_isTightLepDY && LepGood2_isTightLepDY	; Disable=True
-CRDYledlepPt	: 20.0 < LepGood1_pt	; Disable=True
+#CRDYlepId	: LepGood1_isTightLepDY && LepGood2_isTightLepDY	; Disable=True
+CRDYledlepPt	: 5.0 < LepGood1_pt	; Disable=True
 
 
 ##### TT CR
-### Disable ledlepPt, twoTight, bveto, mT
-CRTTlepId	: LepGood1_isTightLepTT && LepGood2_isTightLepTT	; Disable=True
+### Disable ledlepPt, bveto, mT
+#CRTTlepId	: LepGood1_isTightLepTT && LepGood2_isTightLepTT	; Disable=True
 CRTTledlepPt	: 5.0 < LepGood1_pt	; Disable=True
-btag		: nBJetLoose40 > 0	; Disable=True
+btag		: nBJetLoose25 > 0	; Disable=True
 
 
 ##### VV CR
 ### Disable leplepPt, mT
-CRVVlepId	: LepGood1_isTightLepVV && LepGood2_isTightLepVV	; Disable=True
-CRVVleplepPt	: 20.0 < LepGood1_pt	; Disable=True
+#CRVVlepId	: LepGood1_isTightLepVV && LepGood2_isTightLepVV	; Disable=True
+CRVVledlepPt	: 30.0 < LepGood1_pt	; Disable=True
 CRVVbveto		: nBJetLoose25_Recl == 0; Disable=True
 CRVVmT		: mt_2(LepGood1_pt, LepGood1_phi, MET_pt, MET_phi) > 90. || mt_2(LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 90.0	; Disable=True
-CRVVbveto		: nBJetLoose25_Recl == 0; Disable=True
 
 ##### SS CR
 ### Disable pt5sublep, mT
