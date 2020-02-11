@@ -151,7 +151,6 @@ float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, int 
 	if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 		mu1_Data /= dcaDz_Data[year]; mu2_Data /= dcaDz_Data[year];
 		mu1_MC /= dcaDz_MC[year]; mu2_MC /= dcaDz_MC[year];
-		if(mu1_Data>1.0) {mu1_Data=1.0;}; if(mu1_MC>1.0) {mu1_MC=1.0;}; if(mu2_Data>1.0) {mu2_Data=1.0;}; if(mu2_MC>1.0) {mu2_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 	}
 	if(nSigma!=0){ // 2% uncertainty per muon
 		mu1_Data = mu1_Data * (1 + nSigma * 0.02);
@@ -159,6 +158,7 @@ float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, int 
 		mu2_Data = mu2_Data * (1 + nSigma * 0.02);
 		mu2_MC = mu2_MC * (1 + nSigma * 0.02);
 	}
+	if(mu1_Data>1.0) {mu1_Data=1.0;}; if(mu1_MC>1.0) {mu1_MC=1.0;}; if(mu2_Data>1.0) {mu2_Data=1.0;}; if(mu2_MC>1.0) {mu2_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 
 	if(choose_leptons==12){
 		d12_Data = dcaDzleg_Data(year, _eta1, _eta2);
@@ -173,12 +173,12 @@ float muDleg_SF(int year, float _pt1, float _eta1, float _pt2, float _eta2, int 
 		if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 			mu3_Data /= dcaDz_Data[year];
 			mu3_MC /= dcaDz_MC[year];
-			if(mu3_Data>1.0) {mu3_Data=1.0;}; if(mu3_MC>1.0) {mu3_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
-			if(nSigma!=0){ // 2% uncertainty per muon
-				mu3_Data = mu3_Data * (1 + nSigma * 0.02);
-				mu3_MC = mu3_MC * (1 + nSigma * 0.02);
-			}
 		}
+		if(nSigma!=0){ // 2% uncertainty per muon
+			mu3_Data = mu3_Data * (1 + nSigma * 0.02);
+			mu3_MC = mu3_MC * (1 + nSigma * 0.02);
+		}
+		if(mu3_Data>1.0) {mu3_Data=1.0;}; if(mu3_MC>1.0) {mu3_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 
 		if(choose_leptons==13){
 			d13_Data = dcaDzleg_Data(year, _eta1, _eta3);
@@ -226,12 +226,12 @@ float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, i
 	if(mu1_MC==0) {mu1_MC=1.0;}; if(mu2_MC==0) {mu2_MC=1.0;}; //Fix empty bins in histos
 	if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 		mu1_MC /= dcaDz_MC[year]; mu2_MC /= dcaDz_MC[year];
-		if(mu1_MC>1.0) {mu1_MC=1.0;}; if(mu2_MC>1.0) {mu2_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 	}
 	if(nSigma!=0){ // 2% uncertainty per muon
 		mu1_MC = mu1_MC * (1 + nSigma * 0.02);
 		mu2_MC = mu2_MC * (1 + nSigma * 0.02);
 	}
+	if(mu1_MC>1.0) {mu1_MC=1.0;}; if(mu2_MC>1.0) {mu2_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 
 	if(choose_leptons==12){
 		d12_MC = dcaDzleg_MC(year, _eta1, _eta2);
@@ -243,11 +243,11 @@ float muDleg_MCEff(int year, float _pt1, float _eta1, float _pt2, float _eta2, i
 		if(mu3_MC==0) {mu3_MC=1.0;}; //Fix empty bins in histos
 		if(year == 2016){ //Eliminate the DCA efficiency within the muleg
 			mu3_MC /= dcaDz_MC[year];
-			if(mu3_MC>1.0) {mu3_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
-			if(nSigma!=0){ // 2% uncertainty per muon
-				mu3_MC = mu3_MC * (1 + nSigma * 0.02);
-			}
 		}
+		if(nSigma!=0){ // 2% uncertainty per muon
+			mu3_MC = mu3_MC * (1 + nSigma * 0.02);
+		}
+		if(mu3_MC>1.0) {mu3_MC=1.0;}; //Fix upward stat. fluctuations in maps leading to eff > 1
 
 		if(choose_leptons==13){
 			d13_MC = dcaDzleg_MC(year, _eta1, _eta3);
@@ -294,7 +294,8 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year, int nSig
 				eff_MC = eff_MC * (1 + nSigma * 0.05);
 			}
 		}
-		SF			= (eff_MC == 0.0) ? 0.0 : eff_Data / eff_MC;
+		if(eff_Data>1.0) {eff_Data=1.0;}; if(eff_MC>1.0) {eff_MC=1.0;}; //Fix upward stat. fluctuations leading to eff > 1
+		SF = (eff_MC == 0.0) ? 0.0 : eff_Data / eff_MC;
 	}
 	// Low MET triggers
 	else{
@@ -313,6 +314,7 @@ float triggerSF(float muDleg_SF, float _met, float _met_corr, int year, int nSig
 				met_MC = met_MC * (1 + nSigma * 0.05);
 			}
 		}
+		if(met_Data>1.0) {met_Data=1.0;}; if(met_MC>1.0) {met_MC=1.0;}; //Fix upward stat. fluctuations leading to eff > 1
 
 		// Putting everything together
 		eff_Data	= mass_Data * met_Data;
@@ -355,6 +357,7 @@ float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year, in
 				MCEff = MCEff * (1 + nSigma * 0.05);
 			}
 		}
+		if(MCEff>1.0) {MCEff=1.0;}; //Fix upward stat. fluctuations leading to eff > 1
 	}
 	// Low MET triggers
 	else{
@@ -370,6 +373,7 @@ float triggerMCEff(float muDleg_MCEff, float _met, float _met_corr, int year, in
 				met_MC = met_MC * (1 + nSigma * 0.05);
 			}
 		}
+		if(met_MC>1.0) {met_MC=1.0;}; //Fix upward stat. fluctuations leading to eff > 1
 
 		// Putting everything together
 		MCEff	= muDleg_MCEff * mass_MC * met_MC;
