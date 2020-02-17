@@ -491,6 +491,20 @@ def _runIt(myargs):
 
     fout = ofout.replace('/pool/ciencias/', '/pool/cienciasrw/')
     
+    if options.queue == "condor":
+        if fin.startswith("/eos/"):
+            try:
+                tmpdir = os.environ['TMPDIR'] if 'TMPDIR' in os.environ else "/tmp"
+                tmpfile =  "%s/%s" % (tmpdir, os.path.basename(fin))
+                print "eos cp %s %s" % (fin, tmpfile)
+                os.system("eos cp %s %s" % (fin, tmpfile))
+                if os.path.exists(tmpfile):
+                    fin = tmpfile
+                    fetchedfile = fin
+                    print "success :-)"
+            except:
+                pass
+        fb = ROOT.TFile.Open(fin)
     if 'LSB_JOBID' in os.environ or 'LSF_JOBID' in os.environ:
         if fin.startswith("root://"):
             try:
