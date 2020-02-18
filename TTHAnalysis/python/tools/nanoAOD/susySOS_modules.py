@@ -230,6 +230,17 @@ def tightEleID(lep,year):# from https://twiki.cern.ch/twiki/pub/CMS/SUSLeptonSF/
             return mvaValue >  cuts["EE"][2]
 
 
+
+def tightLeptonSel_SOS(lep,year):
+    bTagCut = 0.4 if year==2016 else 0.1522 if year==2017 else 0.1241 ##2016 loose recomm is 0.2217, while 0.4 derived to match 2018 performance
+    return ( lep.jetBTagDeepCSV < bTagCut) and ( (abs(lep.pdgId)==13 and lep.softId) or (abs(lep.pdgId)==11 and VLooseFOEleID(lep, year) and lep.lostHits==0 and lep.convVeto and tightEleID(lep, year) )) and lep.pfRelIso03_all<0.5 and (lep.pfRelIso03_all*lep.pt)<5. and abs(lep.ip3d)<0.01 and lep.sip3d<2
+    
+def looseNotTight_SOS(lep,year):
+    return  lep.pfRelIso03_all<1. and  ( (abs(lep.pdgId)==11 and new_FOEleID(lep, year) and lep.lostHits==0 and lep.convVeto)
+                                         or (abs(lep.pdgId)==13 and lep.softId ) )
+
+
+##old cleaning selections, used only for flags
 def clean_and_FO_selection_SOS(lep,year):
     bTagCut = 0.4 if year==2016 else 0.1522 if year==2017 else 0.1241 ##2016 loose recomm is 0.2217, while 0.4 derived to match 2018 performance
     return lep.jetBTagDeepCSV < bTagCut and ( (abs(lep.pdgId)==11 and VLooseFOEleID(lep, year) and lep.lostHits==0 and lep.convVeto)
@@ -252,18 +263,6 @@ def fullTightLeptonSel_noBtag(lep,year):
     return ( fullCleaningLeptonSel_noBtag(lep,year) and ( abs(lep.pdgId)==13 or tightEleID(lep, year) )
 										and lep.pfRelIso03_all<0.5 and (lep.pfRelIso03_all*lep.pt)<5. and abs(lep.ip3d)<0.01 and lep.sip3d<2 )
 
-def tightLeptonSel_SOS(lep,year):
-    return ( clean_and_FO_selection_SOS(lep,year) and ( abs(lep.pdgId)==13 or tightEleID(lep, year) )
-										and lep.pfRelIso03_all<0.5 and (lep.pfRelIso03_all*lep.pt)<5. and abs(lep.ip3d)<0.01 and lep.sip3d<2 )
-
-def new_tightLeptonSel_SOS(lep,year):
-    bTagCut = 0.4 if year==2016 else 0.1522 if year==2017 else 0.1241 ##2016 loose recomm is 0.2217, while 0.4 derived to match 2018 performance
-    return ( lep.jetBTagDeepCSV < bTagCut) and ( (abs(lep.pdgId)==13 and lep.softId) or (abs(lep.pdgId)==11 and VLooseFOEleID(lep, year) and lep.lostHits==0 and lep.convVeto and tightEleID(lep, year) )) and lep.pfRelIso03_all<0.5 and (lep.pfRelIso03_all*lep.pt)<5. and abs(lep.ip3d)<0.01 and lep.sip3d<2
-    
-def new_clean_and_FO_selection_SOS(lep,year):
-    return  lep.pfRelIso03_all<1. and  ( (abs(lep.pdgId)==11 and new_FOEleID(lep, year) and lep.lostHits==0 and lep.convVeto)
-                                         or (abs(lep.pdgId)==13 and lep.softId ) )
-
 def tightLepDY(lep,year):
 	return ( clean_and_FO_selection_SOS(lep,year) and ( abs(lep.pdgId)==13 or tightEleID(lep, year) )
 										and lep.pfRelIso03_all<0.5 and ((lep.pfRelIso03_all*lep.pt)<5. or lep.pfRelIso03_all<0.1) ) # relax iso cut,no ip3d cut,no sip3d cut
@@ -284,9 +283,9 @@ from CMGTools.TTHAnalysis.tools.combinedObjectTaggerForCleaning import CombinedO
 from CMGTools.TTHAnalysis.tools.nanoAOD.fastCombinedObjectRecleaner import fastCombinedObjectRecleaner
 recleaner_step1 = lambda : CombinedObjectTaggerForCleaning("InternalRecl",
 	looseLeptonSel = lambda lep,year: ((abs(lep.pdgId)==11 and (VLooseFOEleID(lep,year) and lep.lostHits<=1))) or (abs(lep.pdgId)==13 and lep.looseId),
-	cleaningLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ,
-  FOLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ,
-	tightLeptonSel = lambda lep,year: new_tightLeptonSel_SOS(lep,year), #tight wp
+	cleaningLeptonSel = lambda lep,year: tightLeptonSel_SOS(lep,year) or  looseNotTight_SOS(lep,year) ,
+        FOLeptonSel = lambda lep,year: tightLeptonSel_SOS(lep,year) or  looseNotTight_SOS(lep,year) ,
+	tightLeptonSel = lambda lep,year: tightLeptonSel_SOS(lep,year), #tight wp
 	FOTauSel = foTauSel,
 	tightTauSel = tightTauSel,
 	selectJet = lambda jet: abs(jet.eta)<2.4 and jet.pt > 25 and jet.jetId > 0, # FIXME need to select on pt or ptUp or ptDown
@@ -343,10 +342,13 @@ isTightLepTT = lambda : ObjTagger('isTightLepTT', "LepGood", [ lambda lep,year: 
 isTightLepVV = lambda : ObjTagger('isTightLepVV', "LepGood", [ lambda lep,year: tightLepVV(lep,year) ]) # relax iso cut
 isTightLepWZ = lambda : ObjTagger('isTightLepWZ', "LepGood", [ lambda lep,year: tightLepWZ(lep,year) ]) # relax iso cut
 
-isFOLep = lambda : ObjTagger('isFOLep', "LepGood", [ lambda lep,year: new_tightLeptonSel_SOS(lep,year) or  new_clean_and_FO_selection_SOS(lep,year) ]) 
+isFOLep = lambda : ObjTagger('isFOLep', "LepGood", [ lambda lep,year: tightLeptonSel_SOS(lep,year) or  looseNotTight_SOS(lep,year) ]) 
 
 eleSel_seq = [isVLFOEle, isTightEle]
 tightLepCR_seq = [isTightLepDY,isTightLepTT,isTightLepVV,isTightLepWZ]
+
+data_recl_seq=[recleaner_step1,recleaner_step2_data]
+mc_recl_seq=[recleaner_step1,recleaner_step2_mc,mcMatchId,mcPromptGamma]
 
 
 #btag weights
