@@ -419,6 +419,8 @@ WWTo2L2Nu_DPS = kreator.makeMCComponent("WWTo2L2Nu_DPS", "/WWTo2L2Nu_DoubleScatt
 WZTo2L2Q = kreator.makeMCComponent("WZTo2L2Q"   , "/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM"   , "CMS", ".*root",  5.60, fracNegWeights=0.2)
 ZZTo2L2Q = kreator.makeMCComponent("ZZTo2L2Q", "/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM", "CMS", ".*root",  3.28, fracNegWeights=0.18)
 
+VVTo2L2Nu = kreator.makeMCComponent("VVTo2L2Nu","/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM", "CMS", ".*root",  11.95, fracNegWeights=0.2)
+
 DiBosons = [
     WW,
     WWTo2L2Nu,
@@ -434,6 +436,7 @@ DiBosons = [
     ZZTo2L2Nu,
     WGToLNuG, ZGTo2LG, WWTo2L2Nu_DPS,
     WZTo2L2Q, ZZTo2L2Q,
+    VVTo2L2Nu,
 ]
 
 # ===  TRI-BOSONS
