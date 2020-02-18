@@ -11,10 +11,11 @@ conf = dict(
     iperbolic_iso_0 = 20.,
     iperbolic_iso_1 = 300.,
 )
-susySOS_skim_cut =  ("nMuon + nElectron >= 2 &&" + ##if heppy option fast
-        "MET_pt > {minMet}  &&"+
-        "Sum$(Muon_pt > {muPt}) +"
-        "Sum$(Electron_pt > {elePt}) >= 2").format(**conf)
+#susySOS_skim_cut =  ("nMuon + nElectron >= 2 &&" + ##if heppy option fast
+#        "MET_pt > {minMet}  &&"+
+#        "Sum$(Muon_pt > {muPt}) +"
+#        "Sum$(Electron_pt > {elePt}) >= 2").format(**conf)
+susySOS_skim_cut =  "1"
 
 muonSelection     = lambda l: abs(l.eta) < 2.4 and l.pt > conf["muPt"]  and l.sip3d < conf["sip3d"] and abs(l.dxy) < conf["dxy"] and abs(l.dz) < conf["dz"]  and l.pfRelIso03_all*l.pt < ( conf["iperbolic_iso_0"]+conf["iperbolic_iso_1"]/l.pt) and abs(l.ip3d) < conf["ip3d"]
 electronSelection = lambda l: abs(l.eta) < 2.5 and l.pt > conf["elePt"]  and l.sip3d < conf["sip3d"] and abs(l.dxy) < conf["dxy"] and abs(l.dz) < conf["dz"] and l.pfRelIso03_all*l.pt < ( conf["iperbolic_iso_0"]+conf["iperbolic_iso_1"]/l.pt) and abs(l.ip3d) < conf["ip3d"] 
@@ -27,7 +28,7 @@ lepSkim = ttHPrescalingLepSkimmer(0, ##do not apply prescale
                                   minLeptonsNoPrescale = 2, # things with less than 2 leptons are rejected irrespectively of the prescale
                                   minLeptons = 2, requireSameSignPair = False,
                                   jetSel = lambda j: j.pt > 25 and abs(j.eta) < 2.4  and j.jetId > 0, 
-                                  minJets = 0, minMET = 0)
+                                  minJets = 0, minMET = 0, minMETNoPrescale = 50)
 
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.collectionMerger import collectionMerger
 lepMerge = collectionMerger(input = ["Electron","Muon"], 
@@ -42,7 +43,7 @@ from CMGTools.TTHAnalysis.tools.nanoAOD.yearTagger import yearTag
 from CMGTools.TTHAnalysis.tools.nanoAOD.xsecTagger import xsecTag
 from CMGTools.TTHAnalysis.tools.nanoAOD.lepJetBTagAdder import lepJetBTagCSV, lepJetBTagDeepCSV
 
-susySOS_sequence_step1 = [lepSkim, lepMerge, autoPuWeight, yearTag, xsecTag, lepJetBTagCSV, lepJetBTagDeepCSV, lepMasses]
+susySOS_sequence_step1 = [autoPuWeight, lepSkim, lepMerge, yearTag, xsecTag, lepJetBTagCSV, lepJetBTagDeepCSV, lepMasses]
 
 
 #from PhysicsTools.NanoAODTools.postprocessing.tools import deltaR
