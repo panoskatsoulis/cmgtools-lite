@@ -95,7 +95,6 @@ if options.categ:
         allreports["%s_%s"%(binname,lab)] = dict( (k, h.projectionX("x_"+k,ic+1,ic+1)) for (k,h) in report.iteritems() )
 else:
     allreports = {binname:report}
-
 for scanpoint in scanpoints: 
     listSignals = [] 
     pointname = '_'.join( [ '%s_%s'%(x,y) for x,y in zip(options.params.split(','),scanpoint)])
@@ -111,15 +110,15 @@ for scanpoint in scanpoints:
     #print(listSignals)
     
     for binname, report in allreports.iteritems():
-      if options.bbb:
-        if options.autoMCStats: raise RuntimeError("Can't use --bbb together with --amc/--autoMCStats")
-        for p,h in report.iteritems(): 
-          if p not in ("data", "data_obs"):
-            h.addBinByBin(namePattern="%s_%s_%s_bin{bin}" % (options.bbb, binname, p), conservativePruning = True)
-      for p,h in report.iteritems():
-        for b in xrange(1,h.GetNbinsX()+1):
-          h.SetBinError(b,min(h.GetBinContent(b),h.GetBinError(b))) # crop all uncertainties to 100% to avoid negative variations
-      nuisances = sorted(listAllNuisances(report))
+        if options.bbb:
+            if options.autoMCStats: raise RuntimeError("Can't use --bbb together with --amc/--autoMCStats")
+            for p,h in report.iteritems(): 
+                if p not in ("data", "data_obs"):
+                    h.addBinByBin(namePattern="%s_%s_%s_bin{bin}" % (options.bbb, binname, p), conservativePruning = True)
+        for p,h in report.iteritems():
+            for b in xrange(1,h.GetNbinsX()+1):
+                h.SetBinError(b,min(h.GetBinContent(b),h.GetBinError(b))) # crop all uncertainties to 100% to avoid negative variations
+        nuisances = sorted(listAllNuisances(report))
     
         allyields = dict([(p,h.Integral()) for p,h in report.iteritems()])
         procs = []; iproc = {}
@@ -203,22 +202,11 @@ for scanpoint in scanpoints:
             (kind,effmap,effshape) = systs[name]
             datacard.write(('%s %5s' % (npatt % name,kind)) + " ".join([kpatt % effmap[p]  for p in procs]) +"\n")
             for p,(hup,hdn) in effshape.iteritems():
-                i0 = allyields[p]
-                kup, kdn = hup.Integral()/i0, hdn.Integral()/i0
-                if abs(kup*kdn-1)<1e-5:
-                    if abs(kup-1)>2e-4:
-                        effyield[p] = "%.3f" % kup
-                        isNorm = True
-                else:
-                    effyield[p] = "%.3f/%.3f" % (kdn,kup)
-                    isNorm = True
-            if isNorm:
-                if name.endswith("_lnU"):
-                    systs[name] = ("lnU", effyield, {})
-                else:
-                    systs[name] = ("lnN", effyield, {})
-      # make a new list with only the ones that have an effect
-      nuisances = sorted(systs.keys())
+                towrite.append(hup.Clone("x_%s_%sUp"   % (p,name)))
+                towrite.append(hdn.Clone("x_%s_%sDown" % (p,name)))
+        if options.autoMCStats: 
+            datacard.write('* autoMCStats %d\n' % options.autoMCStatsValue)
+    
         workspace = ROOT.TFile.Open(outdir+binname+'_'+pointname+".input.root", "RECREATE")
         for h in towrite:
             workspace.WriteTObject(h,h.GetName())
@@ -226,4 +214,3 @@ for scanpoint in scanpoints:
     
         print "Wrote to {0}.card.txt and {0}.input.root ".format(outdir+binname+'_'+pointname)
     
-      print "Wrote to {0}.card.txt and {0}.input.root ".format(outdir+pointname+binname)    
