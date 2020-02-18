@@ -374,6 +374,8 @@ ZZTo4L_ext2 = kreator.makeMCComponent("ZZTo4L_ext2", "/ZZTo4L_TuneCP5_13TeV_powh
 ZZTo2L2Nu = kreator.makeMCComponent("ZZTo2L2Nu", "/ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM", "CMS", ".*root", 0.564)
 ZZTo2L2Nu_ext2 = kreator.makeMCComponent("ZZTo2L2Nu_ext2", "/ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext2-v2/MINIAODSIM", "CMS", ".*root", 0.564)
 
+VVTo2L2Nu = kreator.makeMCComponent("VVTo2L2Nu","/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM", "CMS", ".*root",  11.95, fracNegWeights=0.2)
+
 WGToLNuG = kreator.makeMCComponent("WGToLNuG", "/WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM", "CMS", ".*root", 466.1)
 ZGTo2LG =  kreator.makeMCComponent("ZGTo2LG", "/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM", "CMS", ".*root", 55.78)
 WWTo2L2Nu_DPS = kreator.makeMCComponent("WWTo2L2Nu_DPS", "/WWTo2L2Nu_DoubleScattering_13TeV-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM", "CMS", ".*root", 1.921)
@@ -391,6 +393,7 @@ DiBosons = [
     ZZ,
     ZZTo4L, ZZTo4L_ext2,
     ZZTo2L2Nu,ZZTo2L2Nu_ext2,
+    VVTo2L2Nu,
     WGToLNuG, ZGTo2LG,
     WWTo2L2Nu_DPS,
 ]
