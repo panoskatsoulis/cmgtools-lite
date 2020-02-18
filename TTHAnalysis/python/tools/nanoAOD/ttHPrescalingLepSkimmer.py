@@ -13,6 +13,7 @@ class ttHPrescalingLepSkimmer( Module ):
             jetSel = lambda j : True,
             minJets = 0,
             minMET = 0,
+            minMETNoPrescale = 0,
             useEventNumber = True,
             label = "prescaleFromSkim"):
 
@@ -26,6 +27,7 @@ class ttHPrescalingLepSkimmer( Module ):
         self.jetSel = jetSel
         self.minJets = minJets
         self.minMET = minMET
+        self.minMETNoPrescale = minMETNoPrescale
         self.label = label
         self.events = 0
 
@@ -58,6 +60,9 @@ class ttHPrescalingLepSkimmer( Module ):
         if self.minMET > 0:
             if event.MET_pt > self.minMET:
                 toBePrescaled = False
+        if self.minMETNoPrescale > 0:
+            if not (event.MET_pt > self.minMETNoPrescale):
+                return False
         if not toBePrescaled:
             self.wrappedOutputTree.fillBranch(self.label, 1)
             return True
