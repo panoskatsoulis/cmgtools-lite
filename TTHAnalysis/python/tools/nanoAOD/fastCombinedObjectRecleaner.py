@@ -6,9 +6,9 @@ from CMGTools.TTHAnalysis.tools.nanoAOD.friendVariableProducerTools import decla
 import ROOT, os
 from PhysicsTools.Heppy.physicsobjects.Jet import _btagWPs
 
-
 class fastCombinedObjectRecleaner(Module):
-    def __init__(self,label,inlabel,cleanTausWithLooseLeptons,cleanJetsWithFOTaus,doVetoZ,doVetoLMf,doVetoLMt,jetPts,jetPtsFwd,btagL_thr,btagM_thr,jetCollection='Jet',jetBTag='btagDeepFlavB',tauCollection='Tau',isMC=None):
+    def __init__(self,label,inlabel,cleanTausWithLooseLeptons,cleanJetsWithFOTaus,doVetoZ,doVetoLMf,doVetoLMt,jetPts,jetPtsFwd,btagL_thr,btagM_thr,jetCollection='Jet',jetBTag='btagDeepFlavB',tauCollection='Tau',isMC=None, 
+                 variations=["jesTotalCorr","jesTotalUnCorr","jer"]):
 
         self.label = "" if (label in ["",None]) else ("_"+label)
         self.inlabel = inlabel
@@ -29,25 +29,29 @@ class fastCombinedObjectRecleaner(Module):
         self.doVetoLMt = doVetoLMt
         if isMC is not None: 
             self.isMC = isMC
+        self.variations = variations
 
     def initComponent(self, component):
         self.isMC = component.isMC
 
     def beginJob(self,histFile=None,histDirName=None):
-        self.vars = ["pt","eta","phi","mass"]
-        self.vars_leptons = ["pdgId",'jetIdx']
-        self.vars_taus = []
+        self.vars = ["eta","phi","mass"]
+        self.vars_leptons = ["pdgId",'jetIdx','pt']
+        self.vars_taus = ["pt"]
         self.vars_taus_int = ['jetIdx']
-        self.vars_taus_uchar = ['idMVAoldDMdR032017v2']
-        self.vars_jets = ["btagDeepB","qgl",'btagDeepFlavB'] #"btagCSVV2",,"btagDeepC"]#"btagCSV","btagDeepCSV",,"btagDeepCSVCvsL","btagDeepCSVCvsB","ptd","axis1"] # FIXME recover
-        if self.isMC: self.vars_jets += ['pt_jesTotalUp','pt_jesTotalDown']
+        self.vars_taus_uchar = ['idMVAoldDMdR032017v2','idDeepTau2017v2p1VSjet']
+        self.vars_jets = [("pt","pt_nom") if self.isMC else 'pt',"btagDeepB","qgl",'btagDeepFlavB'] + [ 'pt_%s%s'%(x,y) for x in self.variations for y in ["Up","Down"]] #"btagCSVV2",,"btagDeepC"]#"btagCSV","btagDeepCSV",,"btagDeepCSVCvsL","btagDeepCSVCvsB","ptd","axis1"] # FIXME recover
         self.vars_jets_int = (["hadronFlavour"] if self.isMC else [])
         self.vars_jets_int.extend(['jetId'])
         self.vars_jets_nooutput = []
+        self.systsJEC = {0:""}
+        if self.isMC:
+            for sys in range(len(self.variations)):
+                self.systsJEC[sys+1]    = '_' + self.variations[sys] + 'Up'
+                self.systsJEC[-(sys+1)] = '_' + self.variations[sys] + 'Down'
 
-        self.systsJEC = {0:"", 1:"_jecUp", -1:"_jecDown"} 
 
-        self.outmasses=['mZ1','minMllAFAS','minMllAFOS','minMllAFSS','minMllSFOS']
+        self.outmasses=['mZ1','minMllAFAS','minMllAFOS','minMllAFSS','minMllSFOS','mZ2','m4l']
         self._outjetvars = [x%self.jc for x in ['ht%s%%dj','mht%s%%d','nB%sLoose%%d','nB%sMedium%%d','n%s%%d']]
         self.outjetvars=[]
         for jetPt in self.jetPts: self.outjetvars.extend([(x%jetPt+y,'I' if ('nB%s'%self.jc in x or 'n%s'%self.jc in x) else 'F') for x in self._outjetvars for y in self.systsJEC.values()])
@@ -94,7 +98,10 @@ class fastCombinedObjectRecleaner(Module):
             if coll==self.tauc: _vars.extend(self.vars_taus+self.vars_taus_int+self.vars_taus_uchar)
             if coll==self.jc: _vars.extend(self.vars_jets+self.vars_jets_int+self.vars_jets_nooutput)
             for B in _vars:
-                setattr(self,"%s_%s"%(coll,B), tree.arrayReader("%s_%s"%(coll,B)))
+                if type(B) == tuple:
+                    setattr(self,"%s_%s"%(coll,B[0]), tree.arrayReader("%s_%s"%(coll,B[1])))
+                else:
+                    setattr(self,"%s_%s"%(coll,B), tree.arrayReader("%s_%s"%(coll,B)))
         return True
 
     def initWorkers(self,wpL,wpM):
@@ -112,8 +119,17 @@ class fastCombinedObjectRecleaner(Module):
 
         self._worker.setLeptons(self.nLepGood, self.LepGood_pt, self.LepGood_eta, self.LepGood_phi, self.LepGood_jetIdx)
         self._worker.setTaus(getattr(self,'n%s'%self.tauc),getattr(self,'%s_pt'%self.tauc),getattr(self,'%s_eta'%self.tauc),getattr(self,'%s_phi'%self.tauc), getattr(self,'%s_jetIdx'%self.tauc))
+        jecs= ROOT.vector("TTreeReaderArray<float>*")()
+        if self.isMC:
+            for var in self.variations:
+                jecs.push_back( getattr(self, '%s_pt_%sUp'%(self.jc, var)))
+                jecs.push_back( getattr(self, '%s_pt_%sDown'%(self.jc, var)))
+
         self._worker.setJets(getattr(self,'n%s'%self.jc),getattr(self,'%s_pt'%self.jc),getattr(self,'%s_eta'%self.jc),getattr(self,'%s_phi'%self.jc),
-                             getattr(self,'%s_%s'%(self.jc,self.jetBTag)),getattr(self,'%s_pt_jesTotalUp'%self.jc) if self.isMC else None,getattr(self,'%s_pt_jesTotalDown'%self.jc) if self.isMC else None)
+                             getattr(self,'%s_%s'%(self.jc,self.jetBTag)),
+                             jecs
+                         )
+        
         self._workerMV.setLeptons(self.nLepGood, self.LepGood_pt, self.LepGood_eta, self.LepGood_phi, self.LepGood_mass, self.LepGood_pdgId)
 
     def analyze(self, event):
