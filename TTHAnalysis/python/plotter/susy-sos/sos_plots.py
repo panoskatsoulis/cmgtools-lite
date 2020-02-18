@@ -27,6 +27,7 @@ parser.add_argument("--queue", default="workday", help="HTCondor queue for job s
 parser.add_argument("--allCards", action="store_true", default=False, help="run cards for all years, cats and bins")
 parser.add_argument("--runCombine", action="store_true", default=False, help="combine cards and run limit")
 parser.add_argument("--asimov", dest="asimov", default=None, help="Use an Asimov dataset of the specified kind: including signal ('signal','s','sig','s+b') or background-only ('background','bkg','b','b-only')")
+parser.add_argument("--fakes", dest="fakes", default="mc", help="Choose estimate of fakes: mc, semidd, dd")
 args = parser.parse_args()
 
 ODIR=args.outDir
@@ -39,6 +40,7 @@ if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss","cr_ss_1F
 if args.bin not in ["min", "low", "med", "high"]: raise RuntimeError("Unknown choice for BIN option. Please check help." )
 if args.doWhat not in ["plots", "cards"]: raise RuntimeError("Unknown choice for DOWHAT option. Please check help." ) # More options to be added
 if args.signalMasses and args.doWhat != "cards": print "Option SIGNALMASSES to be used only with the 'cards' option. Ignoring it...\n"
+if args.fakes not in ['mc','semidd','dd']: raise RuntimeError("Unknown choice for FAKES option. Please check help." )
 
 lumis = {
 '2016': '35.9', # '33.2' for low MET
@@ -61,10 +63,10 @@ HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0
 def base(selection):
     CORE=TREESALL
     CORE+=" -f -j %d --split-factor=-1 --year %s --s2v -L susy-sos/functionsSOS.cc -L susy-sos/functionsSF.cc --tree NanoAOD --mcc susy-sos/mcc_sos.txt --mcc susy-sos/mcc_triggerdefs.txt "%(nCores,YEAR) # --neg"
-    if  args.reg=="cr_ss_dd"or args.reg=='cr_ss_semidd'  or args.reg=='cr_ss_1F_SF1' or args.reg=='cr_ss_2F_SF2': CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt"%(YEAR,args.lep)
-    if args.reg=="appl_1F_SF1F" or args.reg=="appl_2F_SF2F" or args.reg=="sr_semidd" or args.reg=='sr_closure' or args.reg=='closure_norm': CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt"%(YEAR,args.lep,args.bin)
-    if args.reg=="sr_col_semidd": CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_col_%s.txt"%(YEAR,args.lep,args.bin)
-    if args.reg=="sr_3l_semidd" : CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s.txt"%(YEAR,args.lep,args.bin)
+    if  ( args.reg=="cr_ss" and  (args.fakes=='dd' or args.fakes=='semidd'))  or args.reg=='cr_ss_1F_SF1' or args.reg=='cr_ss_2F_SF2': CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt"%(YEAR,args.lep)
+    if args.reg=="appl_1F_SF1F" or args.reg=="appl_2F_SF2F" or (args.reg=="sr" and args.lep=='2los' and args.fakes=="semidd") or args.reg=='sr_closure' or args.reg=='closure_norm': CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt"%(YEAR,args.lep,args.bin)
+    if args.reg=="sr_col" and args.fakes=="semidd": CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_col_%s.txt"%(YEAR,args.lep,args.bin)
+    if args.reg=="sr" and args.fakes=="semidd" and args.lep=="3l": CORE+="--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s.txt"%(YEAR,args.lep,args.bin) ##looks redundant wrt two lines above
     if YEAR == "2017": CORE += " --mcc susy-sos/mcc_METFixEE2017.txt "
     RATIO= " --maxRatioRange 0.0  1.99 --ratioYNDiv 505 "
     RATIO2=" --showRatio --attachRatioPanel --fixRatioRange "
@@ -175,7 +177,8 @@ def prepareWrapper(name):
     if not args.allCards:
         nameWr=name.replace("_%s"%YEAR,'')
         filename="/%s/src//wrapRunners_%s.sh"%(ODIR,nameWr)
-        print filename
+        print "nameWr ",nameWr
+        print "filename ",filename
         if os.path.isfile(filename): return
         createPath(filename)
         f = open(filename, "w")
@@ -192,6 +195,8 @@ def prepareWrapper(name):
         print filename
         filename=filename.replace('__','_')
         print filename
+        print "nameWr ",nameWr
+        print "filename ",filename
         if os.path.isfile(filename): return
         createPath(filename)
         f = open(filename, "w")
@@ -203,7 +208,9 @@ def prepareWrapper(name):
                     for ibin in ["low","med","high"]:
                         if ibin == "high" and nlep != "2los" and ireg!="sr": continue
                         if ireg == "cr_ss" and nlep != "2los" and ibin != "med": continue
-                        newName = '_'.join([nlep,ireg,ibin,nameSplit[3],nameSplit[4],year])
+                        newName = '_'.join([nlep,ireg,ibin,nameSplit[-3],nameSplit[-2],year])
+                        print "nameSplit ", nameSplit
+                        print "newName ",newName
                         f.write('if test -f "%s/jobs/runJob_%s.sh"; then\n'%(ODIR,newName))
                         f.write('    echo "running %s"\n'%year)
                         f.write('    source "%s/jobs/runJob_%s.sh"\n'%(ODIR,newName))
@@ -273,6 +280,7 @@ def runIt(GO,name):
         
     print ret
     if args.htcondor:
+        print "NAME, ",name
         prepareSubmitter("%s_%s"%(name,YEAR),ret)
         prepareRunner("%s_%s"%(name,YEAR),ret)
         prepareWrapper("%s_%s"%(name,YEAR))    
@@ -340,9 +348,9 @@ if __name__ == '__main__':
                 if '_high' in torun: 
                      x = add(x,"-X ^pt5sublep$ ")
                      x = x.replace('-E ^met250$','-E ^met300_col$')
-            if '_semidd' in torun:
+            if args.fakes=="semidd":
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-semidd.txt'%(YEAR))
-            if '_dd' in torun:
+            if args.fakes=="dd":
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-dd.txt'%(YEAR))
             if '_closure' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-closure.txt'%(YEAR))
@@ -413,19 +421,19 @@ if __name__ == '__main__':
             elif '_2F_SF2' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-2F.txt'%(YEAR))
                 x = add(x, "-E ^2LNT$ -X ^twoTight$")
-            elif '_dd' in torun:
+            elif args.fakes=="dd":
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-dd.txt'%(YEAR))
                 x = add(x, "--sP SR_2l_ewk --sP lep1pt")
-            elif '_semidd' in torun:
+            elif args.fakes=="semidd":
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/mca-2los-%s-semidd.txt'%(YEAR))
                 x = add(x, "--sP SR_2l_ewk --sP lep1pt")
 
     elif '3l_' in torun:
         x = base('3l')
         x = binChoice(x,torun)
-        if '_dd' in torun:
+        if args.fakes=="dd":
                 x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-dd.txt'%(YEAR))    
-        if '_semidd' in torun:
+        if args.fakes=="semidd":
                 x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/mca-3l-%s-semidd.txt'%(YEAR))    
 
         if 'appl' in torun:
