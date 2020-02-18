@@ -412,6 +412,12 @@ ZZTo4L = kreator.makeMCComponent("ZZTo4L", "/ZZTo4L_13TeV_powheg_pythia8/RunIIFa
 ZZTo4L_ext = kreator.makeMCComponent("ZZTo4L_ext", "/ZZTo4L_13TeV_powheg_pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7_ext1-v1/NANOAODSIM", "CMS", ".*root", 1.256)
 ZZTo2L2Nu = kreator.makeMCComponent("ZZTo2L2Nu", "/ZZTo2L2Nu_13TeV_powheg_pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM", "CMS", ".*root", 0.564)
 
+WGToLNuG = kreator.makeMCComponent("WGToLNuG", "/WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM", "CMS", ".*root", 466.1)
+ZGTo2LG =  kreator.makeMCComponent("ZGTo2LG", "/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM", "CMS", ".*root", 55.78)
+WWTo2L2Nu_DPS = kreator.makeMCComponent("WWTo2L2Nu_DPS", "/WWTo2L2Nu_DoubleScattering_13TeV-pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM", "CMS", ".*root", 1.921)
+
+WZTo2L2Q = kreator.makeMCComponent("WZTo2L2Q"   , "/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM"   , "CMS", ".*root",  5.60, fracNegWeights=0.2)
+ZZTo2L2Q = kreator.makeMCComponent("ZZTo2L2Q", "/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM", "CMS", ".*root",  3.28, fracNegWeights=0.18)
 
 DiBosons = [
     WW,
@@ -426,6 +432,8 @@ DiBosons = [
     ZZ,
     ZZTo4L, ZZTo4L_ext,
     ZZTo2L2Nu,
+    WGToLNuG, ZGTo2LG, WWTo2L2Nu_DPS,
+    WZTo2L2Q, ZZTo2L2Q,
 ]
 
 # ===  TRI-BOSONS
@@ -484,11 +492,16 @@ DYJetsToLL_M1to4 = [
     DYJetsToLL_M1to4_HT600toInf
 ]
 
+SMS_TChiWZ = kreator.makeMCComponent("SMS_TChiWZ", "/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_GridpackScan_102X_mc2017_realistic_v7-v1/NANOAODSIM", "CMS", ".*root", 1)
+
+SignalSUSY = [
+SMS_TChiWZ,
+]
 
 # ----------------------------- summary ----------------------------------------
 
 
-mcSamples = QCDPtFlat + QCDPt + QCDHT + QCD_Mus + QCD_EMs + QCD_bcToE + Ws + DYs + VJetsQQHT + TTs + Ts + TTXs + TTXXs + DiBosons + TriBosons + Higgs + ZZandVV_M1toInf + DYJetsToLL_M1to4
+mcSamples = QCDPtFlat + QCDPt + QCDHT + QCD_Mus + QCD_EMs + QCD_bcToE + Ws + DYs + VJetsQQHT + TTs + Ts + TTXs + TTXXs + DiBosons + TriBosons + Higgs + ZZandVV_M1toInf + DYJetsToLL_M1to4 + SignalSUSY
 
 
 samples = mcSamples
