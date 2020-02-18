@@ -1,8 +1,6 @@
 # vim: syntax=sh
 
 
-norm_fakes : .*fakes.* : .* : normSymm : 1.4
-
 ### Alias definitions. Careful to avoid trailing '.*' to avoid matching _promptsub
 $alias : ttH : ttH|ttH_h[a-z]+
 $alias : tHq : tHq|tHq_h[a-z]+
@@ -10,12 +8,32 @@ $alias : tHW : tHW|tHW_h[a-z]+
 $alias : ttHX : $ttH|$tHq|$tHW
 $alias : ttV  : TT[WZ]|TTWW
 $alias : PromptFromMC : $ttHX|$ttV|Rares|Convs|WZ|ZZ|EWK  
-$alias : FRData : data_fakes|.*_promptsub
-$alias : FRAll  : data_fakes|.*_promptsub|TT_FR_QCD
+#$alias : FRData : data_fakes|.*_promptsub
+#$alias : FRAll  : data_fakes|.*_promptsub|TT_FR_QCD
+
+$alias : BkgFromMC : prompt_tt|prompt_dy|prompt_vv|Fakes.*|Rares|Convs
+$alias : allMC : prompt_tt|prompt_dy|prompt_vv|Fakes.*|Rares|Convs|sig_.*
+
+
 
 ### Uncertainties
 
-lumi_13TeV_2017		: $PromptFromMC : .* : normSymm : 1.023
+lumi_13TeV_2016		: $allMC : .* : normSymm : 1.025
+lumi_13TeV_2017		: $allMC : .* : normSymm : 1.023
+lumi_13TeV_2018		: $allMC : .* : normSymm : 1.025
+
+norm_tt		: prompt_tt.* : .* : normSymm : 2.0
+norm_dy		: prompt_dy.* : .* : normSymm : 2.0
+norm_vv		: prompt_vv.* : .* : normSymm : 1.5
+norm_fakes	: Fakes.* : .* : normSymm : 1.4
+norm_rares	: Rares.* : .* : normSymm : 2.0
+#norm_convs	: Convs.* : .* : normSymm : 2.0 ##?
+
+CMS_scale_j	: $PromptFromMC : .* : templateAsymm; \
+        FakeRates=['susy-sos/systs/fr-jecUp.txt'\,'susy-sos/systs/fr-jecDn.txt'], \
+        AddWeights=['eventBTagSF_up_jes/eventBTagSF'\,'eventBTagSF_down_jes/eventBTagSF']
+
+
 
 # lepton efficiencies
 CMS_ttHl_lepEff_muloose : $PromptFromMC : .*2lss.* : templateAsymm ; AddWeights=['muLooseUnc_2lss_up'\,'muLooseUnc_2lss_dn']
@@ -46,9 +64,6 @@ CMS_ttHl17_trigger	: $PromptFromMC : .*2lss.* : templateAsymm; AddWeights=['1.02
 CMS_ttHl17_trigger	: $PromptFromMC : .*3l.* : templateAsymm; AddWeights=['triggerUnc_up'\,'triggerUnc_dn']
 CMS_ttHl17_trigger	: $PromptFromMC : .*4l.* : templateAsymm; AddWeights=['triggerUnc_up'\,'triggerUnc_dn']
 
-CMS_scale_j	: $PromptFromMC : .* : templateAsymm; \
-        FakeRates=['ttH-multilepton/fr-jecUp.txt'\,'ttH-multilepton/fr-jecDn.txt'], \
-        AddWeights=['eventBTagSF_up_jes/eventBTagSF'\,'eventBTagSF_down_jes/eventBTagSF']
 
 CMS_ttHl_btag_LF    : $PromptFromMC : .* : templateAsymm; AddWeights=['eventBTagSF_up_lf/eventBTagSF'\,'eventBTagSF_down_lf/eventBTagSF']		
 CMS_ttHl_btag_HF    : $PromptFromMC : .* : templateAsymm; AddWeights=['eventBTagSF_up_hf/eventBTagSF'\,'eventBTagSF_down_hf/eventBTagSF']
