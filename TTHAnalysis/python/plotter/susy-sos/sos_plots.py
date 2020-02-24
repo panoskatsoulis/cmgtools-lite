@@ -91,8 +91,8 @@ def base(selection):
          GO="%s -W %s"%(GO,wBG)
 
          if args.doWhat == "plots":
-			 GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.62 ")
-			 GO=GO.replace(RATIO,  " --maxRatioRange 0.6  1.99 --ratioYNDiv 210 ")
+	     GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.62 ")
+	     GO=GO.replace(RATIO,  " --maxRatioRange 0.6  1.99 --ratioYNDiv 210 ")
          if args.doWhat == "cards":         
              GO += " --binname %s "%args.bin
          else:
