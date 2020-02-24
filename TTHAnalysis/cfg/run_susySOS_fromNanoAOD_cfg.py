@@ -111,6 +111,9 @@ if year == 2018:
             "WGToLNuG",
             "ZGTo2LG",
             "WZTo2L2Q",
+            "TZQToLL",
+            "tWll",
+            "WZTo3LNu_mllmin01",
 
             ##signal SUSY
             "SMS_TChiWZ",
@@ -222,6 +225,9 @@ elif year == 2017:
         "ZGTo2LG",
         "WZTo2L2Q",
         "WW_DPS",
+        "TZQToLL",
+        "tWll",
+        "WZTo3LNu_mllmin01",
 
         ##signal SUSY
         "SMS_TChiWZ",
@@ -329,6 +335,9 @@ elif year == 2016:
         "WGToLNuG_amcatnlo",
         "ZGTo2LG",
         "WZTo2L2Q",
+        "TZQToLL",
+        "tWll",
+        "WZTo3LNu_mllmin01",
 
         ##signal SUSY
         "SMS_TChiWZ"
@@ -369,8 +378,8 @@ if getHeppyOption('selectComponents'):
     else:
         selectedComponents = byCompName(selectedComponents, getHeppyOption('selectComponents').split(","))
 autoAAA(selectedComponents, quiet=not(getHeppyOption("verboseAAA",False)), redirectorAAA="xrootd-cms.infn.it") # must be done before mergeExtensions
-configureSplittingFromTime(mcSamples,250 if preprocessor else 10,10)
-configureSplittingFromTime(dataSamples,80 if preprocessor else 10,10)
+configureSplittingFromTime(mcSamples,500 if preprocessor else 10,10)
+configureSplittingFromTime(dataSamples,160 if preprocessor else 10,10)
 selectedComponents, _ = mergeExtensions(selectedComponents, verbose=True)
 
 # create and set preprocessor if requested
@@ -379,7 +388,7 @@ if getHeppyOption("nanoPreProcessor"):
     preproc_cfg = {2016: ("mc94X2016","data94X2016"),
                    2017: ("mc94Xv2","data94Xv2"),
                    2018: ("mc102X","data102X_ABC","data102X_D")}
-    preproc_cmsswArea = "/afs/cern.ch/work/v/vtavolar/SusySOSSW_2_clean/nanoAOD/clean/CMSSW_10_2_16_UL"#/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/nanoAOD/CMSSW_10_2_15" #MODIFY ACCORDINGLY
+    preproc_cmsswArea = "/afs/cern.ch/user/p/peruzzi/work/cmgtools_sos/CMSSW_10_2_18" #MODIFY ACCORDINGLY
     preproc_mc = nanoAODPreprocessor(cfg='%s/src/PhysicsTools/NanoAOD/test/%s_NANO.py'%(preproc_cmsswArea,preproc_cfg[year][0]),cmsswArea=preproc_cmsswArea,keepOutput=True)
     if year==2018:
         preproc_data_ABC = nanoAODPreprocessor(cfg='%s/src/PhysicsTools/NanoAOD/test/%s_NANO.py'%(preproc_cmsswArea,preproc_cfg[year][1]),cmsswArea=preproc_cmsswArea,keepOutput=True, injectTriggerFilter=True, injectJSON=True)
