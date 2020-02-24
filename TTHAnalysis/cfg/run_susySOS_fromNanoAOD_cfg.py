@@ -27,10 +27,10 @@ else:
         from CMGTools.RootTools.samples.samples_13TeV_RunIIAutumn18NanoAODv6 import samples as mcSamples_
         from CMGTools.RootTools.samples.samples_13TeV_DATA2018_NanoAOD import dataSamples_25Oct2019 as allData
     elif year == 2017:
-        from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17NanoAODv5 import samples as mcSamples_
+        from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17NanoAODv6 import samples as mcSamples_
         from CMGTools.RootTools.samples.samples_13TeV_DATA2017_NanoAOD import dataSamples_25Oct2019 as allData
     elif year == 2016:
-        from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16NanoAODv5 import samples as mcSamples_
+        from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16NanoAODv6 import samples as mcSamples_
         from CMGTools.RootTools.samples.samples_13TeV_DATA2016_NanoAOD import dataSamples_25Oct2019 as allData
 
 DatasetsAndTriggers = []
@@ -143,16 +143,12 @@ elif year == 2017:
     mcSamples = byCompName(mcSamples_, [
 
         ## low Mll Samples
-        # "ZZTo4L_M1toInf",
-        # "VVTo2L2Nu_M1toInf",
-        # "DYJetsToLL_M1to4_HT70to100",
-        # "DYJetsToLL_M1to4_HT100to200",
-        # "DYJetsToLL_M1to4_HT200to400",
-        # "DYJetsToLL_M1to4_HT400to600",
-        # "DYJetsToLL_M1to4_HT600toInf",
+        "ZZTo4L_M1toInf",
+        "VVTo2L2Nu_M1toInf",
+        "DYJetsToLL_M1to4_HT",
 
-        "DYJetsToLL_M50_LO", # for Tag and Probe studies
-        "DYJetsToLL_M10to50_LO_ext,"
+#        "DYJetsToLL_M50_LO", # for Tag and Probe studies
+#        "DYJetsToLL_M10to50_LO_ext,"
 ##        "DYJetsToLL_M50$", "TT(Lep|Semi)_pow", "TTHnobb_pow",
 
         ##main bkgs
@@ -182,8 +178,9 @@ elif year == 2017:
         "TTJets_DiLepton",
 
         #main VV
-        "WWTo2L2Nu",
-        "ZZTo2L2Nu",
+#        "WWTo2L2Nu",
+#        "ZZTo2L2Nu",
+        "VVTo2L2Nu",
 
         #fakesbkg
         "TTJets_SingleLeptonFromT",
@@ -202,31 +199,32 @@ elif year == 2017:
         "WWToLNuQQ",
         "WZTo1L1Nu2Q",
         "ZZTo4L",
-        "WWW", #_4F
+        "WWW_ll", #_4F
         "WZZ",
         "WWZ", #_4F
         "ZZZ",
         "T_tch",
         "TBar_tch",
         "T_sch_lep",
+        "T_tWch_noFullyHad",
         "WWTo2L2Nu_DPS_hpp",
         "TTWToLNu_fxfx",
-        "TTZToLLNuNu_amc",
+        "TTZToLLNuNu_amc$",
         "TTZToLLNuNu_m1to10",
         "TTGJets",
         "TGJets_lep",
 
 #more to be included
-#            "ZZTo2L2Q",
-            "WpWpJJ",
+        "ZZTo2L2Q",
+        "WpWpJJ",
 #            "WZTo1L3Nu",
-#            "WGToLNuG_amcatnlo_ext",
-#            "ZGTo2LG_ext",
-#            "WZTo2L2Q",
-
+        "WGToLNuG",
+        "ZGTo2LG",
+        "WZTo2L2Q",
+        "WW_DPS",
 
         ##signal SUSY
-        "SMS_TChiWZ"
+        "SMS_TChiWZ",
 
     ])
 
@@ -243,16 +241,12 @@ elif year == 2016:
     mcSamples = byCompName(mcSamples_, [
 
         ## low Mll Samples
-        # "ZZTo4L_M1toInf",
-        # "VVTo2L2Nu_M1toInf",
-        # "DYJetsToLL_M1to4_HT70to100",
-        # "DYJetsToLL_M1to4_HT100to200",
-        # "DYJetsToLL_M1to4_HT200to400",
-        # "DYJetsToLL_M1to4_HT400to600",
-        # "DYJetsToLL_M1to4_HT600toInf",
+        "ZZTo4L_M1toInf",
+        "VVTo2L2Nu_M1toInf",
+        "DYJetsToLL_M1to5_HT",
 
-        "DYJetsToLL_M50_LO", # for Tag and Probe studies
-        "DYJetsToLL_M10to50_LO$",
+#        "DYJetsToLL_M50_LO", # for Tag and Probe studies
+#        "DYJetsToLL_M10to50_LO$",
 
         ##main bkgs
         "T_tWch_noFullyHad", #extensions are to be included?
@@ -266,15 +260,6 @@ elif year == 2016:
         "DYJetsToLL_M5to50_HT400to600_ext",
         "DYJetsToLL_M5to50_HT600toInf",
         "DYJetsToLL_M5to50_HT600toInf_ext",
-##        "DYJetsToLL_M4to50_HT70to100", 
-##        "DYJetsToLL_M4to50_HT70to100_ext1",
-##        "DYJetsToLL_M4to50_HT100to200", 
-##        "DYJetsToLL_M4to50_HT100to200_ext1",
-##        "DYJetsToLL_M4to50_HT200to400",
-##        "DYJetsToLL_M4to50_HT200to400_ext1",
-##        "DYJetsToLL_M4to50_HT400to600",
-##        "DYJetsToLL_M4to50_HT400to600_ext1",
-##        "DYJetsToLL_M4to50_HT600toInf",
 
 
         "DYJetsToLL_M50_HT70to100", 
@@ -288,22 +273,13 @@ elif year == 2016:
         "DYJetsToLL_M50_HT800to1200",
         "DYJetsToLL_M50_HT1200to2500",
         "DYJetsToLL_M50_HT2500toInf",
-#        "DYJetsToLL_M50_HT100to200", 
-#        "DYJetsToLL_M50_HT100to200_ext1",
-#        "DYJetsToLL_M50_HT200to400",
-#        "DYJetsToLL_M50_HT200to400_ext1",
-#        "DYJetsToLL_M50_HT400to600",
-#        "DYJetsToLL_M50_HT400to600_ext1",
-#        "DYJetsToLL_M50_HT600to800",
-#        "DYJetsToLL_M50_HT800to1200",
-#        "DYJetsToLL_M50_HT1200to2500",
-#        "DYJetsToLL_M50_HT2500toInf",
 
         "TTJets_DiLepton",
 
         #main VV
-        "WWTo2L2Nu",
-        "ZZTo2L2Nu",
+#        "WWTo2L2Nu",
+#        "ZZTo2L2Nu",
+        "VVTo2L2Nu",
 
         #fakesbkg
         "TTJets_SingleLeptonFromT",
@@ -326,42 +302,33 @@ elif year == 2016:
         "WJetsToLNu_HT1200to2500_ext",
         "WJetsToLNu_HT2500toInf",
         "WJetsToLNu_HT2500toInf_ext",
-##        "WJetsToLNu_HT100to200",
-##        "WJetsToLNu_HT200to400",
-##        "WJetsToLNu_HT400to600",
-##        "WJetsToLNu_HT600to800",
-##        "WJetsToLNu_HT800to1200",
-##        "WJetsToLNu_HT1200to2500",
-##        "WJetsToLNu_HT2500toInf",
 
         #rarebkg
         "WZTo3LNu_fxfx",
         "WWToLNuQQ",
         "WZTo1L1Nu2Q",
         "ZZTo4L",
-        "WWW", #_4F
+        "WWW_ll", #_4F
         "WZZ",
         "WWZ", #why not _4F?
         "ZZZ",
         "T_tch",
         "TBar_tch",
         "T_sch_lep",
-##        "WWTo2L2Nu_DPS_hpp", #missing
-        "TTWToLNu", "TTWToLNu_ext",  #_fxfx
-        "TTZToLLNuNu", "TTZToLLNuNu_ext", "TTZToLLNuNu_ext2", #_amc
+        "WWDoubleTo2L",
+        "TTWToLNu",  #_fxfx
+        "TTZToLLNuNu", #_amc
         "TTZToLLNuNu_m1to10",
-        "TTGJets", "TTGJets_ext"
-       # "TGJets_lep" #missing
+        "TTGJets",
+        "TGJets_lep",
 
 #more to be included
         "ZZTo2L2Q", 
         "WpWpJJ",
-        "WZTo1L3Nu",
+#        "WZTo1L3Nu",
         "WGToLNuG_amcatnlo",
-        "WGToLNuG_amcatnlo_ext",
         "ZGTo2LG",
         "WZTo2L2Q",
-
 
         ##signal SUSY
         "SMS_TChiWZ"
