@@ -1,6 +1,7 @@
 ### Signal
 ## xsec in pb multiplied by 0.1 BR
 
+
 signal_TChiWZ_100_1+	: SMS_TChiWZ :  0.1*22.6701 : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 ; genWeightName="genWeight*GenModel_TChiWZ_ZToLL_100_1", genSumWeightName="genEventSumw_TChiWZ_ZToLL_100_1"
 signal_TChiWZ_100_10+	: SMS_TChiWZ :  0.1*22.6701 : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 ; genWeightName="genWeight*GenModel_TChiWZ_ZToLL_100_10", genSumWeightName="genEventSumw_TChiWZ_ZToLL_100_10"
 signal_TChiWZ_100_20+	: SMS_TChiWZ :  0.1*22.6701 : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 ; genWeightName="genWeight*GenModel_TChiWZ_ZToLL_100_20", genSumWeightName="genEventSumw_TChiWZ_ZToLL_100_20"
