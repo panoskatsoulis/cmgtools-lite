@@ -299,8 +299,9 @@ recleaner_step2_mc = lambda : fastCombinedObjectRecleaner(label="Recl", inlabel=
 	jetPtsFwd=[25,40],
 	btagL_thr=lambda year: 0.4 if year==2016 else 0.1522 if year==2017 else 0.1241,
 	btagM_thr=lambda year: 0.6324 if year==2016 else 0.4941 if year==2017 else 0.4184,
-  jetBTag='btagDeepB',
-	isMC = True)
+        jetBTag='btagDeepB',
+        isMC = True,
+        variations=["jesTotal","jer"])
 recleaner_step2_data = lambda : fastCombinedObjectRecleaner(label="Recl", inlabel="_InternalRecl",
 	cleanTausWithLooseLeptons=True,
 	cleanJetsWithFOTaus=True,
@@ -309,8 +310,9 @@ recleaner_step2_data = lambda : fastCombinedObjectRecleaner(label="Recl", inlabe
 	jetPtsFwd=[25,40],
 	btagL_thr=lambda year: 0.4 if year==2016 else 0.1522 if year==2017 else 0.1241,
 	btagM_thr=lambda year: 0.6324 if year==2016 else 0.4941 if year==2017 else 0.4184,
-  jetBTag='btagDeepB',
-	isMC = False)
+        jetBTag='btagDeepB',
+        isMC = False,
+        variations=[])
 
 from CMGTools.TTHAnalysis.tools.eventVars_2lss import EventVars2LSS
 eventVars = lambda : EventVars2LSS('','Recl', doSystJEC=False)
