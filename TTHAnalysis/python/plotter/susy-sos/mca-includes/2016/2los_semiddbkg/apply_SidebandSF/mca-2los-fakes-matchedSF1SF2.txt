@@ -1,5 +1,5 @@
 ## FAKES (MC with SF)
-## At least one fake and SF1F  and SF2F imposed
+## At least one fake and SF1F  and SF2F applied
 ## -----------------------------------------------------------
 fakes_matchedBoth          : WJetsToLNu_HT100to200        : ScaleFactor1F*xsec  : (LepGood1_mcMatchId==0 || LepGood2_mcMatchId==0) && (LepGood1_isLepTight+LepGood2_isLepTight)==1 ; Label="Nonprompt e/\#mu", FillColor=ROOT.kGray  
 fakes_matchedBoth          : WJetsToLNu_HT200to400        : ScaleFactor1F*xsec  : (LepGood1_mcMatchId==0 || LepGood2_mcMatchId==0) && (LepGood1_isLepTight+LepGood2_isLepTight)==1 ; Label="Nonprompt e/\#mu", FillColor=ROOT.kGray  

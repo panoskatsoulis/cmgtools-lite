@@ -1,4 +1,4 @@
-## One fake and SF1F imposed
+## One fake and SF1F applied
 ## -----------------------------------------------------------
 fakes_matched1          : WJetsToLNu_HT100to200        : ScaleFactor1F*xsec  :LepGood1_mcMatchId==0 || LepGood2_mcMatchId==0  ;  Label="Wj(fakes)", FillColor=ROOT.kGray  
 fakes_matched1          : WJetsToLNu_HT200to400        : ScaleFactor1F*xsec  :LepGood1_mcMatchId==0 || LepGood2_mcMatchId==0  ;  Label="Wj(fakes)", FillColor=ROOT.kGray  

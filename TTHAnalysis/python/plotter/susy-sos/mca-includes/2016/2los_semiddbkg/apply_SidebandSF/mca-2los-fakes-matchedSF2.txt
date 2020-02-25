@@ -1,4 +1,4 @@
-## At least one fake and SF2F imposed
+## At least one fake and SF2F applied
 ## -----------------------------------------------------------
 fakes_matched2           : WJetsToLNu_HT100to200        : ScaleFactor2F*xsec  : LepGood1_mcMatchId==0 || LepGood2_mcMatchId==0 ;  Label="Wj(fakes)",  FillColor=ROOT.kGray  
 fakes_matched2           : WJetsToLNu_HT200to400        : ScaleFactor2F*xsec  : LepGood1_mcMatchId==0 || LepGood2_mcMatchId==0 ;  Label="Wj(fakes)",  FillColor=ROOT.kGray  
