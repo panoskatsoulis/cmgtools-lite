@@ -10,3 +10,7 @@ Rares	: TTZToLLNuNu_amc	: xsec	: LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 
 Rares	: TTZToLLNuNu_m1to10	: xsec	: LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 && LepGood3_mcMatchId!=0	;  FillColor=ROOT.kMagenta+2, Label="Rares"
 Rares   : TZQToLL               : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 && LepGood3_mcMatchId!=0       ;  FillColor=ROOT.kMagenta+2, Label="Rares"
 Rares   : tWll                  : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 && LepGood3_mcMatchId!=0       ;  FillColor=ROOT.kMagenta+2, Label="Rares"
+
+#Rares  : TTHnobb_pow       : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 && LepGood3_mcMatchId!=0   ; FillColor=ROOT.kMagenta+2, Label="Rares" # In samples file but not produced --> Minor
+#Rares  : TTTT              : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 && LepGood3_mcMatchId!=0   ; FillColor=ROOT.kMagenta+2, Label="Rares" # In samples file but not produced --> Minor
+#Rares  : VHToNonbb         : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0 && LepGood3_mcMatchId!=0   ; FillColor=ROOT.kMagenta+2, Label="Rares" # In samples file but not produced

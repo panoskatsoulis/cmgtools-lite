@@ -6,5 +6,3 @@ prompt_vv   : ZZTo4L_M1toInf    : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMa
 prompt_vv   : VVTo2L2Nu_M1toInf : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0    ; FillColor=ROOT.kViolet-4, Label="VV"
 prompt_vv   : WpWpJJ            : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0    ; FillColor=ROOT.kViolet-4, Label="VV"
 prompt_vv   : WW_DPS            : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0    ; FillColor=ROOT.kViolet-4, Label="VV"
-
-#prompt_vv  : VHToNonbb         : xsec  : LepGood1_mcMatchId!=0 && LepGood2_mcMatchId!=0    ; FillColor=ROOT.kViolet-4, Label="VV" # In samples file but not produced --> Minor
