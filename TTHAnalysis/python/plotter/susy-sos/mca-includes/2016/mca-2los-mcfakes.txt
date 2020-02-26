@@ -20,8 +20,3 @@ Fakes_t     : TBar_tWch_noFullyHad          : xsec  : ((LepGood1_mcMatchId==0 &&
 
 Fakes_vv    : WZTo1L1Nu2Q                   : xsec  : ((LepGood1_mcMatchId==0 && LepGood1_mcPromptGamma==0) || (LepGood2_mcMatchId==0  && LepGood2_mcPromptGamma==0))   ;  FillColor=ROOT.kGray+3, Label="VV(fakes)"
 Fakes_vv    : WWToLNuQQ                     : xsec  : ((LepGood1_mcMatchId==0 && LepGood1_mcPromptGamma==0) || (LepGood2_mcMatchId==0  && LepGood2_mcPromptGamma==0))   ;  FillColor=ROOT.kGray+3, Label="VV(fakes)"
-
-Fakes_vvv   : WWW_ll                        : xsec  : ((LepGood1_mcMatchId==0 && LepGood1_mcPromptGamma==0) || (LepGood2_mcMatchId==0  && LepGood2_mcPromptGamma==0))   ;  FillColor=ROOT.kGray+4, Label="VVV(fakes)"
-Fakes_vvv   : WWZ                           : xsec  : ((LepGood1_mcMatchId==0 && LepGood1_mcPromptGamma==0) || (LepGood2_mcMatchId==0  && LepGood2_mcPromptGamma==0))   ;  FillColor=ROOT.kGray+4, Label="VVV(fakes)"
-Fakes_vvv   : WZZ                           : xsec  : ((LepGood1_mcMatchId==0 && LepGood1_mcPromptGamma==0) || (LepGood2_mcMatchId==0  && LepGood2_mcPromptGamma==0))   ;  FillColor=ROOT.kGray+4, Label="VVV(fakes)"
-Fakes_vvv   : ZZZ                           : xsec  : ((LepGood1_mcMatchId==0 && LepGood1_mcPromptGamma==0) || (LepGood2_mcMatchId==0  && LepGood2_mcPromptGamma==0))   ;  FillColor=ROOT.kGray+4, Label="VVV(fakes)"
