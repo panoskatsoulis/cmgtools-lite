@@ -4,16 +4,16 @@ function do_help() {
     printf "Use this to generate a directory named <year> with mca files
 Fetches info from the path ./metadata
 Usage:
-$(basename $0) --year <year> --buildfiles <list-of-files> --md <metadata-dir> [--make-draft]
+$(basename $0) --year <year> --md <metadata-dir> [--make-draft]
 "
     exit 0
 }
 
 while [ ! -z "$1" ]; do
     [ "$1" == "--help" ] && do_help
-    [ "$1" == "--buildfiles" ] && { buildfiles=$2; shift 2; continue; }
+#    [ "$1" == "--buildfiles" ] && { buildfiles=$2; shift 2; continue; }
     [ "$1" == "--year" ] && { year=$2; shift 2; continue; }
-    [ "$1" == "--md" ] && { metadata=$2; shift 2; continue; }
+    [ "$1" == "--md" ] && { metadata=$PWD/$2; shift 2; continue; }
     [ "$1" == "--make-draft" ] && { mkdraft=true; shift; continue; }
     echo "Unrecognized cli argument $1"
     exit 1
@@ -21,11 +21,13 @@ done
 
 
 ## check args and build env
-[ -z "$buildfiles" ] && { echo "Specify the list of files to create"; exit 1; }
+{ [ -z "$CMSSW_BASE" ] || ! [[ $PWD =~ .*$(echo $CMSSW_BASE | sed s/.*$USER//).* ]]; } && { echo "Run cmsenv"; exit 1; }
+cd $CMSSW_BASE/src/CMGTools/TTHAnalysis/python/plotter/susy-sos/mca-includes
 [ -z "$year" ] && { echo "specify year using '--year <year>'"; exit 1; }
 [ -z "$mkdraft" ] && dirout=$year || { dirout=${year}_draft; rm -rf $dirout; }
+[ -z "$metadata" ] && { echo "Please provide the metadata dir using --md <metadata>"; exit 1; }
 mkdir $dirout || { echo "Output dir $dirout failed to be created. Check if it exists already."; exit 1; }
-
+[ -z "$buildfiles" ] && { echo "Getting the filelist toi create from the matadata/ dir."; buildfiles=$metadata/filesToChange_fakes.txt; }
 
 ## look up info for labels and colors
 function getLabel() {
@@ -55,15 +57,8 @@ function getLabel() {
 cat $buildfiles | while read line; do
     ## check validity of line
     [[ $line =~ ^$ ]] && continue
-    [ "$metadata" == "metadata/ioanna" ] && {
-	echo $file | grep $year > /dev/null || continue # skip files for diff year
-	file=$line # this line is a file	    
-	buildfile=$dirout/$(echo $file | sed s@.*mca\-includes/201[678]/@@)
-    }
-    [ "$metadata" == "metadata/manos" ] && {
-	file=$(echo $line | sed -r "s/^([^,]*),.*/\1/")
-	buildfile=$dirout/$(echo $file | sed s@.*mca\-includes/YEAR/@@)
-    }
+    file=$(echo $line | sed -r "s/^([^,]*),.*/\1/")
+    buildfile=$dirout/$(echo $file | sed s@.*mca\-includes/YEAR/@@)
 
     ## create file
     ! [ -z "$buildfile" ] && echo "-----> file: $buildfile" || { echo "buildfile var is empty"; exit 2; }
