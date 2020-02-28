@@ -27,7 +27,7 @@ cd $CMSSW_BASE/src/CMGTools/TTHAnalysis/python/plotter/susy-sos/mca-includes
 [ -z "$mkdraft" ] && { mkdraft=false; dirout=$year; } || { dirout=${year}_draft; rm -rf $dirout; }
 [ -z "$onefile" ] && onefile=false
 [ -z "$metadata" ] && { echo "Please provide the metadata dir using --md <metadata>"; exit 1; }
-[ -z "$buildfiles" ] && { echo "Getting the filelist toi create from the matadata/ dir."; buildfiles=$metadata/filesToChange_fakes.txt; }
+[ -z "$buildfiles" ] && { echo "Getting the filelist to create from the matadata/ dir."; buildfiles=$metadata/filesToChange_fakes.txt; }
 $mkdraft && { # if is making draft mk the draft dir, otherwise already exists
     mkdir $dirout || { echo "Output dir $dirout failed to be created. Check if it exists already."; exit 1; }
 }
