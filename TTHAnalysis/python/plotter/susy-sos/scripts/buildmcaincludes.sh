@@ -98,7 +98,7 @@ cat $buildfiles | while read line; do
 	## get extra info from the src file
 	# echo $weight
 	weight=$(echo $weight | sed s/\*.*//)
-	name=$(grep $weight $srcfile | sed -r "s/^([^:]*):.*/\1/; s/ *$//; s/^#//" | sort -u)
+	name=$(grep $weight $srcfile | sed -r "s/^([^:]*):.*/\1/; s/ *$//" | grep -v ^# | sort -u)
 	label=$(grep $weight $srcfile | grep -o "Label=[^,]*" | sed "s/ *$//" | sort -u)
 	color=$(grep $weight $srcfile | grep -o "FillColor=[^,]*" | sed "s/ *$//" | sort -u)
 	echo $name
