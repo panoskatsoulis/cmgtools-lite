@@ -4,17 +4,17 @@ function do_help() {
     printf "Use this to generate a directory named <year> with mca files
 Fetches info from the path ./metadata
 Usage:
-$(basename $0) --year <year> --md <metadata-dir> [--make-draft]
+$(basename $0) --year <year> --md <metadata-dir> [--make-draft] [--one-file]
 "
     exit 0
 }
 
 while [ ! -z "$1" ]; do
     [ "$1" == "--help" ] && do_help
-#    [ "$1" == "--buildfiles" ] && { buildfiles=$2; shift 2; continue; }
     [ "$1" == "--year" ] && { year=$2; shift 2; continue; }
     [ "$1" == "--md" ] && { metadata=$PWD/$2; shift 2; continue; }
     [ "$1" == "--make-draft" ] && { mkdraft=true; shift; continue; }
+    [ "$1" == "--one-file" ] && { onefile=true; shift; continue; }
     echo "Unrecognized cli argument $1"
     exit 1
 done
@@ -24,10 +24,13 @@ done
 { [ -z "$CMSSW_BASE" ] || ! [[ $PWD =~ .*$(echo $CMSSW_BASE | sed s/.*$USER//).* ]]; } && { echo "Run cmsenv"; exit 1; }
 cd $CMSSW_BASE/src/CMGTools/TTHAnalysis/python/plotter/susy-sos/mca-includes
 [ -z "$year" ] && { echo "specify year using '--year <year>'"; exit 1; }
-[ -z "$mkdraft" ] && dirout=$year || { dirout=${year}_draft; rm -rf $dirout; }
+[ -z "$mkdraft" ] && { mkdraft=false; dirout=$year; } || { dirout=${year}_draft; rm -rf $dirout; }
+[ -z "$onefile" ] && onefile=false
 [ -z "$metadata" ] && { echo "Please provide the metadata dir using --md <metadata>"; exit 1; }
-mkdir $dirout || { echo "Output dir $dirout failed to be created. Check if it exists already."; exit 1; }
 [ -z "$buildfiles" ] && { echo "Getting the filelist toi create from the matadata/ dir."; buildfiles=$metadata/filesToChange_fakes.txt; }
+$mkdraft && { # if is making draft mk the draft dir, otherwise already exists
+    mkdir $dirout || { echo "Output dir $dirout failed to be created. Check if it exists already."; exit 1; }
+}
 
 ## look up info for labels and colors
 function getLabel() {
@@ -64,10 +67,11 @@ cat $buildfiles | while read line; do
     ! [ -z "$buildfile" ] && echo "-----> file: $buildfile" || { echo "buildfile var is empty"; exit 2; }
     where=$(dirname $buildfile)
     ! [ -e $where ] && mkdir -p $where
-    touch $buildfile # create file
+    ! $mkdraft && buildfile=$buildfile.tmp
+    touch $buildfile # be sure that you can access the file in hand
 
     ## find source file
-    srcfile=$year/$(echo $buildfile | sed "s@$dirout/@@")
+    srcfile=$year/$(echo $buildfile | sed "s@$dirout/@@; s@\.tmp@@")
     echo "-----> srcfile: $srcfile"
 
     ## get analysis
@@ -107,7 +111,7 @@ cat $buildfiles | while read line; do
 	    ## go to the samples for the correct year
 	    if ! $yearfound; then
 		echo $sample | grep $year > /dev/null && yearfound=true
-		continue ## in any case go to the next line
+		continue # in any case go to the next line
 	    fi
 	    ## skip these lines
 	    { [ "$sample" == "----" ] || [[ $sample =~ ^$ ]]; } && continue
@@ -139,7 +143,9 @@ cat $buildfiles | while read line; do
     done
     IFS=$oldifs # revert delimeter splitting
 
-#    break
+    ## move the tmp file to its correct name (only of not draft)
+    ! $mkdraft && mv $buildfile $(echo $buildfile | sed s/\.tmp$//)
+    $onefile && break # testing
 done
 
 exit 0
