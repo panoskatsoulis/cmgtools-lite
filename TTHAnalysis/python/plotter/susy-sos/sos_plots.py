@@ -7,7 +7,7 @@ import argparse
 helpText = "LEP = '2los', '3los'\n\
 REG = 'sr', 'sr_col', 'cr_dy', 'cr_tt', 'cr_vv', 'cr_ss','cr_wz', 'appl', 'appl_col',\n\
 \t'cr_ss_1F_NoSF', 'cr_ss_2F_NoSF', 'cr_ss_1F_SF1', 'cr_ss_2F_SF2',\n\
-\t'appl_1F_NoSF', 'appl_2F_NoSF', 'appl_1F_SF1F', 'appl_2F_SF2F',\n\
+\t'appl_1F_NoSF', 'appl_2F_NoSF','appl_3F_NoSF', 'appl_1F_SF1F', 'appl_2F_SF2F',\n\
 \t'appl_col_1F_NoSF', 'appl_col_2F_NoSF',\n\
 \t'sr_closure', 'sr_closure_norm'\n\
 BIN = 'min', 'low', 'med', 'high'"
@@ -27,6 +27,8 @@ parser.add_argument("--norm", action="store_true", default=False, help="Normaliz
 parser.add_argument("--unc", action="store_true", default=False, help="Include uncertainties")
 parser.add_argument("--inPlots", default=None, help="Select plots, separated by commas, no spaces")
 parser.add_argument("--exPlots", default=None, help="Exclude plots, separated by commas, no spaces")
+parser.add_argument("--lowmll_LowPt_bothlep", action="store_true", default=False, help="Flag to run with low mll & low lead/sublead lep pt cuts")
+parser.add_argument("--lowmll_NominalPt_bothlep", action="store_true", default=False, help="Flag to run with low mll &  nominal lead/sublead lep pt cuts")
 
 parser.add_argument("--doWhat", default="plots", help="Do 'plots' or 'cards'. Default = '%(default)s'")
 parser.add_argument("--signalMasses", default=None, help="Select only these signal samples (e.g 'signal_TChiWZ_100_70+'), comma separated. Use only when doing 'cards'")
@@ -43,7 +45,7 @@ conf="%s_%s_%s"%(args.lep,args.reg,args.bin)
 
 if YEAR not in ("2016","2017","2018"): raise RuntimeError("Unknown year: Please choose '2016', '2017' or '2018'")
 if args.lep not in ["2los","3l"]: raise RuntimeError("Unknown choice for LEP option. Please check help" )
-if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss", "cr_wz", "appl", "appl_col", "cr_ss_1F_NoSF", "cr_ss_2F_NoSF", "cr_ss_1F_SF1", "cr_ss_2F_SF2", "appl_1F_NoSF", "appl_2F_NoSF", "appl_1F_SF1F", "appl_2F_SF2F", "appl_col_1F_NoSF", "appl_col_2F_NoSF", "sr_closure", "sr_closure_norm"]: raise RuntimeError("Unknown choice for REG option. Please check help." )
+if args.reg not in ["sr", "sr_col", "cr_dy", "cr_tt", "cr_vv", "cr_ss", "cr_wz", "appl", "appl_col", "cr_ss_1F_NoSF", "cr_ss_2F_NoSF", "cr_ss_1F_SF1", "cr_ss_2F_SF2", "appl_1F_NoSF", "appl_2F_NoSF","appl_3F_NoSF", "appl_1F_SF1F", "appl_2F_SF2F", "appl_col_1F_NoSF", "appl_col_2F_NoSF", "sr_closure", "sr_closure_norm"]: raise RuntimeError("Unknown choice for REG option. Please check help." )
 if args.bin not in ["min", "low", "med", "high"]: raise RuntimeError("Unknown choice for BIN option. Please check help." )
 if args.fakes not in ["mc", "dd", "semidd"]: raise RuntimeError("Unknown choice for FAKES option. Please check help." )
 if args.doWhat not in ["plots", "cards"]: raise RuntimeError("Unknown choice for DOWHAT option. Please check help." ) # More options to be added
@@ -74,7 +76,7 @@ def base(selection):
     RATIO= " --maxRatioRange 0.0  1.99 --ratioYNDiv 505 "
     RATIO2=" --showRatio --attachRatioPanel --fixRatioRange "
     LEGEND=" --legendColumns 2 --legendWidth 0.25 "
-    LEGEND2=" --legendFontSize 0.042 "
+    LEGEND2=" --legendFontSize 0.032 "
     SPAM=" --noCms --topSpamSize 1.1 --lspam '#scale[1.1]{#bf{CMS}} #scale[0.9]{#it{Preliminary}}' "
     if args.doWhat == "plots": 
         CORE+=LUMI+RATIO+RATIO2+LEGEND+LEGEND2+SPAM+" --showMCError "
@@ -107,7 +109,7 @@ def base(selection):
         wBG = " 'puWeight*eventBTagSF*triggerSF(muDleg_SF(%s,LepGood1_pt,LepGood1_eta,LepGood2_pt,LepGood2_eta,0,LepGood3_pt,LepGood3_eta,lepton_permut(LepGood1_pdgId,LepGood2_pdgId,LepGood3_pdgId)), MET_pt, metmmm_pt(LepGood1_pt, LepGood1_phi, LepGood2_pt, LepGood2_phi, LepGood3_pt, LepGood3_phi, MET_pt, MET_phi, lepton_Id_selection(LepGood1_pdgId,LepGood2_pdgId,LepGood3_pdgId)), %s)*lepSF(LepGood1_pt,LepGood1_eta,LepGood1_pdgId,%s)*lepSF(LepGood2_pt,LepGood2_eta,LepGood2_pdgId,%s)*lepSF(LepGood3_pt,LepGood3_eta,LepGood3_pdgId,%s)' "%(YEAR,YEAR,YEAR,YEAR,YEAR)
         GO="%s -W %s"%(GO,wBG)
 
-        if args.doWhat == "plots": GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.42 ")
+        if args.doWhat == "plots": GO=GO.replace(LEGEND, " --legendColumns 3 --legendWidth 0.62 ")
         if args.doWhat == "cards":         
             GO += " --binname %s "%args.bin
         else:
@@ -335,6 +337,8 @@ if __name__ == '__main__':
 
 	if args.fakes == "semidd": x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/semidd_bkg/mca-2los-%s-semidd.txt'%(YEAR))
 	if args.fakes == "dd": x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/dd_bkg/mca-2los-%s-dd.txt'%(YEAR))
+        if args.lowmll_LowPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -X ^pt5sublep$ -E ^lowptsubmu$ -E ^mindR$ -X ^ledlepPt$ -E ^ledlepPt3p5$")
+        if args.lowmll_NominalPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -E ^mindR$")
 
         if 'sr' in torun:
             if '_col' in torun:
@@ -347,7 +351,8 @@ if __name__ == '__main__':
                      x = x.replace('-E ^met250$','-E ^met300_col$')
             if args.fakes == "semidd":
 	   	if '_col' in torun: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_col_%s.txt "%(YEAR,args.lep,args.bin))
-		else: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s.txt "%(YEAR,args.lep,args.bin))
+                if args.lowmll_LowPt_bothlep: x = add(x, "--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s_lowMll_3p5pt.txt"%(YEAR,args.lep,args.bin))
+                else:  x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_appl_%s_Nominal.txt"%(YEAR,args.lep,args.bin))
             if '_closure' in torun:
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/closure/mca-2los-%s-closure.txt'%(YEAR))
 		x = add(x,"-X ^met200$") # Run low MET bin and remove upper MET bound to get inclusive yields (not exactly correct). Needs modification to accomodate '_col' regions.
@@ -424,7 +429,9 @@ if __name__ == '__main__':
                 x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/semidd_bkg/Tests/mca-2los-%s-2F.txt'%(YEAR))
 		x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
                 x = add(x, "-E ^2LNT$ -X ^twoTight$")
-            if args.fakes == "semidd": x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_ss.txt "%(YEAR,args.lep))
+            if args.fakes == "semidd" :
+                if args.lowmll_LowPt_bothlep: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_cr_ss_lowMll_3p5pt.txt"%(YEAR,args.lep))
+                else : x = add(x, "--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_cr_ss_Nominal.txt"%(YEAR,args.lep))
 
     elif '3l_' in torun:
         x = base('3l')
@@ -433,8 +440,14 @@ if __name__ == '__main__':
 
         if args.fakes == "semidd": x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/semidd_bkg/mca-3l-%s-semidd.txt'%(YEAR))    
         if args.fakes == "dd": x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/dd_bkg/mca-3l-%s-dd.txt'%(YEAR))    
+        if args.lowmll_LowPt_bothlep: x = add(x, "-X ^minMll$ -E ^minMll_low$ -E ^JPsiVeto$ -X ^pt5sublep$ -E ^lowptsubmu$ -E ^mindR$ -X ^ledlepPt$ -E ^ledlepPt3p5$")
+        if args.lowmll_NominalPt_bothlep: x = add(x, "-X ^minMll$ -E ^minMll_low$ -E ^JPsiVeto$ -E ^mindR$")
 
-        if 'sr' in torun: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s.txt "%(YEAR,args.lep,args.bin))
+        if 'sr' in torun:
+            if args.fakes == "semidd":
+                #: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s.txt "%(YEAR,args.lep,args.bin))
+                if args.lowmll_LowPt_bothlep : x = add(x, "--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s_lowMll_3p5pt.txt"%(YEAR,args.lep,args.bin))
+                else: x= add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s_Nominal.txt"%(YEAR,args.lep,args.bin))
 
         if 'appl' in torun:
             x = add(x,"-X ^threeTight$ ")
