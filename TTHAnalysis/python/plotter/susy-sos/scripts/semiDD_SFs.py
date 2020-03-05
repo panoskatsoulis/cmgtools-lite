@@ -25,8 +25,7 @@ with open(fileName) as fp:
            if 'BACKGROUND' in bkg_category: bkg = float(line_list[1])
            if 'DATA' in bkg_category: data = float(line_list[1])
        cnt += 1
-SF = (data - (bkg - fakes)) / fakes
+if data==0 or fakes==0: SF = 0
+else: SF = (data - (bkg - fakes)) / fakes
 SF_string = "ScaleFactor1F" if "1F" in args.reg else "ScaleFactor2F" if "2F" in args.reg else "ScaleFactor3F"
-reg_string = "col" if "col" in args.reg else "appl"
 subprocess.call(["echo", "%s: %f"%(SF_string,SF)])
-
