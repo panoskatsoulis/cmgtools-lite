@@ -4,7 +4,7 @@ import re
 import os
 import argparse
 
-helpText = "LEP = '2los', '3los'\n\
+helpText = "LEP = '2los', '3l'\n\
 REG = 'sr', 'sr_col', 'cr_dy', 'cr_tt', 'cr_vv', 'cr_ss','cr_wz', 'appl', 'appl_col',\n\
 \t'cr_ss_1F_NoSF', 'cr_ss_2F_NoSF', 'cr_ss_1F_SF1', 'cr_ss_2F_SF2',\n\
 \t'appl_1F_NoSF', 'appl_2F_NoSF','appl_3F_NoSF', 'appl_1F_SF1F', 'appl_2F_SF2F',\n\
@@ -337,10 +337,9 @@ if __name__ == '__main__':
 
 	if args.fakes == "semidd": x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/semidd_bkg/mca-2los-%s-semidd.txt'%(YEAR))
 	if args.fakes == "dd": x = x.replace('susy-sos/mca/mca-2los-%s.txt'%(YEAR),'susy-sos/mca/dd_bkg/mca-2los-%s-dd.txt'%(YEAR))
-        if args.lowmll_LowPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -X ^pt5sublep$ -E ^lowptsubmu$ -E ^mindR$ -X ^ledlepPt$ -E ^ledlepPt3p5$")
-        if args.lowmll_NominalPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -E ^mindR$")
-
         if 'sr' in torun:
+            if args.lowmll_LowPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -X ^pt5sublep$  -E ^mindR$ -X ^ledlepPt$ -E ^ledlepPt3p5$")
+            if args.lowmll_NominalPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -E ^mindR$")
             if '_col' in torun:
                 x = add(x,"-X ^mT$ -X ^SF$ ")
                 if '_med' in torun: 
@@ -363,6 +362,8 @@ if __name__ == '__main__':
 			x = add(x, "--plotmode=%s "%("nostack"))
 
         if 'appl' in torun:
+            if args.lowmll_LowPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -X ^pt5sublep$  -E ^mindR$ -X ^ledlepPt$ -E ^ledlepPt3p5$")
+            if args.lowmll_NominalPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -E ^mindR$")
             if '_col' in torun:
                 x = add(x,"-X ^mT$ -X ^SF$ ")
                 if '_med' in torun: 
@@ -412,6 +413,8 @@ if __name__ == '__main__':
             x = add(x,"-E ^CRVVledlepPt$ -E ^CRVVbveto$ -E ^CRVVmT$ ")
 
         if 'cr_ss' in torun:
+            if args.lowmll_LowPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -X ^pt5sublep$  -E ^mindR$ -X ^ledlepPt$ -E ^ledlepPt3p5$")
+            if args.lowmll_NominalPt_bothlep: x = add(x, "-X ^mll$ -E ^mll_low$ -E ^JPsiVeto$ -E ^mindR$")
             if '_med' in torun:
                 x = x.replace('-E ^met200$','-E ^met200_CR$')
                 x = add(x,'-X ^pt5sublep$ ')
@@ -440,10 +443,10 @@ if __name__ == '__main__':
 
         if args.fakes == "semidd": x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/semidd_bkg/mca-3l-%s-semidd.txt'%(YEAR))    
         if args.fakes == "dd": x = x.replace('susy-sos/mca/mca-3l-%s.txt'%(YEAR),'susy-sos/mca/dd_bkg/mca-3l-%s-dd.txt'%(YEAR))    
-        if args.lowmll_LowPt_bothlep: x = add(x, "-X ^minMll$ -E ^minMll_low$ -E ^JPsiVeto$ -X ^pt5sublep$ -E ^lowptsubmu$ -E ^mindR$ -X ^ledlepPt$ -E ^ledlepPt3p5$")
-        if args.lowmll_NominalPt_bothlep: x = add(x, "-X ^minMll$ -E ^minMll_low$ -E ^JPsiVeto$ -E ^mindR$")
 
         if 'sr' in torun:
+            if args.lowmll_LowPt_bothlep: x = add(x, "-X ^minMll$ -E ^minMll_low$ -E ^JPsiVeto$ -X ^pt5sublep$  -E ^mindR$ -X ^ledlepPt$ -E ^ledlepPt3p5$")
+            if args.lowmll_NominalPt_bothlep: x = add(x, "-X ^minMll$ -E ^minMll_low$ -E ^JPsiVeto$ -E ^mindR$")
             if args.fakes == "semidd":
                 #: x = add(x,"--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s.txt "%(YEAR,args.lep,args.bin))
                 if args.lowmll_LowPt_bothlep : x = add(x, "--mcc susy-sos/fakerate/%s/%s/ScaleFactors_SemiDD/mcc_SF_%s_lowMll_3p5pt.txt"%(YEAR,args.lep,args.bin))
