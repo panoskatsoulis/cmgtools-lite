@@ -42,6 +42,7 @@ class fastCombinedObjectRecleaner(Module):
         self.vars_taus_uchar = ['idMVAoldDMdR032017v2','idDeepTau2017v2p1VSjet']
         self.vars_jets = [("pt","pt_nom") if self.isMC else 'pt',"btagDeepB","qgl",'btagDeepFlavB'] + [ 'pt_%s%s'%(x,y) for x in self.variations for y in ["Up","Down"]] #"btagCSVV2",,"btagDeepC"]#"btagCSV","btagDeepCSV",,"btagDeepCSVCvsL","btagDeepCSVCvsB","ptd","axis1"] # FIXME recover
         self.vars_jets_int = (["hadronFlavour"] if self.isMC else [])
+        self.vars_jets_int.extend(['jetId'])
         self.vars_jets_nooutput = []
         self.systsJEC = {0:""}
         if self.isMC:
