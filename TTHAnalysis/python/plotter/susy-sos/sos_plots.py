@@ -62,7 +62,9 @@ submit = '{command}'
 #args.doWhat = "yields" 
 #args.doWhat = "ntuple"
 
-P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_070220_v6/"
+#P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_070220_v6/"
+#P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_230819_v5/"
+P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_070220_v6_skim_2lep_met125/"
 nCores = 8
 TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR)
 HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src" # To be changed accordingly
@@ -206,9 +208,9 @@ def prepareWrapper(name):
                         if ibin == "high" and nlep != "2los" and ireg!="sr": continue
                         if ireg == "cr_ss" and nlep != "2los" and ibin != "med": continue
                         newName = '_'.join([nlep,ireg,ibin,nameSplit[-3],nameSplit[-2],year])
-                        f.write('if test -f "%s/jobs/runJob_%s.sh"; then\n'%(ODIR,newName))
+                        f.write('if test -f "%s/jobs/runJob_%s.sh"; then\n'%(ODIR,name))
                         f.write('    echo "running %s"\n'%year)
-                        f.write('    source "%s/jobs/runJob_%s.sh"\n'%(ODIR,newName))
+                        f.write('    source "%s/jobs/runJob_%s.sh"\n'%(ODIR,name))
                         f.write('fi\n')
         f.write( 'CARDS_ALL=""\n' )
         masses = '_'.join((args.signalMasses.rstrip('+').split('_'))[-2:])
@@ -262,9 +264,9 @@ def prepareWrapper(name):
 def runIt(GO,name):
     if not args.doWhat == "cards" : name=name+"_"+args.fakes
     if args.data and not args.doWhat == "cards" : name=name+"_data"
+    if args.doWhat == "cards": mass = '_'.join(name.split('_')[-2:])
     if args.norm: name=name+"_norm"
     if args.unc: name=name+"_unc"
-    if args.doWhat == "cards": mass = '_'.join(name.split('_')[-2:])
 #    print name.split('_')[-2]
 #    print mass
 #    print name+"\n"
