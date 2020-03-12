@@ -362,6 +362,7 @@ WpWpJJ = kreator.makeMCComponent("WpWpJJ", "/WpWpJJ_EWK-QCD_TuneCP5_13TeV-madgra
 
 WZTo3LNu_fxfx = kreator.makeMCComponent("WZTo3LNu_fxfx", "/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM", "CMS", ".*root", 5.063, fracNegWeights=0.189 )
 WZTo3LNu_fxfx_ext1 = kreator.makeMCComponent("WZTo3LNu_fxfx_ext1", "/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM", "CMS", ".*root", 5.063, fracNegWeights=0.189 )
+WZTo3LNu_mllmin01 = kreator.makeMCComponent("WZTo3LNu_mllmin01", "/WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM", "CMS", ".*root", 62.17)
 WZTo1L1Nu2Q = kreator.makeMCComponent("WZTo1L1Nu2Q", "/WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM", "CMS", ".*root",  10.71, fracNegWeights=0.204 )
 WZTo2L2Q    = kreator.makeMCComponent("WZTo2L2Q"   , "/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM"   , "CMS", ".*root",  5.60, fracNegWeights=0.2)
 
@@ -383,7 +384,7 @@ DiBosons = [
     WW_DPS,
     WpWpJJ,
     WZ,
-    WZTo3LNu_fxfx, WZTo3LNu_fxfx_ext1,
+    WZTo3LNu_fxfx, WZTo3LNu_fxfx_ext1, WZTo3LNu_mllmin01,
     WZTo1L1Nu2Q,
     WZTo2L2Q,
     ZZ,
