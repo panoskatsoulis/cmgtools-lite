@@ -205,14 +205,16 @@ def prepareWrapper(name):
         nameSplit = name.split('_')
         for year in ["2016","2017","2018"]:
             for nlep in ["2los","3l"]:
-                for ireg in ["sr","cr_ss"]:
+                for ireg in ["sr","cr_ss","cr_dy","cr_tt"]:
                     for ibin in ["low","med","high"]:
                         if ibin == "high" and nlep != "2los" and ireg!="sr": continue
                         if ireg == "cr_ss" and nlep != "2los" and ibin != "med": continue
+                        if ireg == "cr_dy" and (nlep != "2los"  or ibin == "high"): continue
+                        if ireg == "cr_tt" and (nlep != "2los"  or ibin == "high"): continue
                         newName = '_'.join([nlep,ireg,ibin,nameSplit[-3],nameSplit[-2],year])
-                        f.write('if test -f "%s/jobs/runJob_%s.sh"; then\n'%(ODIR,name))
+                        f.write('if test -f "%s/jobs/runJob_%s.sh"; then\n'%(ODIR,newName))
                         f.write('    echo "running %s"\n'%year)
-                        f.write('    source "%s/jobs/runJob_%s.sh"\n'%(ODIR,name))
+                        f.write('    source "%s/jobs/runJob_%s.sh"\n'%(ODIR,newName))
                         f.write('fi\n')
         f.write( 'CARDS_ALL=""\n' )
         masses = '_'.join((args.signalMasses.rstrip('+').split('_'))[-2:])
@@ -231,7 +233,7 @@ def prepareWrapper(name):
 
 
         f.write( 'CARDS_2L=""\n' )
-        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|2los_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
+        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|2los_cr_dy\|2los_cr_tt\|2los_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
         f.write( 'do CARDS_2L="${CARDS_2L} `find  $f -regex .*txt`"\n'  )
         f.write( 'done\n' )
         f.write( 'echo ${CARDS_2L}\n' )
@@ -246,7 +248,7 @@ def prepareWrapper(name):
 
 
         f.write( 'CARDS_3L=""\n' )
-        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|3l_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
+        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|2los_cr_dy\|2los_cr_tt\|3l_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
         f.write( 'do CARDS_3L="${CARDS_3L} `find  $f -regex .*txt`"\n'  )
         f.write( 'done\n' )
         f.write( 'echo ${CARDS_3L}\n' )
@@ -268,7 +270,7 @@ def runIt(GO,name):
     if args.data and not args.doWhat == "cards" : name=name+"_data"
     if args.doWhat == "cards": mass = '_'.join(name.split('_')[-2:])
     if args.norm: name=name+"_norm"
-    if args.unc: name=name+"_unc"
+#    if args.unc: name=name+"_unc"
 #    print name.split('_')[-2]
 #    print mass
 #    print name+"\n"
