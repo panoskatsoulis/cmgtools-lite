@@ -18,9 +18,9 @@ $alias : allSR : .*sr.*
 
 ### Uncertainties
 
-lumi_13TeV_2016		: $allMC : .* : normSymm : 1.025
-lumi_13TeV_2017		: $allMC : .* : normSymm : 1.023
-lumi_13TeV_2018		: $allMC : .* : normSymm : 1.025
+lumi_13TeV_2016		: $allMC : .* : normSymm : 1.025; year="2016"
+lumi_13TeV_2017		: $allMC : .* : normSymm : 1.023; year="2017"
+lumi_13TeV_2018		: $allMC : .* : normSymm : 1.025; year="2018"
 
 norm_tt_lnU		: prompt_tt.* : .* : normSymm : 2.0; lnU=True
 norm_dy_lnU		: prompt_dy.* : .* : normSymm : 2.0; lnU=True
