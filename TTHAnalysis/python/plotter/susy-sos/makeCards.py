@@ -4,7 +4,7 @@ massPoints=["signal_TChiWZ_100_1+","signal_TChiWZ_100_20+","signal_TChiWZ_100_30
 years=["2016","2017","2018"]
 
 ###Change and configure accoridngly###
-odir="/afs/cern.ch/work/v/vtavolar/SusySOSSW_2_clean/nanoAOD/clean/CMSSW_10_4_0/src/CMGTools/TTHAnalysis/python/plotter/cards/"
+odir="${PWD}/cards/"
 queue="tomorrow"
 fakes="semidd"
 
@@ -23,6 +23,8 @@ for yr in years:
       os.system("python sos_plots.py --lep 2los --reg cr_dy --bin med %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes %s "%(odir,yr,mP, queue, fakes))
       os.system("python sos_plots.py --lep 2los --reg cr_tt --bin low %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes %s "%(odir,yr,mP, queue, fakes))
       os.system("python sos_plots.py --lep 2los --reg cr_tt --bin med %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes %s "%(odir,yr,mP, queue, fakes))
+      os.system("python sos_plots.py --lep 2los --reg cr_vv --bin low %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes %s "%(odir,yr,mP, queue, fakes))
+      os.system("python sos_plots.py --lep 2los --reg cr_vv --bin med %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes %s "%(odir,yr,mP, queue, fakes))
 
 
 
