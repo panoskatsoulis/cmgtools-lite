@@ -32,17 +32,9 @@ met300_col	: metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId,
 met250_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
 
 
-
-
-###### Med MET	
-###met200		: MET_pt > 200 	; Disable=True
-###met200_col	: MET_pt > 200 && MET_pt < 300	; Disable=True
-###met200_CR	: MET_pt > 200	; Disable=True
-###met200_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
-###### High MET
-###met250		: MET_pt > 250	; Disable=True
-###met300_col	: MET_pt > 300	; Disable=True
-###met250_trig	: (year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET )	; Disable=True
+###Inclusive in MET
+inclMET_2l         : (MET_pt > 125 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 125 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) < 200 && ((year==2016 && HLT_MuMuMET16) || ( (year==2017 || year==2018) && HLT_MuMuMET )) && (abs(LepGood1_pdgId)==13 && abs(LepGood2_pdgId)==13)) || \
+                      (metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200 && ((year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET ))) ; Disable=True
 
 
 ##### SR (enabled by default but likely to be inverted cuts)
@@ -55,9 +47,6 @@ mtautau		: 0.0 > mass_tautau(MET_pt,MET_phi,LepGood1_pt,LepGood1_eta,LepGood1_ph
 mT		: mt_2(LepGood1_pt, LepGood1_phi, MET_pt, MET_phi) < 70. && mt_2(LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) < 70.0
 SF		: abs(LepGood1_pdgId*LepGood2_pdgId)==169 || abs(LepGood1_pdgId*LepGood2_pdgId)==121
 
-###Inclusive in MET
-inclMET_2l         : (MET_pt > 125 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 125 && metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) < 200 && ((year==2016 && HLT_MuMuMET16) || ( (year==2017 || year==2018) && HLT_MuMuMET )) && (abs(LepGood1_pdgId)==13 && abs(LepGood2_pdgId)==13)) || \
-                      (metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) > 200 && ((year==2016 && HLT_HighMET16) || ( (year==2017 || year==2018) && HLT_HighMET ))) ; Disable=True
 
 ### Low MET
 mm		: abs(LepGood1_pdgId)==13 && abs(LepGood2_pdgId)==13
