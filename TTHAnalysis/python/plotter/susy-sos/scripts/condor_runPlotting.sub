@@ -1,0 +1,107 @@
+executable      = $ENV(CMSSW_BASE)/src/CMGTools/TTHAnalysis/python/plotter/susy-sos/scripts/runPlotting.sh
+output          = $ENV(CMSSW_BASE)/src/CMGTools/TTHAnalysis/python/plotter/susy-sos/scripts/plotting_logs/job.$(ClusterId).$(ProcId).out
+error           = $ENV(CMSSW_BASE)/src/CMGTools/TTHAnalysis/python/plotter/susy-sos/scripts/plotting_logs/job.$(ClusterId).$(ProcId).err
+log             = $ENV(CMSSW_BASE)/src/CMGTools/TTHAnalysis/python/plotter/susy-sos/scripts/plotting_logs/job.$(ClusterId).$(ProcId).log
+getenv = True
++JobFlavour	= "longlunch"
+queue arguments from (
+#
+######
+# 2016 -- 2l -- SRs
+#/full/path/to/your/output/directory 2016 2los sr       low  --signal
+#/full/path/to/your/output/directory 2016 2los sr       med  --signal
+#/full/path/to/your/output/directory 2016 2los sr       high --signal
+#/full/path/to/your/output/directory 2016 2los sr_col   low  --signal
+#/full/path/to/your/output/directory 2016 2los sr_col   med  --signal
+#/full/path/to/your/output/directory 2016 2los sr_col   high --signal
+# 2016 -- 2l -- CRs
+#/full/path/to/your/output/directory 2016 2los cr_dy    low  --data   
+#/full/path/to/your/output/directory 2016 2los cr_dy    med  --data   
+#/full/path/to/your/output/directory 2016 2los cr_tt    low  --data   
+#/full/path/to/your/output/directory 2016 2los cr_tt    med  --data   
+#/full/path/to/your/output/directory 2016 2los cr_vv    low  --data  
+#/full/path/to/your/output/directory 2016 2los cr_vv    med  --data  
+#/full/path/to/your/output/directory 2016 2los cr_ss    med  --data  
+# 2016 -- 2l -- ARs
+#/full/path/to/your/output/directory 2016 2los appl     low  --data  
+#/full/path/to/your/output/directory 2016 2los appl     med  --data  
+#/full/path/to/your/output/directory 2016 2los appl     high --data  
+#/full/path/to/your/output/directory 2016 2los appl_col low  --data  
+#/full/path/to/your/output/directory 2016 2los appl_col med  --data  
+#/full/path/to/your/output/directory 2016 2los appl_col high --data  
+# 2016 -- 3l -- SRs
+#/full/path/to/your/output/directory 2016 3l   sr      low  --signal
+#/full/path/to/your/output/directory 2016 3l   sr      med  --signal
+# 2016 -- 3l -- CRs
+#/full/path/to/your/output/directory 2016 3l   cr_wz   low  --data  
+#/full/path/to/your/output/directory 2016 3l   cr_wz   med  --data  
+# 2016 -- 3l -- ARs
+#/full/path/to/your/output/directory 2016 3l   appl    low  --data  
+#/full/path/to/your/output/directory 2016 3l   appl    med  --data  
+#
+######
+# 2017 -- 2l -- SRs
+#/full/path/to/your/output/directory 2017 2los sr       low  --signal
+#/full/path/to/your/output/directory 2017 2los sr       med  --signal
+#/full/path/to/your/output/directory 2017 2los sr       high --signal
+#/full/path/to/your/output/directory 2017 2los sr_col   low  --signal
+#/full/path/to/your/output/directory 2017 2los sr_col   med  --signal
+#/full/path/to/your/output/directory 2017 2los sr_col   high --signal
+# 2017 -- 2l -- CRs
+#/full/path/to/your/output/directory 2017 2los cr_dy    low  --data  
+#/full/path/to/your/output/directory 2017 2los cr_dy    med  --data  
+#/full/path/to/your/output/directory 2017 2los cr_tt    low  --data  
+#/full/path/to/your/output/directory 2017 2los cr_tt    med  --data  
+#/full/path/to/your/output/directory 2017 2los cr_vv    low  --data 
+#/full/path/to/your/output/directory 2017 2los cr_vv    med  --data 
+#/full/path/to/your/output/directory 2017 2los cr_ss    med  --data 
+# 2017 -- 2l -- ARs
+#/full/path/to/your/output/directory 2017 2los appl     low  --data  
+#/full/path/to/your/output/directory 2017 2los appl     med  --data  
+#/full/path/to/your/output/directory 2017 2los appl     high --data  
+#/full/path/to/your/output/directory 2017 2los appl_col low  --data  
+#/full/path/to/your/output/directory 2017 2los appl_col med  --data  
+#/full/path/to/your/output/directory 2017 2los appl_col high --data  
+# 2017 -- 3l -- SRs
+#/full/path/to/your/output/directory 2017 3l    sr      low  --signal
+#/full/path/to/your/output/directory 2017 3l    sr      med  --signal
+# 2017 -- 3l -- CRs
+#/full/path/to/your/output/directory 2017 3l    cr_wz   low  --data  
+#/full/path/to/your/output/directory 2017 3l    cr_wz   med  --data  
+# 2017 -- 3l -- ARs
+#/full/path/to/your/output/directory 2017 3l    appl    low  --data  
+#/full/path/to/your/output/directory 2017 3l    appl    med  --data  
+#
+######
+# 2018 -- 2l -- SRs
+#/full/path/to/your/output/directory 2018 2los sr       low  --signal
+#/full/path/to/your/output/directory 2018 2los sr       med  --signal
+#/full/path/to/your/output/directory 2018 2los sr       high --signal
+#/full/path/to/your/output/directory 2018 2los sr_col   low  --signal
+#/full/path/to/your/output/directory 2018 2los sr_col   med  --signal
+#/full/path/to/your/output/directory 2018 2los sr_col   high --signal
+# 2018 -- 2l -- CRs
+#/full/path/to/your/output/directory 2018 2los cr_dy    low  --data  
+#/full/path/to/your/output/directory 2018 2los cr_dy    med  --data  
+#/full/path/to/your/output/directory 2018 2los cr_tt    low  --data  
+#/full/path/to/your/output/directory 2018 2los cr_tt    med  --data  
+#/full/path/to/your/output/directory 2018 2los cr_vv    low  --data  
+#/full/path/to/your/output/directory 2018 2los cr_vv    med  --data  
+#/full/path/to/your/output/directory 2018 2los cr_ss    med  --data  
+# 2018 -- 2l -- ARs
+#/full/path/to/your/output/directory 2018 2los appl     low  --data  
+#/full/path/to/your/output/directory 2018 2los appl     med  --data  
+#/full/path/to/your/output/directory 2018 2los appl     high --data  
+#/full/path/to/your/output/directory 2018 2los appl_col low  --data  
+#/full/path/to/your/output/directory 2018 2los appl_col med  --data  
+#/full/path/to/your/output/directory 2018 2los appl_col high --data  
+# 2018 -- 3l -- SRs
+#/full/path/to/your/output/directory 2018 3l   sr       low  --signal
+#/full/path/to/your/output/directory 2018 3l   sr       med  --signal
+# 2018 -- 3l -- CRs                                                                               
+#/full/path/to/your/output/directory 2018 3l   cr_wz    low  --data 
+#/full/path/to/your/output/directory 2018 3l   cr_wz    med  --data 
+# 2018 -- 3l -- ARs                                                                            
+#/full/path/to/your/output/directory 2018 3l   appl     low  --data  
+#/full/path/to/your/output/directory 2018 3l   appl     med  --data  
+)
