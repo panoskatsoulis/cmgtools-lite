@@ -66,8 +66,8 @@ class BTagEventWeightFriend(Module):
             elif (_var==1): jets = filter(lambda x : x.pt_jesTotalUp>jetptcut, jets)
             elif (_var==-1): jets = filter(lambda x : x.pt_jesTotalDown>jetptcut, jets)
             if (_var==0): jetcorr = [1 for x in jets]
-            elif (_var==1): jetcorr = [ x.pt_jesTotalUp/x.pt for x in jets]
-            elif (_var==-1): jetcorr = [ x.pt_jesTotalDown/x.pt for x in jets]
+            elif (_var==1): jetcorr = [ x.pt_jesTotalUp/x.pt if x.pt != 0 else 1 for x in jets]
+            elif (_var==-1): jetcorr = [ x.pt_jesTotalDown/x.pt  if x.pt != 0 else 1 for x in jets]
             jetscoll[_var]=(jets,jetcorr)
 
         for syst in self.btag_systs:

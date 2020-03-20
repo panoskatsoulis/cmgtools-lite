@@ -4,6 +4,13 @@ import ROOT
 from ROOT import *
 import array
 
+###to be changed accordingly###
+indir="./datacards/limits/" ##"limits" folder from your datacard production
+label="scan"                ##label to identify this scan
+outdir="/output/scanPlots/" ##output folder for plots
+
+
+
 moreText = "pp #rightarrow #tilde{#chi}_{1}^{#pm}#tilde{#chi}_{2}^{0} #rightarrow WZ#tilde{#chi}^{0}_{1}#tilde{#chi}^{0}_{1}, NLO-NLL excl."
 moreText2 = "median expected upper limit on cross section at 95% CL"
 
@@ -167,21 +174,19 @@ def getLimit(files, label, outdir):
     return h2limRet
 
 
-#indir="./fullRun2_oldCats_fakesMC_fixThreeLep/limits/"
-#label="oldCats_fakesMC_fixThreeLep"
-#outdir="/afs/cern.ch/user/v/vtavolar/www/SusySOS/scans/oldCats_fakesMC_fixThreeLep_300120"
-
-indir="./fullRun2_oldCats_fakesSemiDD/limits/"
-label="oldCats_fakesSemiDD_fixThreeLep"
-outdir="/afs/cern.ch/user/v/vtavolar/www/SusySOS/scans/oldCats_fakesSemiDD_fixThreeLep_310120"
+indir="./fullRun2_testCR_v2_skim_longQ_allCRs_semidd/limits/"
+label="cr_dyAndTt_semidd"
+outdir="/afs/cern.ch/user/v/vtavolar/www/SusySOS/scans/cr_dyAndTt_semidd/"
 
 
 limCurves=[]
 files=glob.glob(indir+'*limit.txt')
+print "FILES ALL"
 print files
 h2All = getLimit(files, label, outdir)
 
 files=glob.glob(indir+'*limit_2lep.txt')
+print "FILES 2L"
 print files
 h22l = getLimit(files, label+"_2lep", outdir)
 
@@ -256,3 +261,7 @@ mT2.Draw()
 
 for fmt in savefmts:
     c1.SaveAs("%s/h2lim_ratio2lto2lp3l%s"%(outdir,fmt))
+
+
+
+

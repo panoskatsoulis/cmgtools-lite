@@ -66,7 +66,8 @@ submit = '{command}'
 
 P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_070220_v6_skim_2lep_met125/"
 nCores = 8
-TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR)
+#TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR)
+TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights --FMCs {P}/jetmetUncertainties -P "+P0+"%s "%(YEAR)
 HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src" # To be changed accordingly
 
 def base(selection):
@@ -199,10 +200,13 @@ def prepareWrapper(name):
         nameSplit = name.split('_')
         for year in ["2016","2017","2018"]:
             for nlep in ["2los","3l"]:
-                for ireg in ["sr","cr_ss"]:
+                for ireg in ["sr","cr_ss","cr_dy","cr_tt","cr_vv"]:
                     for ibin in ["low","med","high"]:
                         if ibin == "high" and nlep != "2los" and ireg!="sr": continue
                         if ireg == "cr_ss" and nlep != "2los" and ibin != "med": continue
+                        if ireg == "cr_dy" and (nlep != "2los"  or ibin == "high"): continue
+                        if ireg == "cr_tt" and (nlep != "2los"  or ibin == "high"): continue
+                        if ireg == "cr_vv" and (nlep != "2los"  or ibin == "high"): continue
                         newName = '_'.join([nlep,ireg,ibin,nameSplit[-3],nameSplit[-2],year])
                         f.write('if test -f "%s/jobs/runJob_%s.sh"; then\n'%(ODIR,newName))
                         f.write('    echo "running %s"\n'%year)
@@ -225,7 +229,7 @@ def prepareWrapper(name):
 
 
         f.write( 'CARDS_2L=""\n' )
-        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|2los_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
+        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|2los_cr_dy\|2los_cr_tt\|2los_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
         f.write( 'do CARDS_2L="${CARDS_2L} `find  $f -regex .*txt`"\n'  )
         f.write( 'done\n' )
         f.write( 'echo ${CARDS_2L}\n' )
@@ -240,7 +244,7 @@ def prepareWrapper(name):
 
 
         f.write( 'CARDS_3L=""\n' )
-        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|3l_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
+        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|2los_cr_dy\|2los_cr_tt\|cr_wz\|3l_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
         f.write( 'do CARDS_3L="${CARDS_3L} `find  $f -regex .*txt`"\n'  )
         f.write( 'done\n' )
         f.write( 'echo ${CARDS_3L}\n' )
@@ -260,9 +264,9 @@ def prepareWrapper(name):
 def runIt(GO,name):
     if not args.doWhat == "cards" : name=name+"_"+args.fakes
     if args.data and not args.doWhat == "cards" : name=name+"_data"
-    if args.norm: name=name+"_norm"
-    if args.unc: name=name+"_unc"
     if args.doWhat == "cards": mass = '_'.join(name.split('_')[-2:])
+    if args.norm: name=name+"_norm"
+#    if args.unc: name=name+"_unc"
 #    print name.split('_')[-2]
 #    print mass
 #    print name+"\n"
