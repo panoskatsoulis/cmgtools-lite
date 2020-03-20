@@ -36,15 +36,15 @@ for dset in dsets:
     f_t.Close()
     f_f = openRootOrUrl(sys.argv[2]+'/'+dset+'_Friend.root')
     if not f_f: 
-        print dset, ' NOT THERE!', 'ERROR '*15
+        print dset, ' NOT THERE!', 'ERROR '*3
         continue
     t_f = f_f.Get("Friends")
     if not t_f: 
-        print dset, ' NOT THERE!', 'ERROR '*15
+        print dset, ' NOT THERE!', 'ERROR '*3
         continue
     n_f = t_f.GetEntries()
     f_f.Close()
-    print '%s: %d - %d : %s'%(dset,n_t,n_f,'OK' if n_t==n_f else 'ERROR '*15+' !!!')
+    print '%s: %d - %d : %s'%(dset,n_t,n_f,'OK' if n_t==n_f else 'ERROR '*3+' !!!'+sys.argv[2]+'/'+dset+'_Friend.root')
     if not (n_t==n_f): allok = False
     tot_ev += n_f
     tot_comp += 1

@@ -189,8 +189,9 @@ if options.checkchunks:
         size = int(fields[4])
         fname = fields[8]
         basepattern = options.outPattern % r"(\w+)"
-        m1 = re.match(basepattern + r"%s.chunk(\d+).sub(\d+).root" % (), fname);
-        m2 = re.match(basepattern + r"%s.chunk(\d+).root", fname);
+        m1 = re.match(basepattern + r".chunk(\d+).sub(\d+).root", fname);
+        m2 = re.match(basepattern + r".chunk(\d+).root", fname);
+        m3 = re.match(basepattern + r".root", fname);
         good = (size > 2048)
         if m1:
             sample = m1.group(1)
@@ -202,6 +203,11 @@ if options.checkchunks:
         elif m2:
             sample = m2.group(1)
             chunk = int(m2.group(2))
+            sub = None
+            if good: done_chunks[sample].add(chunk)
+        elif m3:
+            sample = m3.group(1)
+            chunk = 1
             sub = None
             if good: done_chunks[sample].add(chunk)
         else:
