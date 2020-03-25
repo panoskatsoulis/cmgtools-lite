@@ -68,7 +68,7 @@ P0="/eos/cms/store/cmst3/group/tthlep/peruzzi/NanoTrees_SOS_070220_v6_skim_2lep_
 nCores = 8
 #TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights -P "+P0+"%s "%(YEAR)
 TREESALL = " --Fs {P}/recleaner/ --FMCs {P}/bTagWeights --FMCs {P}/jetmetUncertainties -P "+P0+"%s "%(YEAR)
-HIGGSCOMBINEDIR="/afs/cern.ch/user/v/vtavolar/work/SusySOSSW_2_clean/CMSSW_8_1_0/src" # To be changed accordingly
+HIGGSCOMBINEDIR="/afs/cern.ch/user/k/kpanos/work/Projects/SOS_data2018_SingleMuonTrigger/Plotting/CMSSW_10_2_13/src" # To be changed accordingly
 
 def base(selection):
     CORE=TREESALL
