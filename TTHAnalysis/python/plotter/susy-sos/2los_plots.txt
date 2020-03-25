@@ -85,8 +85,7 @@ metmm               : metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGoo
 #metMinusMetmm      : (MET_pt - metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi) )   : 20,-100,100;  XTitle="p_{T}^{miss} - p_{T}^{miss\,corr}  [GeV]"
 #metVsMetmm         : MET_pt\:metmm_pt(LepGood1_pdgId, LepGood1_pt, LepGood1_phi, LepGood2_pdgId, LepGood2_pt, LepGood2_phi, MET_pt, MET_phi)   : 15,125,400,15,125,400 ; YTitle="p_{T}^{miss} [GeV]", XTitle="p_{T}^{miss\,corr} [GeV]";
 mtautau             : mass_tautau(MET_pt,MET_phi,LepGood1_pt,LepGood1_eta,LepGood1_phi,LepGood2_pt,LepGood2_eta,LepGood2_phi): 26,-10,250; XTitle="m(#tau#tau) [GeV]", Logy
-dRll                : deltaR(LepGood1_eta, LepGood1_phi, LepGood2_eta, LepGood2_phi): 18,0,6; XTitle="dR(ll)"
-dRll_fine           : deltaR(LepGood1_eta, LepGood1_phi, LepGood2_eta, LepGood2_phi): 20,0,2; XTitle="dR(ll)"
+#dRll               : deltaR(LepGood1_eta, LepGood1_phi, LepGood2_eta, LepGood2_phi): 18,0,6; XTitle="dR(ll)"
 ptll                : pt_2(LepGood1_pt,LepGood1_phi, LepGood2_pt,LepGood2_phi) : 20,0,100  ; XTitle="p_{T}(ll) [GeV]"
 
 nJet25      : nJet25            : [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5] ; XTitle='N(jet\, p_{T} > 25)'
