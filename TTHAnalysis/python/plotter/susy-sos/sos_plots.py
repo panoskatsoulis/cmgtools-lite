@@ -230,7 +230,7 @@ def prepareWrapper(name):
 
 
         f.write( 'CARDS_2L=""\n' )
-        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|2los_cr_dy\|2los_cr_tt\|2los_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
+        f.write( 'for f in `find   %s/scan/SR -type d -regex ".*\(2los_cr_ss\|2los_cr_dy\|2los_cr_tt\|cr_wz\|2los_sr\).*/%s"`\n'%(ODIR,masses) ) ##-type d -regex '.*\(cr_ss\|3l_sr\).*/100_70'
         f.write( 'do CARDS_2L="${CARDS_2L} `find  $f -regex .*txt`"\n'  )
         f.write( 'done\n' )
         f.write( 'echo ${CARDS_2L}\n' )
