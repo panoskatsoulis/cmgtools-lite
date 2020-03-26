@@ -34,3 +34,6 @@ for yr in years:
       os.system("python sos_plots.py --lep 2los --reg cr_tt --bin med %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes mc "%(odir,yr,mP, queue))
       os.system("python sos_plots.py --lep 2los --reg cr_vv --bin low %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes mc "%(odir,yr,mP, queue))
       os.system("python sos_plots.py --lep 2los --reg cr_vv --bin med %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes mc "%(odir,yr,mP, queue))
+
+      os.system("python sos_plots.py --lep 3l --reg cr_wz --bin low %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes mc "%(odir,yr,mP, queue))
+      os.system("python sos_plots.py --lep 3l --reg cr_wz --bin med %s %s --data --signalMasses %s --doWhat cards --htcondor --allCards  --asimov signal  --queue %s --unc --fakes mc "%(odir,yr,mP, queue))
